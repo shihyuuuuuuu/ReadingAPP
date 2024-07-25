@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:reading_app/style/theme.dart';
 import 'package:reading_app/view/bookshelf/bookshelf.dart';
 
 void main() {
@@ -12,32 +13,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 249, 146, 30)),
-        useMaterial3: true,
-        textTheme: TextTheme(
-          titleLarge: const TextStyle(
-            fontSize: 30,
-          ),
-          
-          bodyMedium: GoogleFonts.merriweather(
-            fontSize: 20,
-            fontStyle: FontStyle.normal
-          ),
-          labelSmall: GoogleFonts.merriweather(
-            fontSize: 12,
-            // fontWeight: FontWeight.bold
-          ),
-          
-        ),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      theme: lightTheme,
+      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
 
       /* Use this to test */
-      //home: const BookShelf(title: 'Flutter Demo Home Page'),
+      home: const BookshelfPage(title: 'Flutter Demo Home Page'),
     );
   }
 }

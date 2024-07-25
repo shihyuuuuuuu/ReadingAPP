@@ -11,7 +11,50 @@ class BookshelfPage extends StatefulWidget {
 }
 
 class _BookshelfPageState extends State<BookshelfPage> {
+  
+  void _showPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  hintText: '輸入書名、作者或標籤',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Wrap(
+                spacing: 10,
+                children: <Widget>[
+                  _buildFilterChip('在讀'),
+                  _buildFilterChip('待讀'),
+                  _buildFilterChip('已暫停'),
+                  _buildFilterChip('已完成'),
+                  _buildFilterChip('已放棄'),
+                  _buildFilterChip('全部'),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
+  Widget _buildFilterChip(String label) {
+    return FilterChip(
+      label: Text(label),
+      onSelected: (bool value) {},
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +69,29 @@ class _BookshelfPageState extends State<BookshelfPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           '書架',
-          style: Theme.of(context).textTheme.titleLarge,),
+          style: Theme.of(context).textTheme.headlineLarge,),
         actions: <Widget>[
-          IconButton(
-            iconSize: 35,
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // ...
-            },
+          Container(
+            // color: Theme.of(context).colorScheme.primary,
+            margin: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.7),
+                  blurRadius: 5.0,
+                  offset: const Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: IconButton(
+              // padding: EdgeInsets.all(5),
+              iconSize: 28,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+              icon: const Icon(Icons.search),
+              onPressed: () => _showPopup(context),
+            ),
           ),
         ],
       ),
