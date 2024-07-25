@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/all.dart';
 import 'theme/theme.dart';
-import 'widgets/icons.dart';
+import 'ui/icons.dart';
 
 void main() {
   runApp(const MyApp());
