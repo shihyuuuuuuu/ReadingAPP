@@ -14,8 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Reading APP',
-      theme: const MaterialTheme(TextTheme()).light(),
-      darkTheme: const MaterialTheme(TextTheme()).dark(),
+      theme: const MaterialTheme().light(),
+      darkTheme: const MaterialTheme().dark(),
       themeMode: ThemeMode.light,
       home: const BasePage(),
     );

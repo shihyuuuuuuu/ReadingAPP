@@ -1,9 +1,7 @@
 import "package:flutter/material.dart";
 
 class MaterialTheme {
-  final TextTheme textTheme;
-
-  const MaterialTheme(this.textTheme);
+  const MaterialTheme();
 
   static ColorScheme lightScheme() {
     return const ColorScheme(
@@ -340,10 +338,7 @@ class MaterialTheme {
      useMaterial3: true,
      brightness: colorScheme.brightness,
      colorScheme: colorScheme,
-     textTheme: textTheme.apply(
-       bodyColor: colorScheme.onSurface,
-       displayColor: colorScheme.onSurface,
-     ),
+     textTheme: const TextTheme(),
      scaffoldBackgroundColor: colorScheme.surface,
      canvasColor: colorScheme.surface,
   );
