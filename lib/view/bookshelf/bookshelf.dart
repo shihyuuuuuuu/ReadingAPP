@@ -2,6 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:reading_app/view/bookshelf/bookshelf_bookguide_content.dart';
 
+enum BookStateFilter { 
+  waiting(str:  "待讀"),
+  reading(str: "在讀"),
+  finish(str: "已完成"),
+  suspended(str: "已暫停"),
+  giveup(str: "已放棄");
+
+  final String str;
+
+  const BookStateFilter({required this.str});
+  
+ }
 class BookshelfPage extends StatefulWidget {
   const BookshelfPage({super.key, required this.title});
   final String title;
@@ -11,7 +23,8 @@ class BookshelfPage extends StatefulWidget {
 }
 
 class _BookshelfPageState extends State<BookshelfPage> {
-  
+  Set<BookStateFilter> filter = <BookStateFilter>{};
+
   void _showPopup(BuildContext context) {
     showDialog(
       context: context,
@@ -33,15 +46,26 @@ class _BookshelfPageState extends State<BookshelfPage> {
               SizedBox(height: 20),
               Wrap(
                 spacing: 10,
-                children: <Widget>[
-                  _buildFilterChip('在讀'),
-                  _buildFilterChip('待讀'),
-                  _buildFilterChip('已暫停'),
-                  _buildFilterChip('已完成'),
-                  _buildFilterChip('已放棄'),
-                  _buildFilterChip('全部'),
-                ],
+                children: 
+                  BookStateFilter.values.map((BookStateFilter bookstate){
+                    return FilterChip(
+                      label: Text(bookstate.str), 
+                      selected: filter.contains(bookstate),
+                      onSelected: (bool selected) {
+                        setState(() {
+                          if (selected) {
+                            filter.add(bookstate);
+                          } else {
+                            filter.remove(bookstate);
+                          }
+                        });
+                      },
+                      );
+                  }).toList(),
               ),
+              const SizedBox(height: 10.0),
+              Text('Looking for: ${filter.map((BookStateFilter e) => e.str).join(', ')}',
+                style: Theme.of(context).textTheme.labelLarge),
             ],
           ),
         );
@@ -49,12 +73,6 @@ class _BookshelfPageState extends State<BookshelfPage> {
     );
   }
 
-  Widget _buildFilterChip(String label) {
-    return FilterChip(
-      label: Text(label),
-      onSelected: (bool value) {},
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
