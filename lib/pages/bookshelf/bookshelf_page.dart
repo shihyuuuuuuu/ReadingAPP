@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:reading_app/pages/bookshelf/bookshelf_bookguide_content.dart';
+import 'package:reading_app/pages/bookshelf/bookshelf_search_content.dart';
+import 'package:reading_app/pages/bookshelf/bookshelf_filter_model.dart';
+import 'package:reading_app/pages/bookshelf/bookshelf_search_return_model.dart';
 
-enum BookStateFilter { 
-  waiting(str:  "待讀"),
-  reading(str: "在讀"),
-  finish(str: "已完成"),
-  suspended(str: "已暫停"),
-  giveup(str: "已放棄");
 
-  final String str;
-
-  const BookStateFilter({required this.str});
-  
- }
 class BookshelfPage extends StatefulWidget {
   const BookshelfPage({super.key});
   // final String title;
@@ -23,56 +15,23 @@ class BookshelfPage extends StatefulWidget {
 }
 
 class _BookshelfPageState extends State<BookshelfPage> {
-  Set<BookStateFilter> filter = <BookStateFilter>{};
+  
+  BookSearchReturn _searchCondition = BookSearchReturn(); 
 
-  void _showPopup(BuildContext context) {
-    showDialog(
+  Future<void> _showPopup(BuildContext context) async {
+    final result = await showDialog<BookSearchReturn>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          contentPadding: EdgeInsets.all(20),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  hintText: '輸入書名、作者或標籤',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Wrap(
-                spacing: 10,
-                children: 
-                  BookStateFilter.values.map((BookStateFilter bookstate){
-                    return FilterChip(
-                      label: Text(bookstate.str), 
-                      selected: filter.contains(bookstate),
-                      onSelected: (bool selected) {
-                        setState(() {
-                          if (selected) {
-                            filter.add(bookstate);
-                          } else {
-                            filter.remove(bookstate);
-                          }
-                        });
-                      },
-                      );
-                  }).toList(),
-              ),
-              const SizedBox(height: 10.0),
-              Text('Looking for: ${filter.map((BookStateFilter e) => e.str).join(', ')}',
-                style: Theme.of(context).textTheme.labelLarge),
-            ],
-          ),
-        );
+        return BookshelfSearchContent();
       },
     );
-  }
 
+    if (result != null) {
+      setState(() {
+        _searchCondition = result;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,12 +58,11 @@ class _BookshelfPageState extends State<BookshelfPage> {
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.7),
                   blurRadius: 5.0,
-                  offset: const Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3), 
                 ),
               ],
             ),
             child: IconButton(
-              // padding: EdgeInsets.all(5),
               iconSize: 28,
               color: Theme.of(context).colorScheme.onSecondaryContainer,
               icon: const Icon(Icons.search),
@@ -122,6 +80,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
           crossAxisCount: 2,
           childAspectRatio: (0.51),
           children: [
+            Text('search condition: ${_searchCondition.name}, with filter ${_searchCondition.filter.map((BookStateFilter e) => e.str).join(', ')}'),
             BookShelfBookGuideContent(img: img[0]),
             BookShelfBookGuideContent(img: img[1]),
             BookShelfBookGuideContent(img: img[2]),

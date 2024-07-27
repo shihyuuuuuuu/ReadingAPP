@@ -1,4 +1,4 @@
-export 'bookshelf/bookshelf.dart';
+export 'bookshelf/bookshelf_page.dart';
 export 'feed/feed.dart';
 export 'home/home.dart';
 export 'notes/notes.dart';
