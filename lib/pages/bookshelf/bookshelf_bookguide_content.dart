@@ -1,57 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:reading_app/ui/tags.dart';
 
 class BookShelfBookGuideContent extends StatelessWidget{
   final String img;
+  final String bookName;
+  final List<String> tags;
   const BookShelfBookGuideContent({
     super.key,
     required this.img,
+    required this.bookName,
+    required this.tags,
     });
   
 
   @override
   Widget build(BuildContext context) {
-    List<String> tags = ["小說","文學","經典"];
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),
       elevation: 8,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 5),
         child: (
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(img,
-                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) {
-                  return child;
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
-                          : null,
-                    ),
-                  );
-                }
-              },
-              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                // 打印出错误信息
-                print("Failed to load image: $exception");
-                print(img);
-                return Text(
-                  '图片加载失败',
-                  style: TextStyle(color: Colors.red),
-                );
-              },
-          
-            ),
+              Image.network(img,),
               const SizedBox(height: 10,),
               Text(
-                "書名", 
-                style: Theme.of(context).textTheme.titleMedium,
+                bookName, 
+                style: textTheme.titleMedium,
               ),
               const SizedBox(height: 6,),
               Row(
@@ -61,31 +45,6 @@ class BookShelfBookGuideContent extends StatelessWidget{
             ],)
           ),
       )
-
       );
-  }
-}
-
-class Tag extends StatelessWidget{
-  final String text;
-  const Tag({
-    super.key, 
-    required this.text
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      margin: const EdgeInsets.only(right: 8.0),
-      padding: const EdgeInsets.only(left: 3.0, right: 3.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
-        borderRadius: BorderRadius.circular(5.0),
-      ), 
-      child: Text(text,
-      style: Theme.of(context).textTheme.labelMedium),
-    );
   }
 }
