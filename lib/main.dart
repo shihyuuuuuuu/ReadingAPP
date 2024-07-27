@@ -34,7 +34,7 @@ class _BasePageState extends State<BasePage> {
 
   final List<Widget> _pages = [
     const BookshelfPage(),
-    const NotesPage(),
+    const NotePage(),
     const HomePage(),
     const FeedPage(),
     const ProfilePage(),
