@@ -23,7 +23,31 @@ class BookShelfBookGuideContent extends StatelessWidget{
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(img),
+              Image.network(img,
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                          : null,
+                    ),
+                  );
+                }
+              },
+              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                // 打印出错误信息
+                print("Failed to load image: $exception");
+                print(img);
+                return Text(
+                  '图片加载失败',
+                  style: TextStyle(color: Colors.red),
+                );
+              },
+          
+            ),
               const SizedBox(height: 10,),
               Text(
                 "書名", 
