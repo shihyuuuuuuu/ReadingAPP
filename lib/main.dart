@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:reading_app/style/theme.dart';
-import 'package:reading_app/view/bookshelf/bookshelf.dart';
+// import 'package:reading_app/style/theme.dart';
+import 'package:reading_app/pages/bookshelf/bookshelf.dart';
+import 'pages/all.dart';
+import 'theme/theme.dart';
+import 'ui/icons.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,65 +13,63 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
 
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: lightTheme,
-      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-
-      /* Use this to test */
-      home: const BookshelfPage(title: 'Flutter Demo Home Page'),
+      title: 'Reading APP',
+      theme: const MaterialTheme().light(),
+      darkTheme: const MaterialTheme().dark(),
+      themeMode: ThemeMode.light,
+      home: const BasePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class BasePage extends StatefulWidget {
+  const BasePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<BasePage> createState() => _BasePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _BasePageState extends State<BasePage> {
+  int _selectedIndex = 2;
 
-  void _incrementCounter() {
+  final List<Widget> _pages = [
+    const BookshelfPage(),
+    const NotesPage(),
+    const HomePage(),
+    const FeedPage(),
+    const ProfilePage(),
+  ];
+
+  void _onItemTapped(int index) {
     setState(() {
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(
-       
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: MenuIcon.values.map((menuIcon) {
+          return BottomNavigationBarItem(
+            icon: menuIcon.icon,
+            label: '',
+          );
+        }).toList(),
+        currentIndex: _selectedIndex,
+        selectedItemColor: theme.colorScheme.inversePrimary,
+        unselectedItemColor: theme.colorScheme.outline,
+        onTap: _onItemTapped,
+        showUnselectedLabels: false,
+        showSelectedLabels: false,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
