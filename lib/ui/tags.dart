@@ -12,7 +12,7 @@ class Tag extends StatelessWidget{
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.only(right: 8.0),
-      padding: const EdgeInsets.only(left: 3.0, right: 3.0),
+      padding: const EdgeInsets.symmetric(horizontal: 3.0),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondaryContainer,
         border: Border.all(color: Theme.of(context).colorScheme.outline),

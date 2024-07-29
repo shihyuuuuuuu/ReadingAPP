@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:reading_app/pages/bookshelf/bookshelf_bookguide_content.dart';
-import 'package:reading_app/pages/bookshelf/bookshelf_search_content.dart';
-import 'package:reading_app/pages/bookshelf/bookshelf_search_return_model.dart';
+import 'package:reading_app/pages/bookshelf/book_state.dart';
+import 'package:reading_app/pages/bookshelf/book_search_query.dart';
+import 'package:reading_app/ui/tags.dart';
 
 
 class BookshelfPage extends StatefulWidget {
@@ -13,13 +13,13 @@ class BookshelfPage extends StatefulWidget {
 
 class _BookshelfPageState extends State<BookshelfPage> {
   
-  BookSearchReturn _searchCondition = BookSearchReturn(); 
+  BookSearchQuery _searchCondition = BookSearchQuery(); 
 
   Future<void> _showPopup(BuildContext context) async {
-    final result = await showDialog<BookSearchReturn>(
+    final result = await showDialog<BookSearchQuery>(
       context: context,
       builder: (BuildContext context) {
-        return BookshelfSearchContent();
+        return _searchingDialog();
       },
     );
 
@@ -52,7 +52,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
           Container(
             margin: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
+              shape: BoxShape.circle,
               color: colorScheme.secondaryContainer,
               boxShadow: [
                 BoxShadow(
@@ -82,14 +82,148 @@ class _BookshelfPageState extends State<BookshelfPage> {
             // use this to test data:
             // Text('search condition: ${_searchCondition.name}, with filter ${_searchCondition.filter.map((BookStateFilter e) => e.str).join(', ')}'),
             
-            BookShelfBookGuideContent(img: img[0], bookName: bookName[0], tags: tags),
-            BookShelfBookGuideContent(img: img[1], bookName: bookName[1], tags: tags),
-            BookShelfBookGuideContent(img: img[2], bookName: bookName[2], tags: tags),
-            BookShelfBookGuideContent(img: img[0], bookName: bookName[0], tags: tags),
-            BookShelfBookGuideContent(img: img[1], bookName: bookName[1], tags: tags),
+            _BookCard(img: img[0], bookName: bookName[0], tags: tags),
+            _BookCard(img: img[1], bookName: bookName[1], tags: tags),
+            _BookCard(img: img[2], bookName: bookName[2], tags: tags),
+            _BookCard(img: img[0], bookName: bookName[0], tags: tags),
+            _BookCard(img: img[1], bookName: bookName[1], tags: tags),
             ],
           ),
       
+      ),
+    );
+  }
+}
+
+
+class _BookCard extends StatelessWidget{
+  final String img;
+  final String bookName;
+  final List<String> tags;
+  const _BookCard({
+    super.key,
+    required this.img,
+    required this.bookName,
+    required this.tags,
+    });
+  
+
+  @override
+  Widget build(BuildContext context) {
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 8,
+      color: colorScheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 5),
+        child: (
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(img,),
+              const SizedBox(height: 10,),
+              Text(
+                bookName, 
+                style: textTheme.titleMedium,
+              ),
+              const SizedBox(height: 6,),
+              Row(
+                children: 
+                  tags.map((item) => Tag(text:item)).toList()
+                )
+            ],)
+          ),
+      )
+      );
+  }
+}
+
+
+
+
+class _searchingDialog extends StatefulWidget {
+  @override
+  State<_searchingDialog> createState() => _BookshelfSearchContentState();
+}
+
+class _BookshelfSearchContentState extends State<_searchingDialog> {
+
+
+  final BookSearchQuery _searchCondition = BookSearchQuery();
+  final TextEditingController _textController = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _textController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return AlertDialog(
+      contentPadding: const EdgeInsets.all(20),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search),
+              hintText: '輸入書名、作者或標籤',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onSubmitted: (value){
+              _searchCondition.queryString = value;
+              Navigator.of(context).pop(_searchCondition);
+            },
+            controller: _textController,
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 10,
+            children: 
+              BookState.values.map((BookState bookstate){
+                return FilterChip(
+                  label: Text(bookstate.str), 
+                  selected: _searchCondition.filter.contains(bookstate),
+                  onSelected: (bool selected) {
+                    setState(() {
+                      if (selected) {
+                        _searchCondition.filter.add(bookstate);
+                      } else {
+                        _searchCondition.filter.remove(bookstate);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+          ),
+          const SizedBox(height: 10.0),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.tonal(
+              onPressed:(){
+                _searchCondition.queryString = _textController.text;
+                Navigator.of(context).pop(_searchCondition);
+              } , 
+              style: ButtonStyle(
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))
+                ),
+              ),
+              child: Text("搜尋", style: textTheme.labelLarge),
+              ),
+          ),
+        ],
       ),
     );
   }

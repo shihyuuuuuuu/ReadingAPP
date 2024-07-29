@@ -1,4 +1,4 @@
-enum BookStateFilter { 
+enum BookState { 
   waiting(str:  "待讀"),
   reading(str: "在讀"),
   finish(str: "已完成"),
@@ -7,6 +7,6 @@ enum BookStateFilter {
 
   final String str;
 
-  const BookStateFilter({required this.str});
+  const BookState({required this.str});
   
  }
