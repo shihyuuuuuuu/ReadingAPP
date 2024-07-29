@@ -1,4 +1,4 @@
-import 'package:reading_app/pages/bookshelf/book_state.dart';
+import 'package:reading_app/ui/bookshelf/book_state.dart';
 
 class BookSearchQuery {
   String? queryString;

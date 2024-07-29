@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:reading_app/pages/bookshelf/book_state.dart';
-import 'package:reading_app/pages/bookshelf/book_search_query.dart';
+import 'package:reading_app/ui/bookshelf/book_state.dart';
+import 'package:reading_app/ui/bookshelf/book_search_query.dart';
 import 'package:reading_app/ui/tags.dart';
 
 
@@ -19,7 +19,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
     final result = await showDialog<BookSearchQuery>(
       context: context,
       builder: (BuildContext context) {
-        return _searchingDialog();
+        return _SearchingDialog();
       },
     );
 
@@ -147,12 +147,12 @@ class _BookCard extends StatelessWidget{
 
 
 
-class _searchingDialog extends StatefulWidget {
+class _SearchingDialog extends StatefulWidget {
   @override
-  State<_searchingDialog> createState() => _BookshelfSearchContentState();
+  State<_SearchingDialog> createState() => _SearchingDialogState();
 }
 
-class _BookshelfSearchContentState extends State<_searchingDialog> {
+class _SearchingDialogState extends State<_SearchingDialog> {
 
 
   final BookSearchQuery _searchCondition = BookSearchQuery();
