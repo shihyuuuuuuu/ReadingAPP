@@ -97,7 +97,7 @@ class _NotePageState extends State<NotePage> {
             noteType: NoteType.action,
             description: str,
           ),
-          Text('query string: ${_searchCondition}'),
+          // Text('query string: ${_searchCondition}'),
         ],
       ),
     );
