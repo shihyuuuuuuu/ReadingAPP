@@ -21,7 +21,6 @@ class _NotePageState extends State<NotePage> {
         context: context,
         builder: (BuildContext context) {
           return const SearchingDialog(
-            showFilter: false,
           searchHint: '輸入筆記名稱或相關內容',
             history: [
               '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
@@ -98,7 +97,7 @@ class _NotePageState extends State<NotePage> {
               noteType: NoteType.action,
               description: str,
             ),
-            Text('query string: ${_searchCondition}'),
+            // Text('query string: ${_searchCondition}'),
           ],
         ),
       ),
@@ -159,101 +158,80 @@ class _NoteContainerState extends State<_NoteContainer> {
       return colorScheme.surfaceDim;
   }
 }
-
-  String getNoteLabel(NoteType noteType) {
-    switch (noteType) {
-      case NoteType.content:
-        return "內容筆記";
-      case NoteType.experience:
-        return "經驗";
-      case NoteType.action:
-        return "行動";
-      case NoteType.thought:
-        return "連結想法";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // style
-    const double containerBR = 10;
+    const double cardBoarderRadius = 10;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     
-    
     Color chooseColor = getColor(widget.noteType);
-    String chooseNoteLabel = getNoteLabel(widget.noteType);
-    
+    EdgeInsets cardEdgeInsets = const EdgeInsets.symmetric(vertical: 0.5, horizontal: 0.0);
+
     return Stack(
       children:[ 
-        Container(
-        padding: EdgeInsets.only(right: 30),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(containerBR),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.7),
-              blurRadius: 5,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
+      Card(  
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(cardBoarderRadius),
         ),
-        // margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Column(
-          children: [
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(16.0),
-                      title: Padding(
-                        padding: EdgeInsets.only(bottom: 12.0),
-                        child: Text(
-                          widget.title,
-                          style: textTheme.titleLarge,
+        elevation: 8,
+        color: colorScheme.surfaceContainerHighest,
+        margin: cardEdgeInsets,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 30),
+          child: Column(
+            children: [
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16.0),
+                        title: Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Text(
+                            widget.title,
+                            style: textTheme.titleLarge,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${widget.pages}, ${widget.date}',
+                          style: textTheme.labelLarge,
                         ),
                       ),
-                      subtitle: Text(
-                        '${widget.pages}, ${widget.date}',
-                        style: textTheme.labelLarge,
-                      ),
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        iconSize: 28.0,
-                        // padding: EdgeInsets.only(right: 30),
-                        color: colorScheme.tertiary,
-                        onPressed: onExpandPressed,
-                        icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
-                      ),
-                      IconButton(
-                        iconSize: 28.0,
-                        // padding: EdgeInsets.only(right: 30),
-                        color: colorScheme.tertiary,
-                        onPressed: onPinPressed,
-                        icon: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            if (isExpanded && widget.description != null)
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
-                child: Text(
-                  widget.description!,
-                  style: textTheme.bodyLarge,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          iconSize: 28.0,
+                          color: colorScheme.tertiary,
+                          onPressed: onExpandPressed,
+                          icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                        ),
+                        IconButton(
+                          iconSize: 28.0,
+                          color: colorScheme.tertiary,
+                          onPressed: onPinPressed,
+                          icon: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+              if (isExpanded && widget.description != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
+                  child: Text(
+                    widget.description!,
+                    style: textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ),
+        ),
         ),
         Positioned(
           right: 0,
@@ -262,18 +240,19 @@ class _NoteContainerState extends State<_NoteContainer> {
           width: 26,
            
           child: Container(
+            margin: cardEdgeInsets,
             padding: const EdgeInsets.all(6),
             alignment: Alignment.topCenter,
             decoration: BoxDecoration(
               color: chooseColor,
               borderRadius: const BorderRadius.horizontal(
                 left: Radius.zero, 
-                right: Radius.circular(containerBR)
+                right: Radius.circular(cardBoarderRadius)
               ),
             ),
             child: (
               Text(
-                chooseNoteLabel, 
+                widget.noteType.str,
                 style: TextStyle(color: colorScheme.onSurface,)
               )
             )

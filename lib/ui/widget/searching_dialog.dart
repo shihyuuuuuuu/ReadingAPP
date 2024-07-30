@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
 class SearchingDialog extends StatefulWidget {
-  final bool showFilter;
   final List<String> history;
   final String searchHint;
   
   const SearchingDialog({
     super.key, 
-    required this.showFilter, 
     required this.history, 
     required this.searchHint,
   });
@@ -25,7 +23,7 @@ class SearchingDialogState extends State<SearchingDialog> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    String _searchQuery;  
+    String searchQuery;  
     
     return AlertDialog(
       contentPadding: const EdgeInsets.all(20),
@@ -42,12 +40,13 @@ class SearchingDialogState extends State<SearchingDialog> {
               ),
             ),
             onSubmitted: (value){
-              _searchQuery = value;
-              Navigator.of(context).pop(_searchQuery);
+              searchQuery = value;
+              Navigator.of(context).pop(searchQuery);
             },
           ),
+          SizedBox(height: 10.0),
           Divider( color: colorScheme.outline),
-          Text("搜尋紀錄"),
+          Text("搜尋紀錄",  style: textTheme.labelLarge),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Wrap(
@@ -59,11 +58,11 @@ class SearchingDialogState extends State<SearchingDialog> {
                     label: Text(tag, 
                     ),
                     onSelected: (bool value) {
-                      _searchQuery = tag;
-                      Navigator.of(context).pop(_searchQuery);
+                      searchQuery = tag;
+                      Navigator.of(context).pop(searchQuery);
                     },
                     labelPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
-                    labelStyle: TextStyle(fontSize: 14.0),
+                    labelStyle: textTheme.labelMedium,
                   );
                 }).toList(),
               ),

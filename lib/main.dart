@@ -5,7 +5,7 @@ import 'ui/home/home.dart';
 import 'ui/notes/note_page.dart';
 import 'ui/profile/profile.dart';
 import 'theme/theme.dart';
-import 'ui/icons.dart';
+import 'ui/widget/icons.dart';
 
 void main() {
   runApp(const MyApp());

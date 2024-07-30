@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
 import 'package:reading_app/ui/bookshelf/book_state.dart';
 
-import 'package:reading_app/ui/searching_dialog.dart';
-import 'package:reading_app/ui/tags.dart';
+import 'package:reading_app/ui/widget/searching_dialog.dart';
+import 'package:reading_app/ui/widget/tags.dart';
 
 
 class BookshelfPage extends StatefulWidget {
@@ -22,7 +22,6 @@ class _BookshelfPageState extends State<BookshelfPage> {
       context: context,
       builder: (BuildContext context) {
         return const SearchingDialog(
-          showFilter: true,
           searchHint: '輸入書名、作者或標籤',
           history:  [
               '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
@@ -77,7 +76,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
           childAspectRatio: (0.51),
           children: [
             // use this to test data:
-            Text('search condition: $_searchCondition'),
+            // Text('search condition: $_searchCondition'),
             
             _BookCard(img: img[0], bookName: bookName[0], tags: tags),
             _BookCard(img: img[1], bookName: bookName[1], tags: tags),
