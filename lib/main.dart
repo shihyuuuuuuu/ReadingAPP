@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'pages/all.dart';
+import 'ui/bookshelf/bookshelf_page.dart';
+import 'ui/feed/feed.dart';
+import 'ui/home/home.dart';
+import 'ui/notes/notes.dart';
+import 'ui/profile/profile.dart';
 import 'theme/theme.dart';
 import 'ui/icons.dart';
 
@@ -12,6 +16,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Reading APP',
       theme: const MaterialTheme().light(),
