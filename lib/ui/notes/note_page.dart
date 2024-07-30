@@ -21,10 +21,10 @@ class _NotePageState extends State<NotePage> {
         context: context,
         builder: (BuildContext context) {
           return const SearchingDialog(
-          searchHint: '輸入筆記名稱或相關內容',
-            history: [
-              '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
-            ],
+            searchHint: '輸入筆記名稱或相關內容',
+              history: [
+                '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
+              ],
           );
         },
       );
@@ -43,6 +43,7 @@ class _NotePageState extends State<NotePage> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
+        toolbarHeight: 70.0,
         title: Text(
           '我的筆記', 
           style: textTheme.headlineLarge,
@@ -50,7 +51,7 @@ class _NotePageState extends State<NotePage> {
         actions: <Widget>[
           appBarIconStyle(colorScheme, context,  
             IconButton(
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
               onPressed: () {
                 _showPopup(context);           // Search logic here
               },
@@ -58,48 +59,46 @@ class _NotePageState extends State<NotePage> {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 24.0),
-        child: ListView(
-          children: <Widget>[
-            _NoteContainer(
-              title: 'Note Title',
-              pages: 'p.148-153',
-              date: '2024.07.14',
-              noteType: NoteType.content,
-              description: str,
-            ),
-            _NoteContainer(
-              title: 'Note Title',
-              pages: 'p.148-153',
-              date: '2024.07.14',
-              noteType: NoteType.action,
-              description: str,
-            ),
-            _NoteContainer(
-              title: 'Note Title',
-              pages: 'p.148-153',
-              date: '2024.07.14',
-              noteType: NoteType.experience,
-              description: str,
-            ),
-            _NoteContainer(
-              title: 'Note Title',
-              pages: 'p.148-153',
-              date: '2024.07.14',
-              noteType: NoteType.thought,
-              description: str,
-            ),
-            _NoteContainer(
-              title: 'Note Title',
-              pages: 'p.148-153',
-              date: '2024.07.14',
-              noteType: NoteType.action,
-              description: str,
-            ),
-            // Text('query string: ${_searchCondition}'),
-          ],
-        ),
+      body: ListView(
+        
+        children: <Widget>[
+          _NoteContainer(
+            title: 'Note Title',
+            pages: 'p.148-153',
+            date: '2024.07.14',
+            noteType: NoteType.content,
+            description: str,
+          ),
+          _NoteContainer(
+            title: 'Note Title',
+            pages: 'p.148-153',
+            date: '2024.07.14',
+            noteType: NoteType.action,
+            description: str,
+          ),
+          _NoteContainer(
+            title: 'Note Title',
+            pages: 'p.148-153',
+            date: '2024.07.14',
+            noteType: NoteType.experience,
+            description: str,
+          ),
+          _NoteContainer(
+            title: 'Note Title',
+            pages: 'p.148-153',
+            date: '2024.07.14',
+            noteType: NoteType.thought,
+            description: str,
+          ),
+          _NoteContainer(
+            title: 'Note Title',
+            pages: 'p.148-153',
+            date: '2024.07.14',
+            noteType: NoteType.action,
+            description: str,
+          ),
+          Text('query string: ${_searchCondition}'),
+        ],
       ),
     );
   }

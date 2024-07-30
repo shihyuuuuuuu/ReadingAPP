@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
-import 'package:reading_app/ui/bookshelf/book_state.dart';
 
 import 'package:reading_app/ui/widget/searching_dialog.dart';
 import 'package:reading_app/ui/widget/tags.dart';
@@ -54,6 +53,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
+        toolbarHeight: 70.0,
         title: Text('書架', style: textTheme.headlineLarge,),
         actions: <Widget>[
           appBarIconStyle(
@@ -69,7 +69,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
       ),
       body: Center(
         child: GridView.count(
-          padding: const EdgeInsets.all(28.0),
+          padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10),
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 24.0,
           crossAxisCount: 2,
