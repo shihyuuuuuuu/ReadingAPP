@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:reading_app/pages/notes/note_type.dart';
+import 'package:reading_app/theme/appbar_icon_style.dart';
+import 'package:reading_app/ui/notes/note_type.dart';
+import 'package:reading_app/ui/widget/searching_dialog.dart';
 
 class NotePage extends StatefulWidget {
   
@@ -11,68 +13,94 @@ class NotePage extends StatefulWidget {
 
 class _NotePageState extends State<NotePage> {
   String str = '《1984》是一部描述反烏托邦社會的經典小說。故事設定在一個虛構的極權主義國家“奧西尼亞”，時間是1984年。主角溫斯頓·史密斯是一名在黨的真理部工作的普通成員。他對黨和其領袖老大哥感到懷疑和不滿，並試圖在秘密中保持自己的思想自由。';
+  
+  String _searchCondition = "";
+
+    Future<void> _showPopup(BuildContext context) async {
+      final result = await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          return const SearchingDialog(
+            showFilter: false,
+          searchHint: '輸入筆記名稱或相關內容',
+            history: [
+              '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
+            ],
+          );
+        },
+      );
+    if (result != null) {
+      setState(() {
+        _searchCondition = result;
+      });
+    }
+
+  }
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(
           '我的筆記', 
-          style: Theme.of(context).textTheme.headlineLarge,
+          style: textTheme.headlineLarge,
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.sort),
-            onPressed: () {
-              // Sorting logic here
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // Search logic here
-            },
-          ),
+          appBarIconStyle(colorScheme, context,  
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                _showPopup(context);           // Search logic here
+              },
+            ),
+          )
         ],
       ),
-      body: ListView(
-        children: <Widget>[
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.content,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.action,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.experience,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.thought,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.action,
-            description: str,
-          ),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.only(top: 24.0),
+        child: ListView(
+          children: <Widget>[
+            _NoteContainer(
+              title: 'Note Title',
+              pages: 'p.148-153',
+              date: '2024.07.14',
+              noteType: NoteType.content,
+              description: str,
+            ),
+            _NoteContainer(
+              title: 'Note Title',
+              pages: 'p.148-153',
+              date: '2024.07.14',
+              noteType: NoteType.action,
+              description: str,
+            ),
+            _NoteContainer(
+              title: 'Note Title',
+              pages: 'p.148-153',
+              date: '2024.07.14',
+              noteType: NoteType.experience,
+              description: str,
+            ),
+            _NoteContainer(
+              title: 'Note Title',
+              pages: 'p.148-153',
+              date: '2024.07.14',
+              noteType: NoteType.thought,
+              description: str,
+            ),
+            _NoteContainer(
+              title: 'Note Title',
+              pages: 'p.148-153',
+              date: '2024.07.14',
+              noteType: NoteType.action,
+              description: str,
+            ),
+            Text('query string: ${_searchCondition}'),
+          ],
+        ),
       ),
     );
   }
@@ -101,6 +129,7 @@ class _NoteContainer extends StatefulWidget {
 
 class _NoteContainerState extends State<_NoteContainer> {
 
+
   // function
   bool isExpanded = false;
   bool isPinned = false;
@@ -118,15 +147,16 @@ class _NoteContainerState extends State<_NoteContainer> {
   }
 
   Color getColor(NoteType noteType) {
+  final colorScheme = Theme.of(context).colorScheme;
   switch (noteType) {
     case NoteType.content:
-      return Theme.of(context).colorScheme.primaryFixedDim;
+      return colorScheme.primaryFixedDim;
     case NoteType.experience:
-      return Theme.of(context).colorScheme.secondaryFixedDim;
+      return colorScheme.secondaryFixedDim;
     case NoteType.action:
-      return Theme.of(context).colorScheme.tertiaryFixedDim;
+      return colorScheme.tertiaryFixedDim;
     case NoteType.thought:
-      return Theme.of(context).colorScheme.surfaceDim;
+      return colorScheme.surfaceDim;
   }
 }
 

@@ -4,3 +4,4 @@ enum NoteType {
   action,
   thought
 } 
+
