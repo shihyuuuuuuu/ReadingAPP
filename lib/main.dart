@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'ui/bookshelf/bookshelf_page.dart';
-import 'ui/feed/feed.dart';
-import 'ui/home/home.dart';
-import 'ui/notes/notes.dart';
-import 'ui/profile/profile.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reading_app/service/navigation.dart';
 import 'theme/theme.dart';
 import 'ui/icons.dart';
 
@@ -17,60 +14,48 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Reading APP',
       theme: const MaterialTheme().light(),
       darkTheme: const MaterialTheme().dark(),
       themeMode: ThemeMode.light,
-      home: const BasePage(),
+      routerConfig: router,
     );
   }
 }
 
-class BasePage extends StatefulWidget {
-  const BasePage({super.key});
 
-  @override
-  State<BasePage> createState() => _BasePageState();
-}
-
-class _BasePageState extends State<BasePage> {
-  int _selectedIndex = 2;
-
-  final List<Widget> _pages = [
-    const BookshelfPage(),
-    const NotesPage(),
-    const HomePage(),
-    const FeedPage(),
-    const ProfilePage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class ScaffoldWithNavbar extends StatelessWidget {
+  const ScaffoldWithNavbar(this.navigationShell, {super.key});
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: navigationShell.currentIndex,
         items: MenuIcon.values.map((menuIcon) {
           return BottomNavigationBarItem(
             icon: menuIcon.icon,
             label: '',
           );
         }).toList(),
-        currentIndex: _selectedIndex,
+        onTap: _onTap,
         selectedItemColor: theme.colorScheme.inversePrimary,
         unselectedItemColor: theme.colorScheme.outline,
-        onTap: _onItemTapped,
         showUnselectedLabels: false,
         showSelectedLabels: false,
       ),
+    );
+  }
+
+  void _onTap(index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
     );
   }
 }
