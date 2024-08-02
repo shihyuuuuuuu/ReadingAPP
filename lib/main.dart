@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reading_app/ui/bookshelf/book/book_page.dart';
 import 'ui/bookshelf/bookshelf_page.dart';
 import 'ui/feed/feed.dart';
 import 'ui/home/home.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: const MaterialTheme().light(),
       darkTheme: const MaterialTheme().dark(),
       themeMode: ThemeMode.light,
-      home: const BasePage(),
+      home: BookPage(),
     );
   }
 }
