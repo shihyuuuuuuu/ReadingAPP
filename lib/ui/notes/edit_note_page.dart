@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ViewNotePage extends StatelessWidget{
+class EditNotePage extends StatelessWidget{
   final noteId;
-  ViewNotePage({
+  EditNotePage({
     required this.noteId,
   });
 
   @override
   Widget build(BuildContext context) {
     
-    return const Center(child: Text('viewnote Page'));
+    return const Center(child: Text('edit note Page'));
   }
 }
