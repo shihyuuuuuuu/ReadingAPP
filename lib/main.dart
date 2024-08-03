@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'theme/theme.dart';
 import 'ui/icons.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<NavigationService>(create: (_) => NavigationService()),
+      ], 
+      child: const MyApp()
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -29,13 +37,16 @@ class ScaffoldWithNavbar extends StatelessWidget {
   const ScaffoldWithNavbar(this.navigationShell, {super.key});
   final StatefulNavigationShell navigationShell;
 
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final nav = Provider.of<NavigationService>(context, listen: false);
+    String currentPath = nav.currentPath(context);
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar:  _showBottomNavigationBar(currentPath)
+          ? BottomNavigationBar(
         currentIndex: navigationShell.currentIndex,
         items: MenuIcon.values.map((menuIcon) {
           return BottomNavigationBarItem(
@@ -48,8 +59,13 @@ class ScaffoldWithNavbar extends StatelessWidget {
         unselectedItemColor: theme.colorScheme.outline,
         showUnselectedLabels: false,
         showSelectedLabels: false,
-      ),
+      ):null,
     );
+  }
+
+  bool _showBottomNavigationBar(String currentPath) {
+    return (currentPath == "/book" || currentPath ==  "/note" ||
+       currentPath == "/home" || currentPath ==  "/feed" || currentPath == "profile");
   }
 
   void _onTap(index) {

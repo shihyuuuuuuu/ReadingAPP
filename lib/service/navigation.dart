@@ -43,7 +43,7 @@ final router = GoRouter(
                   builder: (context, state) => ViewNotePage(noteId: state.pathParameters['noteId']),
                   routes: <RouteBase>[
                     GoRoute(
-                      path: 'startreading',
+                      path: 'editnote',
                       builder: (context, state) => EditNotePage(noteId: state.pathParameters['noteId']),
                     ),
                   ]
@@ -61,14 +61,14 @@ final router = GoRouter(
             routes: <RouteBase>[
               GoRoute(
                 path: ':bookId',
-                builder: (context, state) => BookDetailPage(bookId: state.pathParameters['bookId']),
+                builder: (context, state) => BookDetailPage(bookId: state.pathParameters['bookId']!),
                 routes: <RouteBase>[
                   GoRoute(
-                    path: 'startreading',
+                    path: 'editbook',
                     builder: (context, state) => EditBookPage(bookId: state.pathParameters['bookId']),
                   ),
                   GoRoute(
-                    path: 'edit',
+                    path: 'reading',
                     builder: (context, state) => ReadingPage(bookId: state.pathParameters['bookId']),
                   ),
                   GoRoute(
@@ -123,7 +123,7 @@ final router = GoRouter(
             builder: (context, state) => const ProfilePage(),
             routes: <RouteBase>[
               GoRoute(
-                path: 'friends',
+                path: 'friendlist',
                 builder: (context, state) => FriendListPage(),
               ),
               GoRoute(
@@ -137,3 +137,30 @@ final router = GoRouter(
     ),
   ],
 );
+
+
+class NavigationService {
+  late final GoRouter _router;
+
+  NavigationService() {
+    _router = router;
+  }
+
+  String currentPath(BuildContext context) {
+    return GoRouterState.of(context).uri.path;
+  }
+
+  void goViewNote(String noteid) { _router.push('/note/$noteid');}
+  void goEditNote(String noteid) { _router.go('/note/$noteid/editnote');}
+  void goBookDetail(String bookid) { _router.push('/book/$bookid');}
+  void goEditBook(String bookid) { _router.go('/book/$bookid/editbook');}
+  void goReading(String bookid) { _router.push('/book/$bookid/reading');}
+  void goAddNote(String bookid) { _router.push('/book/$bookid/addnote');}
+  void goChatNote(String bookid) { _router.go('/book/$bookid/chatnote');}
+  void goSearchBook() { _router.push('/home/searchbook');}
+  void goAddBook(String bookid) { _router.go('/home/searchbook/$bookid');}
+  void goFriendList() { _router.go('profile/friendlist'); }
+  void goSetting() { _router.go('/profile/setting');}
+
+  void pop() { _router.pop(); }
+}
