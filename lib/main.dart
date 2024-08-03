@@ -75,9 +75,9 @@ class ScaffoldWithNavbar extends StatelessWidget {
 
   int _getCurrentIndex(String currentPath) {
     switch (currentPath) {
-      case '/book':
-        return 0;
       case '/note':
+        return 0;
+      case '/book':
         return 1;
       case '/home':
         return 2;
@@ -86,7 +86,7 @@ class ScaffoldWithNavbar extends StatelessWidget {
       case '/profile':
         return 4;
       default:
-        return 0;
+        return 2;
     }
   }
 

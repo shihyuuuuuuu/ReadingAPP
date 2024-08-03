@@ -9,12 +9,6 @@ class NotesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = Provider.of<NavigationService>(context, listen: false);
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => {nav.pop()},
-          ),
-      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,

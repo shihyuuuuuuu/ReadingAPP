@@ -95,7 +95,7 @@ final router = GoRouter(
         ),
         // Activity Route
         GoRoute(
-          path: '/activity',
+          path: '/feed',
           builder: (context, state) => const FeedPage(),
         ),
         // Profile Routes
@@ -133,13 +133,33 @@ class NavigationService {
   void _goRoute(String route) {
     _navigationStack.add(route);
     _router.go(route);
+    print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
   }
 
-  void goNote() { _goRoute('/note'); }
-  void goBookshelf() { _goRoute('/book'); }
-  void goHome() { _goRoute('/home'); }
-  void goFeed() { _goRoute('/feed'); }
-  void goProfile() { _goRoute('/profile'); }
+  void _goAndClearRoute() {
+    _navigationStack.clear();
+  }
+
+  void goNote() { 
+    _goAndClearRoute();
+    _goRoute('/note'); 
+  }
+  void goBookshelf() { 
+    _goAndClearRoute();  
+    _goRoute('/book'); 
+  }
+  void goHome() { 
+    _goAndClearRoute();
+    _goRoute('/home');
+  }
+  void goFeed() { 
+    _goAndClearRoute();
+    _goRoute('/feed');
+  }
+  void goProfile() { 
+    _goAndClearRoute();
+    _goRoute('/profile');
+  }
   void goViewNote(String noteId) { _goRoute('/note/$noteId'); }
   void goEditNote(String noteId) { _goRoute('/note/$noteId/editnote'); }
   void goBookDetail(String bookId) { _goRoute('/book/$bookId'); }
@@ -153,10 +173,12 @@ class NavigationService {
   void goSetting() { _goRoute('/profile/setting'); }
 
   void pop() {
+    print("pop, with current stack: ${_navigationStack.join("")}");
     if (_navigationStack.isNotEmpty) {
       _navigationStack.removeLast();
       if (_navigationStack.isNotEmpty) {
-        final previousRoute = _navigationStack.removeLast();
+
+        final previousRoute = _navigationStack.last;
         _router.go(previousRoute);
       } else {
         _router.pop();
@@ -164,5 +186,8 @@ class NavigationService {
     } else {
       _router.pop();
     }
+
+    print("after pop, with current stack: ${_navigationStack.join("")}");
+    
   }
 }
