@@ -33,45 +33,81 @@ class MyApp extends StatelessWidget {
 }
 
 
-class ScaffoldWithNavbar extends StatelessWidget {
-  const ScaffoldWithNavbar(this.navigationShell, {super.key});
-  final StatefulNavigationShell navigationShell;
 
+class ScaffoldWithNavbar extends StatelessWidget {
+  const ScaffoldWithNavbar(this.child, {super.key});
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final nav = Provider.of<NavigationService>(context, listen: false);
     String currentPath = nav.currentPath(context);
+
     return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar:  _showBottomNavigationBar(currentPath)
+      body: child,
+      bottomNavigationBar: _showBottomNavigationBar(currentPath)
           ? BottomNavigationBar(
-        currentIndex: navigationShell.currentIndex,
-        items: MenuIcon.values.map((menuIcon) {
-          return BottomNavigationBarItem(
-            icon: menuIcon.icon,
-            label: '',
-          );
-        }).toList(),
-        onTap: _onTap,
-        selectedItemColor: theme.colorScheme.inversePrimary,
-        unselectedItemColor: theme.colorScheme.outline,
-        showUnselectedLabels: false,
-        showSelectedLabels: false,
-      ):null,
+              currentIndex: _getCurrentIndex(currentPath),
+              items: MenuIcon.values.map((menuIcon) {
+                return BottomNavigationBarItem(
+                  icon: menuIcon.icon,
+                  label: '',
+                );
+              }).toList(),
+              onTap: (index) => _onTap(context, index),
+              selectedItemColor: theme.colorScheme.inversePrimary,
+              unselectedItemColor: theme.colorScheme.outline,
+              showUnselectedLabels: false,
+              showSelectedLabels: false,
+            )
+          : null,
     );
   }
 
   bool _showBottomNavigationBar(String currentPath) {
-    return (currentPath == "/book" || currentPath ==  "/note" ||
-       currentPath == "/home" || currentPath ==  "/feed" || currentPath == "profile");
+    return (currentPath == "/book" ||
+        currentPath == "/note" ||
+        currentPath == "/home" ||
+        currentPath == "/feed" ||
+        currentPath == "/profile");
   }
 
-  void _onTap(index) {
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
+  int _getCurrentIndex(String currentPath) {
+    switch (currentPath) {
+      case '/book':
+        return 0;
+      case '/note':
+        return 1;
+      case '/home':
+        return 2;
+      case '/feed':
+        return 3;
+      case '/profile':
+        return 4;
+      default:
+        return 0;
+    }
+  }
+
+  void _onTap(BuildContext context, int index) {
+    final nav = Provider.of<NavigationService>(context, listen: false);
+    switch (index) {
+      case 0:
+        nav.goNote();
+        break;
+      case 1:
+        nav.goBookshelf();
+        break;
+      case 2:
+        nav.goHome();
+        break;
+      case 3:
+        nav.goFeed();
+        break;
+      case 4:
+        nav.goProfile();
+        break;
+    }
   }
 }

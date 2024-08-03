@@ -21,126 +21,106 @@ import 'package:reading_app/ui/profile/setting_page.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
-
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/home',
   routes: <RouteBase>[
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return ScaffoldWithNavbar(navigationShell);
+    ShellRoute(
+      builder: (context, state, child) {
+        return ScaffoldWithNavbar(child);
       },
-      branches: [
-        StatefulShellBranch(
-          navigatorKey: _sectionNavigatorKey,
-          routes: <RouteBase>[
+      routes: [
+        // Note Routes
+        GoRoute(
+          path: '/note',
+          builder: (context, state) => const NotesPage(),
+          routes: [
             GoRoute(
-              path: '/note',
-              builder: (context, state) => const NotesPage(),
-              routes: <RouteBase>[
+              path: ':noteId',
+              builder: (context, state) => ViewNotePage(noteId: state.pathParameters['noteId']),
+              routes: [
                 GoRoute(
-                  path: ':noteId',
-                  builder: (context, state) => ViewNotePage(noteId: state.pathParameters['noteId']),
-                  routes: <RouteBase>[
-                    GoRoute(
-                      path: 'editnote',
-                      builder: (context, state) => EditNotePage(noteId: state.pathParameters['noteId']),
-                    ),
-                  ]
-                )
+                  path: 'editnote',
+                  builder: (context, state) => EditNotePage(noteId: state.pathParameters['noteId']),
+                ),
               ],
             ),
           ],
         ),
-
-        // The route branch for 2º Tab
-        StatefulShellBranch(routes: <RouteBase>[
-          GoRoute(
-            path: '/book',
-            builder: (context, state) => const BookshelfPage(),
-            routes: <RouteBase>[
-              GoRoute(
-                path: ':bookId',
-                builder: (context, state) => BookDetailPage(bookId: state.pathParameters['bookId']!),
-                routes: <RouteBase>[
-                  GoRoute(
-                    path: 'editbook',
-                    builder: (context, state) => EditBookPage(bookId: state.pathParameters['bookId']),
-                  ),
-                  GoRoute(
-                    path: 'reading',
-                    builder: (context, state) => ReadingPage(bookId: state.pathParameters['bookId']),
-                  ),
-                  GoRoute(
-                    path: 'addnote',
-                    builder: (context, state) => AddNotePage(bookId: state.pathParameters['bookId']),
-                  ),
-                  GoRoute(
-                    path: 'chatnote',
-                    builder: (context, state) => ChatNotePage(bookId: state.pathParameters['bookId']),
-                  ),        
-                ]
-              )
-            ],
-          ),
-        ]),
-
-
-        // The route branch for 3º Tab
-        StatefulShellBranch(routes: <RouteBase>[
-          GoRoute(
-            path: '/home',
-            builder: (context, state) => const HomePage(),
-            routes: [
-              GoRoute(
-                path: 'searchbook',
-                builder: (context, state) => SearchBookPage(),
-                routes: [
-                  GoRoute(
-                    path: ':bookId',
-                    builder: (context, state) => AddBookPage(bookId: state.pathParameters['bookId']),
-                  ),
-                ]
-              ),
-            ]
-          ),
-        ]),
-
-
-        // The route branch for 4º Tab
-        StatefulShellBranch(routes: <RouteBase>[
-          GoRoute(
-            path: '/activity',
-            builder: (context, state) => const FeedPage(),
-          ),
-        ]),
-
-
-        // The route branch for 5º Tab
-        StatefulShellBranch(routes: <RouteBase>[
-          GoRoute(
-            path: '/profile',
-            builder: (context, state) => const ProfilePage(),
-            routes: <RouteBase>[
-              GoRoute(
-                path: 'friendlist',
-                builder: (context, state) => FriendListPage(),
-              ),
-              GoRoute(
-                path: 'setting',
-                builder: (context, state) => SettingPage(),
-              ),
-            ]
-          ),
-        ])
+        // Book Routes
+        GoRoute(
+          path: '/book',
+          builder: (context, state) => const BookshelfPage(),
+          routes: [
+            GoRoute(
+              path: ':bookId',
+              builder: (context, state) => BookDetailPage(bookId: state.pathParameters['bookId']!),
+              routes: [
+                GoRoute(
+                  path: 'editbook',
+                  builder: (context, state) => EditBookPage(bookId: state.pathParameters['bookId']!),
+                ),
+                GoRoute(
+                  path: 'reading',
+                  builder: (context, state) => ReadingPage(bookId: state.pathParameters['bookId']!),
+                ),
+                GoRoute(
+                  path: 'addnote',
+                  builder: (context, state) => AddNotePage(bookId: state.pathParameters['bookId']!),
+                ),
+                GoRoute(
+                  path: 'chatnote',
+                  builder: (context, state) => ChatNotePage(bookId: state.pathParameters['bookId']!),
+                ),
+              ],
+            ),
+          ],
+        ),
+        // Home Routes
+        GoRoute(
+          path: '/home',
+          builder: (context, state) => const HomePage(),
+          routes: [
+            GoRoute(
+              path: 'searchbook',
+              builder: (context, state) => SearchBookPage(),
+              routes: [
+                GoRoute(
+                  path: ':bookId',
+                  builder: (context, state) => AddBookPage(bookId: state.pathParameters['bookId']!),
+                ),
+              ],
+            ),
+          ],
+        ),
+        // Activity Route
+        GoRoute(
+          path: '/activity',
+          builder: (context, state) => const FeedPage(),
+        ),
+        // Profile Routes
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfilePage(),
+          routes: [
+            GoRoute(
+              path: 'friendlist',
+              builder: (context, state) => FriendListPage(),
+            ),
+            GoRoute(
+              path: 'setting',
+              builder: (context, state) => SettingPage(),
+            ),
+          ],
+        ),
       ],
     ),
   ],
 );
 
-
 class NavigationService {
   late final GoRouter _router;
+  final List<String> _navigationStack = [];
 
   NavigationService() {
     _router = router;
@@ -150,17 +130,39 @@ class NavigationService {
     return GoRouterState.of(context).uri.path;
   }
 
-  void goViewNote(String noteid) { _router.push('/note/$noteid');}
-  void goEditNote(String noteid) { _router.go('/note/$noteid/editnote');}
-  void goBookDetail(String bookid) { _router.push('/book/$bookid');}
-  void goEditBook(String bookid) { _router.go('/book/$bookid/editbook');}
-  void goReading(String bookid) { _router.push('/book/$bookid/reading');}
-  void goAddNote(String bookid) { _router.push('/book/$bookid/addnote');}
-  void goChatNote(String bookid) { _router.go('/book/$bookid/chatnote');}
-  void goSearchBook() { _router.push('/home/searchbook');}
-  void goAddBook(String bookid) { _router.go('/home/searchbook/$bookid');}
-  void goFriendList() { _router.go('profile/friendlist'); }
-  void goSetting() { _router.go('/profile/setting');}
+  void _goRoute(String route) {
+    _navigationStack.add(route);
+    _router.go(route);
+  }
 
-  void pop() { _router.pop(); }
+  void goNote() { _goRoute('/note'); }
+  void goBookshelf() { _goRoute('/book'); }
+  void goHome() { _goRoute('/home'); }
+  void goFeed() { _goRoute('/feed'); }
+  void goProfile() { _goRoute('/profile'); }
+  void goViewNote(String noteId) { _goRoute('/note/$noteId'); }
+  void goEditNote(String noteId) { _goRoute('/note/$noteId/editnote'); }
+  void goBookDetail(String bookId) { _goRoute('/book/$bookId'); }
+  void goEditBook(String bookId) { _goRoute('/book/$bookId/editbook'); }
+  void goReading(String bookId) { _goRoute('/book/$bookId/reading'); }
+  void goAddNote(String bookId) { _goRoute('/book/$bookId/addnote'); }
+  void goChatNote(String bookId) { _goRoute('/book/$bookId/chatnote'); }
+  void goSearchBook() { _goRoute('/home/searchbook'); }
+  void goAddBook(String bookId) { _goRoute('/home/searchbook/$bookId'); }
+  void goFriendList() { _goRoute('/profile/friendlist'); }
+  void goSetting() { _goRoute('/profile/setting'); }
+
+  void pop() {
+    if (_navigationStack.isNotEmpty) {
+      _navigationStack.removeLast();
+      if (_navigationStack.isNotEmpty) {
+        final previousRoute = _navigationStack.removeLast();
+        _router.go(previousRoute);
+      } else {
+        _router.pop();
+      }
+    } else {
+      _router.pop();
+    }
+  }
 }
