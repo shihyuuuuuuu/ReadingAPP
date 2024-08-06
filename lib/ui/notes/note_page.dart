@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
 import 'package:reading_app/ui/notes/note_type.dart';
 import 'package:reading_app/ui/widget/searching_dialog.dart';
@@ -166,7 +168,7 @@ class _NoteContainerState extends State<_NoteContainer> {
     
     Color chooseColor = getColor(widget.noteType);
     EdgeInsets cardEdgeInsets = const EdgeInsets.symmetric(vertical: 0.5, horizontal: 0.0);
-
+    final nav = Provider.of<NavigationService>(context, listen: false);
     return Stack(
       children:[ 
       Card(  
@@ -174,62 +176,65 @@ class _NoteContainerState extends State<_NoteContainer> {
           borderRadius: BorderRadius.circular(cardBoarderRadius),
         ),
         elevation: 8,
-        color: colorScheme.surfaceContainerHighest,
+        color: colorScheme.surfaceContainer,
         margin: cardEdgeInsets,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 30),
-          child: Column(
-            children: [
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16.0),
-                        title: Padding(
-                          padding: const EdgeInsets.only(bottom: 12.0),
-                          child: Text(
-                            widget.title,
-                            style: textTheme.titleLarge,
+        child: InkWell(
+          onTap: () => { nav.goViewNote("tt123") },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 30),
+            child: Column(
+              children: [
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(16.0),
+                          title: Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Text(
+                              widget.title,
+                              style: textTheme.titleLarge,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${widget.pages}, ${widget.date}',
+                            style: textTheme.labelLarge,
                           ),
                         ),
-                        subtitle: Text(
-                          '${widget.pages}, ${widget.date}',
-                          style: textTheme.labelLarge,
-                        ),
                       ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          iconSize: 28.0,
-                          color: colorScheme.tertiary,
-                          onPressed: onExpandPressed,
-                          icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
-                        ),
-                        IconButton(
-                          iconSize: 28.0,
-                          color: colorScheme.tertiary,
-                          onPressed: onPinPressed,
-                          icon: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              if (isExpanded && widget.description != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
-                  child: Text(
-                    widget.description!,
-                    style: textTheme.bodyLarge,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            iconSize: 28.0,
+                            color: colorScheme.tertiary,
+                            onPressed: onExpandPressed,
+                            icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                          ),
+                          IconButton(
+                            iconSize: 28.0,
+                            color: colorScheme.tertiary,
+                            onPressed: onPinPressed,
+                            icon: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+                if (isExpanded && widget.description != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
+                    child: Text(
+                      widget.description!,
+                      style: textTheme.bodyLarge,
+                    ),
+                  ),
+                ],
+              ),
+          ),
         ),
         ),
         Positioned(

@@ -12,7 +12,7 @@ import 'package:reading_app/ui/home/add_book_page.dart';
 import 'package:reading_app/ui/home/home.dart';
 import 'package:reading_app/ui/home/search_book_page.dart';
 import 'package:reading_app/ui/notes/edit_note_page.dart';
-import 'package:reading_app/ui/notes/notes.dart';
+import 'package:reading_app/ui/notes/note_page.dart';
 import 'package:reading_app/ui/notes/viewnote_page.dart';
 import 'package:reading_app/ui/profile/friend_list_page.dart';
 import 'package:reading_app/ui/profile/profile.dart';
@@ -33,7 +33,7 @@ final router = GoRouter(
         // Note Routes
         GoRoute(
           path: '/note',
-          builder: (context, state) => const NotesPage(),
+          builder: (context, state) => const NotePage(),
           routes: [
             GoRoute(
               path: ':noteId',
@@ -133,7 +133,7 @@ class NavigationService {
   void _goRoute(String route) {
     _navigationStack.add(route);
     _router.go(route);
-    print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
+    // print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
   }
 
   void _goAndClearRoute() {
@@ -173,7 +173,7 @@ class NavigationService {
   void goSetting() { _goRoute('/profile/setting'); }
 
   void pop() {
-    print("pop, with current stack: ${_navigationStack.join("")}");
+    // print("pop, with current stack: ${_navigationStack.join("")}");
     if (_navigationStack.isNotEmpty) {
       _navigationStack.removeLast();
       if (_navigationStack.isNotEmpty) {
@@ -187,7 +187,7 @@ class NavigationService {
       _router.pop();
     }
 
-    print("after pop, with current stack: ${_navigationStack.join("")}");
+    // print("after pop, with current stack: ${_navigationStack.join("")}");
     
   }
 }
