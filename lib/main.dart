@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'theme/theme.dart';
-import 'ui/icons.dart';
+import 'ui/widget/icons.dart';
 
 void main() {
   runApp(
