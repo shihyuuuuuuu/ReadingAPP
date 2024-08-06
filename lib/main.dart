@@ -3,10 +3,10 @@ import 'package:reading_app/ui/bookshelf/book/book_page.dart';
 import 'ui/bookshelf/bookshelf_page.dart';
 import 'ui/feed/feed.dart';
 import 'ui/home/home.dart';
-import 'ui/notes/notes.dart';
+import 'ui/notes/note_page.dart';
 import 'ui/profile/profile.dart';
 import 'theme/theme.dart';
-import 'ui/icons.dart';
+import 'ui/widget/icons.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,7 +40,7 @@ class _BasePageState extends State<BasePage> {
 
   final List<Widget> _pages = [
     const BookshelfPage(),
-    const NotesPage(),
+    const NotePage(),
     const HomePage(),
     const FeedPage(),
     const ProfilePage(),
