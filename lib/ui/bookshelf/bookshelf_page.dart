@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
 
 import 'package:reading_app/ui/widget/searching_dialog.dart';
@@ -109,32 +111,38 @@ class _BookCard extends StatelessWidget{
 
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
+    final nav = Provider.of<NavigationService>(context, listen: false);
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),
       elevation: 8,
       color: colorScheme.surfaceContainerHighest,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 5),
-        child: (
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.network(img,),
-              const SizedBox(height: 10,),
-              Text(
-                bookName, 
-                style: textTheme.titleMedium,
-              ),
-              const SizedBox(height: 6,),
-              Row(
-                children: 
-                  tags.map((item) => Tag(text:item)).toList()
-                )
-            ],)
-          ),
+      child: InkWell(
+        onTap: () {
+          // GoRouter.of(context).go('/book/tk123');
+          nav.goBookDetail('tt123');
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 5),
+          child: (
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(img,),
+                const SizedBox(height: 10,),
+                Text(
+                  bookName, 
+                  style: textTheme.titleMedium,
+                ),
+                const SizedBox(height: 6,),
+                Row(
+                  children: 
+                    tags.map((item) => Tag(text:item)).toList()
+                  )
+              ],)
+            ),
+        ),
       )
       );
   }
