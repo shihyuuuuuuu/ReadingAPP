@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:reading_app/ui/bookshelf/book/book_page.dart';
-import 'ui/bookshelf/bookshelf_page.dart';
-import 'ui/feed/feed.dart';
-import 'ui/home/home.dart';
-import 'ui/notes/note_page.dart';
-import 'ui/profile/profile.dart';
+import 'package:provider/provider.dart';
+import 'package:reading_app/service/navigation.dart';
 import 'theme/theme.dart';
 import 'ui/widget/icons.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<NavigationService>(create: (_) => NavigationService()),
+      ], 
+      child: const MyApp()
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,60 +21,92 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Reading APP',
       theme: const MaterialTheme().light(),
       darkTheme: const MaterialTheme().dark(),
       themeMode: ThemeMode.light,
-      home: BookPage(),
+      routerConfig: router,
     );
   }
 }
 
-class BasePage extends StatefulWidget {
-  const BasePage({super.key});
 
-  @override
-  State<BasePage> createState() => _BasePageState();
-}
 
-class _BasePageState extends State<BasePage> {
-  int _selectedIndex = 2;
-
-  final List<Widget> _pages = [
-    const BookshelfPage(),
-    const NotePage(),
-    const HomePage(),
-    const FeedPage(),
-    const ProfilePage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class ScaffoldWithNavbar extends StatelessWidget {
+  const ScaffoldWithNavbar(this.child, {super.key});
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final nav = Provider.of<NavigationService>(context, listen: false);
+    String currentPath = nav.currentPath(context);
 
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: MenuIcon.values.map((menuIcon) {
-          return BottomNavigationBarItem(
-            icon: menuIcon.icon,
-            label: '',
-          );
-        }).toList(),
-        currentIndex: _selectedIndex,
-        selectedItemColor: theme.colorScheme.inversePrimary,
-        unselectedItemColor: theme.colorScheme.outline,
-        onTap: _onItemTapped,
-        showUnselectedLabels: false,
-        showSelectedLabels: false,
-      ),
+      body: child,
+      bottomNavigationBar: _showBottomNavigationBar(currentPath)
+          ? BottomNavigationBar(
+              currentIndex: _getCurrentIndex(currentPath),
+              items: MenuIcon.values.map((menuIcon) {
+                return BottomNavigationBarItem(
+                  icon: menuIcon.icon,
+                  label: '',
+                );
+              }).toList(),
+              onTap: (index) => _onTap(context, index),
+              selectedItemColor: theme.colorScheme.inversePrimary,
+              unselectedItemColor: theme.colorScheme.outline,
+              showUnselectedLabels: false,
+              showSelectedLabels: false,
+            )
+          : null,
     );
+  }
+
+  bool _showBottomNavigationBar(String currentPath) {
+    return (currentPath == "/book" ||
+        currentPath == "/note" ||
+        currentPath == "/home" ||
+        currentPath == "/feed" ||
+        currentPath == "/profile");
+  }
+
+  int _getCurrentIndex(String currentPath) {
+    switch (currentPath) {
+      case '/note':
+        return 0;
+      case '/book':
+        return 1;
+      case '/home':
+        return 2;
+      case '/feed':
+        return 3;
+      case '/profile':
+        return 4;
+      default:
+        return 2;
+    }
+  }
+
+  void _onTap(BuildContext context, int index) {
+    final nav = Provider.of<NavigationService>(context, listen: false);
+    switch (index) {
+      case 0:
+        nav.goNote();
+        break;
+      case 1:
+        nav.goBookshelf();
+        break;
+      case 2:
+        nav.goHome();
+        break;
+      case 3:
+        nav.goFeed();
+        break;
+      case 4:
+        nav.goProfile();
+        break;
+    }
   }
 }
