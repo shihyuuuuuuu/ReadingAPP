@@ -146,19 +146,6 @@ class _NoteContainerState extends State<_NoteContainer> {
     });
   }
 
-  Color getColor(NoteType noteType) {
-  final colorScheme = Theme.of(context).colorScheme;
-  switch (noteType) {
-    case NoteType.content:
-      return colorScheme.primaryFixedDim;
-    case NoteType.experience:
-      return colorScheme.secondaryFixedDim;
-    case NoteType.action:
-      return colorScheme.tertiaryFixedDim;
-    case NoteType.thought:
-      return colorScheme.surfaceDim;
-  }
-}
   @override
   Widget build(BuildContext context) {
     // style
@@ -166,7 +153,7 @@ class _NoteContainerState extends State<_NoteContainer> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     
-    Color chooseColor = getColor(widget.noteType);
+    
     EdgeInsets cardEdgeInsets = const EdgeInsets.symmetric(vertical: 0.5, horizontal: 0.0);
     final nav = Provider.of<NavigationService>(context, listen: false);
     return Stack(
@@ -248,7 +235,7 @@ class _NoteContainerState extends State<_NoteContainer> {
             padding: const EdgeInsets.all(6),
             alignment: Alignment.topCenter,
             decoration: BoxDecoration(
-              color: chooseColor,
+              color: widget.noteType.color,
               borderRadius: const BorderRadius.horizontal(
                 left: Radius.zero, 
                 right: Radius.circular(cardBoarderRadius)
