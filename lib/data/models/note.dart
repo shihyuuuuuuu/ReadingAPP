@@ -34,7 +34,7 @@ class Note {
       userBookId: map['userBookId'] as String,
       readingSessionId: map['readingSessionId'] as String,
       title: map['title'] as String,
-      type: map['type'] as String,
+      type: map['type'] as NoteType,
       content: map['content'] as String,
       startPage: map['startPage'] as int,
       endPage: map['endPage'] as int,
