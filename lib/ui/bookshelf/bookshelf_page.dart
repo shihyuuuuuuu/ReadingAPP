@@ -49,7 +49,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
       "https://edit.org/images/cat/book-covers-big-2019101610.jpg",
       "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/yellow-business-leadership-book-cover-design-template-dce2f5568638ad4643ccb9e725e5d6ff.jpg",
     ];
-    List<String> tags = ["小說","文學","經典"];
+    List<String> tags = ["小說","文學","經典", "超好看"];
     List<String> bookName = ["原子習慣", "小婦人", "小王子"];
 
     return Scaffold(
@@ -75,7 +75,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 24.0,
           crossAxisCount: 2,
-          childAspectRatio: (0.51),
+          childAspectRatio: (0.49),
           children: [
             // use this to test data:
             // Text('search condition: $_searchCondition'),
@@ -135,11 +135,7 @@ class _BookCard extends StatelessWidget{
                   bookName, 
                   style: textTheme.titleMedium,
                 ),
-                const SizedBox(height: 6,),
-                Row(
-                  children: 
-                    tags.map((item) => Tag(text:item)).toList()
-                  )
+                TagArea(tagLables: tags.sublist(0,2),)
               ],)
             ),
         ),

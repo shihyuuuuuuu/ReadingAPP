@@ -43,55 +43,61 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
         backgroundColor: Colors.orange,
       ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _BookInfoContainer(textTheme: textTheme, colorScheme: colorScheme),
-              SizedBox(height: 20,),
-              Text('書籍狀態：在讀', style: textTheme.bodyLarge),
-              SizedBox(height: 16),
-              Wrap(
-                spacing: 8.0, // 标签之间的水平间距
-                runSpacing: 2.0, // 标签之间的垂直间距
-                children: [
-                  Chip(
-                    label: Text('# 魔法'),
-                    backgroundColor: Colors.orange[100],
-                    padding: EdgeInsets.zero,
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: CustomScrollView(
+          // mainAxisAlignment: MainAxisAlignment.start,
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start ,
+                children: [ 
+                  _BookInfoContainer(textTheme: textTheme, colorScheme: colorScheme),
+                  SizedBox(height: 20,),
+                  Text('書籍狀態：在讀', style: textTheme.bodyLarge),
+                  SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8.0, // 标签之间的水平间距
+                    runSpacing: 2.0, // 标签之间的垂直间距
+                    children: [
+                      Chip(
+                        label: Text('# 魔法'),
+                        backgroundColor: Colors.orange[100],
+                        padding: EdgeInsets.zero,
+                      ),
+                      Chip(
+                        label: Text('# 小說'),
+                        backgroundColor: Colors.orange[100],
+                        padding: EdgeInsets.zero,
+                      ),
+                      // 可以添加更多的标签
+                      Chip(
+                        label: Text('# 冒險'),
+                        backgroundColor: Colors.orange[100],
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
                   ),
-                  Chip(
-                    label: Text('# 小說'),
-                    backgroundColor: Colors.orange[100],
-                    padding: EdgeInsets.zero,
-                  ),
-                  // 可以添加更多的标签
-                  Chip(
-                    label: Text('# 冒險'),
-                    backgroundColor: Colors.orange[100],
-                    padding: EdgeInsets.zero,
-                  ),
+            
+                  SizedBox(height: 16,),
+                  Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
+                      child: Text("筆記", style: textTheme.titleLarge),
+                    ),
+                    Expanded(child: Divider( )),  
+                  ],),
+                  SizedBox(height: 4.0,),
+                  Text("共6則", style: textTheme.bodySmall),
+                  
                 ],
-              ),
-        
-              SizedBox(height: 16,),
-              Row(children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
-                  child: Text("筆記", style: textTheme.titleLarge),
-                ),
-                Expanded(child: Divider( )),  
-              ],),
-              SizedBox(height: 4.0,),
-              Text("共6則", style: textTheme.bodySmall),
-              ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemBuilder: (_, index) => 
+              )
+            ),
+            SliverList(
+              // scrollDirection: Axis.vertical,
+              // shrinkWrap: true,
+              delegate: SliverChildBuilderDelegate((_, index) => 
                 _NoteCard(
                   noteTitle: "A Good Day",
                   startPage: index,
@@ -100,11 +106,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   noteType: NoteType.action,
                   content: "if there is a dall on the street, should i pick it?"
                 ),
-                itemCount: 5,
-              ),
-              
-            ],
-          ),
+                childCount: 5,
+              )
+            ),
+            
+          ],
         ),
       ),
     );
@@ -203,40 +209,43 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final nav = Provider.of<NavigationService>(context, listen: false);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Stack(
-        children: [    
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child:  Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  noteTitle,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text('p.${startPage}-${endPage+10}, ${DateFormat.yMd().format(date)}'),
-                SizedBox(height: 8),
-                Text(
-                  content,
-                  maxLines: 4,
-                  // overflow: TextOverflow.ellipsis,
-                ),
-              ],
+      child: InkWell(
+        onTap: () => {nav.goViewNote("noteId")},
+        child: Stack(
+          children: [    
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child:  Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    noteTitle,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('p.${startPage}-${endPage+10}, ${DateFormat.yMd().format(date)}'),
+                  const SizedBox(height: 8),
+                  Text(
+                    content,
+                    maxLines: 4,
+                  ),
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            right: 0,
-            top: 24,
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
-              color: noteType.color,
-              child: Text(noteType.name),
+            Positioned(
+              right: 0,
+              top: 24,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
+                color: noteType.color,
+                child: Text(noteType.name),
+              )
             )
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
