@@ -1,18 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/firebase_options.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'theme/theme.dart';
 import 'ui/widget/icons.dart';
 
-void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        Provider<NavigationService>(create: (_) => NavigationService()),
-      ], 
-      child: const MyApp()
-    )
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(MultiProvider(providers: [
+    Provider<NavigationService>(create: (_) => NavigationService()),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp.router(
       title: 'Reading APP',
       theme: const MaterialTheme().light(),
@@ -30,8 +29,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
 
 class ScaffoldWithNavbar extends StatelessWidget {
   const ScaffoldWithNavbar(this.child, {super.key});
