@@ -10,8 +10,9 @@ class TagArea extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: 5.0,
-      runSpacing: 2.0,
+      // clipBehavior: Clip.hardEdge,
+      spacing: 8.0,
+      runSpacing: 5.0,
       children: 
         tagLables.map((item) => _Tags(text:item)).toList()
       );

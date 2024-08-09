@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
+import 'package:reading_app/ui/bookshelf/book_state.dart';
 
 import 'package:reading_app/ui/widget/searching_dialog.dart';
 import 'package:reading_app/ui/widget/tags.dart';
@@ -75,16 +76,17 @@ class _BookshelfPageState extends State<BookshelfPage> {
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 24.0,
           crossAxisCount: 2,
-          childAspectRatio: (0.49),
+          childAspectRatio: (0.53),
           children: [
             // use this to test data:
             // Text('search condition: $_searchCondition'),
             
-            _BookCard(img: img[0], bookName: bookName[0], tags: tags),
-            _BookCard(img: img[1], bookName: bookName[1], tags: tags),
-            _BookCard(img: img[2], bookName: bookName[2], tags: tags),
-            _BookCard(img: img[0], bookName: bookName[0], tags: tags),
-            _BookCard(img: img[1], bookName: bookName[1], tags: tags),
+            _BookCard(img: img[2], bookName: bookName[1], tags: tags, bookState: BookState.reading,),
+            _BookCard(img: img[1], bookName: bookName[1], tags: tags, bookState: BookState.reading,),
+            _BookCard(img: img[0], bookName: bookName[0], tags: tags, bookState: BookState.suspended,),
+            _BookCard(img: img[2], bookName: bookName[2], tags: tags, bookState: BookState.finish,),
+            _BookCard(img: img[1], bookName: bookName[0], tags: tags, bookState: BookState.waiting,),
+            _BookCard(img: img[0], bookName: bookName[1], tags: tags, bookState: BookState.waiting,),
             ],
           ),
       
@@ -98,11 +100,13 @@ class _BookCard extends StatelessWidget{
   final String img;
   final String bookName;
   final List<String> tags;
+  final BookState bookState;
   const _BookCard({
     super.key,
     required this.img,
     required this.bookName,
     required this.tags,
+    required this.bookState,
     });
   
 
@@ -133,9 +137,10 @@ class _BookCard extends StatelessWidget{
                 const SizedBox(height: 10,),
                 Text(
                   bookName, 
-                  style: textTheme.titleMedium,
+                  style: textTheme.titleMedium, // bold
                 ),
-                TagArea(tagLables: tags.sublist(0,2),)
+                Text(bookState.str), //more info for page, etc.
+                // TagArea(tagLables: tags.sublist(0,2),)
               ],)
             ),
         ),
@@ -143,7 +148,3 @@ class _BookCard extends StatelessWidget{
       );
   }
 }
-
-
-
-

@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/notes/note_type.dart';
+import 'package:reading_app/ui/widget/popup_dialog.dart';
+import 'package:reading_app/ui/widget/popup_event.dart';
 import 'package:reading_app/ui/widget/tags.dart';
 
 class BookDetailPage extends StatefulWidget {
@@ -19,6 +21,37 @@ class BookDetailPage extends StatefulWidget {
 }
 
 class _BookDetailPageState extends State<BookDetailPage> {
+  
+  
+  void _showPopup(BuildContext context) async {
+    final nav = Provider.of<NavigationService>(context, listen: false);
+
+    void goEditNote() {
+      nav.goEditNote("noteId");
+    }  
+    
+    final List<popupEvent> popUpEvent = [
+      popupEvent(
+        icon: const Icon(Icons.add_box_outlined), 
+        text: '發布筆記', 
+        onPressed: ()=>{}
+      ),
+      popupEvent(
+        icon: const Icon(Icons.edit_document), 
+        text: '編輯筆記', 
+        onPressed:  goEditNote,
+      )
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PopupDialog(options: popUpEvent,);
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -37,66 +70,38 @@ class _BookDetailPageState extends State<BookDetailPage> {
           IconButton(
             icon: Icon(Icons.more_vert),
             onPressed: () {
-              // Implement more options functionality here
+              _showPopup(context);
             },
           ),
         ],
-        backgroundColor: Colors.orange,
+        // backgroundColor: Colors.orange,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: CustomScrollView(
-          // mainAxisAlignment: MainAxisAlignment.start,
-          // crossAxisAlignment: CrossAxisAlignment.start,
           slivers: [
             SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start ,
                 children: [ 
                   _BookInfoContainer(textTheme: textTheme, colorScheme: colorScheme),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
                   Text('書籍狀態：在讀', style: textTheme.bodyLarge),
-                  SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8.0, // 标签之间的水平间距
-                    runSpacing: 2.0, // 标签之间的垂直间距
-                    children: [
-                      Chip(
-                        label: Text('# 魔法'),
-                        backgroundColor: Colors.orange[100],
-                        padding: EdgeInsets.zero,
-                      ),
-                      Chip(
-                        label: Text('# 小說'),
-                        backgroundColor: Colors.orange[100],
-                        padding: EdgeInsets.zero,
-                      ),
-                      // 可以添加更多的标签
-                      Chip(
-                        label: Text('# 冒險'),
-                        backgroundColor: Colors.orange[100],
-                        padding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-            
-                  SizedBox(height: 16,),
+                  const TagArea(tagLables: ['魔法', '小說', '奇幻']),
+                  const SizedBox(height: 16,),
                   Row(children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
                       child: Text("筆記", style: textTheme.titleLarge),
                     ),
-                    Expanded(child: Divider( )),  
+                    const Expanded(child: Divider( )),  
                   ],),
-                  SizedBox(height: 4.0,),
-                  Text("共6則", style: textTheme.bodySmall),
-                  
+                  const SizedBox(height: 4.0,),
+                  Text("共6則", style: textTheme.bodySmall),     
                 ],
               )
             ),
             SliverList(
-              // scrollDirection: Axis.vertical,
-              // shrinkWrap: true,
               delegate: SliverChildBuilderDelegate((_, index) => 
                 _NoteCard(
                   noteTitle: "A Good Day",
