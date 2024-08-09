@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
@@ -38,7 +37,7 @@ class PopupDialog extends StatelessWidget{
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            (title!=null)?_hintText(text:title!):SizedBox(),
+            (title!=null)?_HintText(text:title!):SizedBox(),
             Wrap(
               runSpacing: 8.0,
               spacing: 8.0,
@@ -57,10 +56,10 @@ class PopupDialog extends StatelessWidget{
   }
 }
 
-class _hintText extends StatelessWidget {
+class _HintText extends StatelessWidget {
   final String text;
 
-  const _hintText({super.key, required this.text});
+  const _HintText({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
