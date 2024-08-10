@@ -1,48 +1,68 @@
-import 'note_type.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../local/note_type.dart';
+import 'base.dart';
 
-class Note {
-  String id;
+class Note extends MappableModel {
+  String? id;
   String userId;
   String userBookId;
-  String readingSessionId;
+  String? readingSessionId;
   String title;
   NoteType type;
   String content;
-  int startPage;
-  int endPage;
-  DateTime createdAt;
-  DateTime updatedAt;
+  int? startPage;
+  int? endPage;
+  Timestamp createdAt;
+  Timestamp updatedAt;
 
+  @override
   Note({
-    required this.id,
     required this.userId,
     required this.userBookId,
-    required this.readingSessionId,
+    this.readingSessionId,
     required this.title,
     required this.type,
     required this.content,
-    required this.startPage,
-    required this.endPage,
+    this.startPage,
+    this.endPage,
+    Timestamp? createdAt,
+    Timestamp? updatedAt,
+  })  : createdAt = createdAt ?? Timestamp.now(),
+        updatedAt = updatedAt ?? Timestamp.now();
+
+  @override
+  Note._({
+    required this.id,
+    required this.userId,
+    required this.userBookId,
+    this.readingSessionId,
+    required this.title,
+    required this.type,
+    required this.content,
+    this.startPage,
+    this.endPage,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory Note.fromMap(Map<String, dynamic> map) {
-    return Note(
-      id: map['id'] as String,
-      userId: map['userId'] as String,
-      userBookId: map['userBookId'] as String,
-      readingSessionId: map['readingSessionId'] as String,
-      title: map['title'] as String,
-      type: map['type'] as NoteType,
-      content: map['content'] as String,
-      startPage: map['startPage'] as int,
-      endPage: map['endPage'] as int,
-      createdAt: map['createdAt'] as DateTime,
-      updatedAt: map['updatedAt'] as DateTime,
+  @override
+  factory Note.fromMap(Map<String, dynamic> map, String? id) {
+    return Note._(
+      id: id,
+      userId: map['userId'],
+      userBookId: map['userBookId'],
+      readingSessionId: map['readingSessionId'],
+      title: map['title'],
+      type: NoteType.values.byName(map['type']),
+      content: map['content'],
+      startPage: map['startPage'],
+      endPage: map['endPage'],
+      createdAt: map['createdAt'],
+      updatedAt: map['updatedAt'],
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -50,7 +70,7 @@ class Note {
       'userBookId': userBookId,
       'readingSessionId': readingSessionId,
       'title': title,
-      'type': type,
+      'type': type.name,
       'content': content,
       'startPage': startPage,
       'endPage': endPage,

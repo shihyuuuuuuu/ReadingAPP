@@ -1,37 +1,58 @@
-class ReadingSession {
-  String id;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'base.dart';
+
+class ReadingSession extends MappableModel {
+  String? id;
   String userBookId;
-  DateTime startTime;
-  DateTime endTime;
-  int startPage;
-  int endPage;
+  Timestamp startTime;
+  Timestamp endTime;
+  int? startPage;
+  int? endPage;
   int duration;
   int earnedExp;
 
+  @override
   ReadingSession({
-    required this.id,
     required this.userBookId,
     required this.startTime,
     required this.endTime,
-    required this.startPage,
-    required this.endPage,
+    this.startPage,
+    this.endPage,
     required this.duration,
     required this.earnedExp,
   });
 
-  factory ReadingSession.fromMap(Map<String, dynamic> map) {
-    return ReadingSession(
-      id: map['id'] as String,
-      userBookId: map['userBookId'] as String,
-      startTime: map['startTime'] as DateTime,
-      endTime: map['endTime'] as DateTime,
-      startPage: map['startPage'] as int,
-      endPage: map['endPage'] as int,
-      duration: map['duration'] as int,
-      earnedExp: map['earnedExp'] as int,
+  @override
+  ReadingSession._({
+    required this.id,
+    required this.userBookId,
+    required this.startTime,
+    required this.endTime,
+    this.startPage,
+    this.endPage,
+    required this.duration,
+    required this.earnedExp,
+  });
+
+  @override
+  factory ReadingSession.fromMap(Map<String, dynamic> map, String? id) {
+    final DateTime startTime = map['startTime'].toDate();
+    final DateTime endTime = map['endTime'].toDate();
+    final Duration difference = endTime.difference(startTime);
+
+    return ReadingSession._(
+      id: id,
+      userBookId: map['userBookId'],
+      startTime: map['startTime'],
+      endTime: map['endTime'],
+      startPage: map['startPage'],
+      endPage: map['endPage'],
+      duration: difference.inMinutes,
+      earnedExp: map['earnedExp'],
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,

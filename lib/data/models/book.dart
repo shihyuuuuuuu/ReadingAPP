@@ -1,43 +1,62 @@
-class Book {
-  String id;
+import 'base.dart';
+
+class Book extends MappableModel {
+  String? id;
   String title;
-  String subtitle;
+  String? subtitle;
   List<String> authors;
-  String publisher;
-  DateTime publishedDate;
-  String description;
-  List<String> categories;
-  int pageCount;
-  String coverImage;
-  
+  String? publisher;
+  DateTime? publishedDate;
+  String? description;
+  List<String>? categories;
+  int? pageCount;
+  String? coverImage;
+
+  @override
   Book({
-    required this.id,
+    this.id,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.authors,
-    required this.publisher,
-    required this.publishedDate,
-    required this.description,
-    required this.categories,
-    required this.pageCount,
-    required this.coverImage,
+    this.publisher,
+    this.publishedDate,
+    this.description,
+    this.categories,
+    this.pageCount,
+    this.coverImage,
   });
 
-  factory Book.fromMap(Map<String, dynamic> map) {
-    return Book(
-      id: map['id'] as String,
-      title: map['title'] as String,
-      subtitle: map['subtitle'] as String,
+  @override
+  Book._({
+    required this.id,
+    required this.title,
+    this.subtitle,
+    required this.authors,
+    this.publisher,
+    this.publishedDate,
+    this.description,
+    this.categories,
+    this.pageCount,
+    this.coverImage,
+  });
+
+  @override
+  factory Book.fromMap(Map<String, dynamic> map, String? id) {
+    return Book._(
+      id: id,
+      title: map['title'],
+      subtitle: map['subtitle'],
       authors: List<String>.from(map['authors']),
-      publisher: map['publisher'] as String,
-      publishedDate: map['publishedDate'] as DateTime,
-      description: map['description'] as String,
+      publisher: map['publisher'],
+      publishedDate: DateTime.parse(map['publishedDate']),
+      description: map['description'],
       categories: List<String>.from(map['categories']),
-      pageCount: map['pageCount'] as int,
-      coverImage: map['coverImage'] as String,
+      pageCount: map['pageCount'],
+      coverImage: map['coverImage'],
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
