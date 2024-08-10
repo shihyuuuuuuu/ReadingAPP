@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
-import 'package:reading_app/data/models/note_type.dart';
+import 'package:reading_app/data/local/note_type.dart';
 import 'package:reading_app/ui/widget/searching_dialog.dart';
 
 class NotePage extends StatefulWidget {
