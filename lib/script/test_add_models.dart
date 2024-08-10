@@ -41,29 +41,29 @@ void main() async {
 
   for (var user in users) {
     final newUser = User.fromMap(user, user['id']);
-    await userRepository.add(newUser);
-    print('User ${user['name']} added to Firestore');
+    var id = await userRepository.add(newUser);
+    print('User ${user['name']} $id added to Firestore');
   }
 
   for (var book in books) {
     final newBook = Book.fromMap(book, book['id']);
-    await bookRepository.add(newBook);
-    print('Book ${book['title']} added to Firestore');
+    var id = await bookRepository.add(newBook);
+    print('Book ${book['title']} $id added to Firestore');
   }
 
   for (var userBook in userBooks) {
     final newUserBook = UserBook.fromMap(userBook, userBook['id']);
-    await userBookRepository.add(newUserBook);
+    var id = await userBookRepository.add(newUserBook);
     print(
-        'UserBook ${newUserBook.userId}(userId)/${newUserBook.bookId}(bookId) added to Firestore');
+        'UserBook $id added to Firestore');
   }
 
   for (var note in notes) {
     note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
     note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
     final newNote = Note.fromMap(note, note['id']);
-    await noteRepository.add(newNote);
-    print('Note ${newNote.title} added to Firestore');
+    var id = await noteRepository.add(newNote);
+    print('Note ${newNote.title} $id added to Firestore');
   }
 
   for (var session in readingSessions) {
@@ -71,7 +71,7 @@ void main() async {
         Timestamp.fromDate(DateTime.parse(session['startTime']));
     session['endTime'] = Timestamp.fromDate(DateTime.parse(session['endTime']));
     final newReadingSession = ReadingSession.fromMap(session, session['id']);
-    await readingSessionRepository.add(newReadingSession);
-    print('ReadingSession ${newReadingSession.id} added to Firestore');
+    var id = await readingSessionRepository.add(newReadingSession);
+    print('ReadingSession ${newReadingSession.id} $id added to Firestore');
   }
 }

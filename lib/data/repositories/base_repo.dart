@@ -8,11 +8,13 @@ abstract class BaseRepository<T extends MappableModel> {
 
   BaseRepository() : collectionPath = T.toString();
 
-  Future<void> add(T item) async {
+  Future<String> add(T item) async {
     Map<String, dynamic> itemMap = item.toMap();
     itemMap.remove('id'); // Assuming `id` is managed by Firestore
 
-    await _db.collection(collectionPath).add(itemMap).timeout(timeout);
+    DocumentReference docRef = await _db.collection(collectionPath).add(itemMap).timeout(timeout);
+    
+    return docRef.id;
   }
 
   Future<T?> get(String id) async {
