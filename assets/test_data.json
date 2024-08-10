@@ -1,0 +1,170 @@
+{
+    "User": [
+        {
+            "id": "1",
+            "name": "Alice",
+            "avatarUrl": "http://example.com/avatar1.jpg"
+        },
+        {
+            "id": "2",
+            "name": "Charlie",
+            "avatarUrl": "http://example.com/avatar2.jpg"
+        },
+        {
+            "id": "3",
+            "name": "Bob",
+            "avatarUrl": "http://example.com/avatar3.jpg"
+        }
+    ],
+    "Book": [
+        {
+            "id": "1",
+            "title": "The Pragmatic Programmer",
+            "subtitle": "Your Journey to Mastery",
+            "authors": [
+                "Andrew Hunt",
+                "David Thomas"
+            ],
+            "publisher": "Addison-Wesley",
+            "publishedDate": "1999-10-20",
+            "description": "A book about software engineering and best practices.",
+            "categories": [
+                "Software Development",
+                "Programming"
+            ],
+            "pageCount": 352,
+            "coverImage": "http://example.com/cover1.jpg"
+        },
+        {
+            "id": "2",
+            "title": "Clean Code",
+            "subtitle": "A Handbook of Agile Software Craftsmanship",
+            "authors": [
+                "Robert C. Martin"
+            ],
+            "publisher": "Prentice Hall",
+            "publishedDate": "2008-08-11",
+            "description": "A book about writing clean and maintainable code.",
+            "categories": [
+                "Software Development",
+                "Programming"
+            ],
+            "pageCount": 464,
+            "coverImage": "http://example.com/cover2.jpg"
+        },
+        {
+            "id": "3",
+            "title": "Extreme Ownership",
+            "subtitle": "How U.S. Navy SEALs Lead and Win",
+            "authors": [
+                "Jocko Willink",
+                "Leif Babin"
+            ],
+            "publisher": "St. Martin's Press",
+            "publishedDate": "2015-10-20",
+            "description": "A book about leadership principles learned in the Navy SEALs.",
+            "categories": [
+                "Leadership",
+                "Business"
+            ],
+            "pageCount": 320,
+            "coverImage": "http://example.com/cover3.jpg"
+        }
+    ],
+    "UserBook": [
+        {
+            "id": "1",
+            "userId": "1",
+            "bookId": "1",
+            "state": "reading",
+            "startDate": "2024-01-15",
+            "currentPage": 120
+        },
+        {
+            "id": "2",
+            "userId": "2",
+            "bookId": "2",
+            "state": "finished",
+            "startDate": "2023-11-01",
+            "currentPage": 464
+        },
+        {
+            "id": "3",
+            "userId": "3",
+            "bookId": "3",
+            "state": "giveup",
+            "startDate": "2024-06-10",
+            "currentPage": 85
+        }
+    ],
+    "Note": [
+        {
+            "id": "1",
+            "userId": "1",
+            "userBookId": "1",
+            "readingSessionId": "1",
+            "title": "Key Takeaways",
+            "type": "content",
+            "content": "Remember to use version control and automate repetitive tasks.",
+            "startPage": 100,
+            "endPage": 120,
+            "createdAt": "2024-07-15 10:00:00",
+            "updatedAt": "2024-07-15 10:00:00"
+        },
+        {
+            "id": "2",
+            "userId": "2",
+            "userBookId": "2",
+            "readingSessionId": "2",
+            "title": "Clean Code Principles",
+            "type": "experience",
+            "content": "Code should be simple, clean, and easy to understand.",
+            "startPage": 50,
+            "endPage": 70,
+            "createdAt": "2024-07-20 11:00:00",
+            "updatedAt": "2024-07-20 11:00:00"
+        },
+        {
+            "id": "3",
+            "userId": "3",
+            "userBookId": "3",
+            "readingSessionId": "3",
+            "title": "Leadership Insights",
+            "type": "action",
+            "content": "Effective leaders take responsibility for their team's actions.",
+            "startPage": 70,
+            "endPage": 85,
+            "createdAt": "2024-07-25 12:00:00",
+            "updatedAt": "2024-07-25 12:00:00"
+        }
+    ],
+    "ReadingSession": [
+        {
+            "id": "1",
+            "userBookId": "1",
+            "startTime": "2024-07-15 09:00:00",
+            "endTime": "2024-07-15 10:00:00",
+            "startPage": 100,
+            "endPage": 120,
+            "earnedExp": 10
+        },
+        {
+            "id": "2",
+            "userBookId": "2",
+            "startTime": "2024-07-20 10:00:00",
+            "endTime": "2024-07-20 11:00:00",
+            "startPage": 50,
+            "endPage": 70,
+            "earnedExp": 10
+        },
+        {
+            "id": "3",
+            "userBookId": "3",
+            "startTime": "2024-07-25 11:00:00",
+            "endTime": "2024-07-25 12:00:00",
+            "startPage": 70,
+            "endPage": 85,
+            "earnedExp": 10
+        }
+    ]
+}
