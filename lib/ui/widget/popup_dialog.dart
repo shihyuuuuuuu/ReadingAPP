@@ -63,9 +63,13 @@ class _HintText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       children: [
-        Text(text),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(text, style: textTheme.titleMedium),
+        ),
         Divider(),
       ],
     );

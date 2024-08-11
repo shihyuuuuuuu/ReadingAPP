@@ -74,7 +74,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
             },
           ),
         ],
-        // backgroundColor: Colors.orange,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -84,7 +83,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start ,
                 children: [ 
-                  _BookInfoContainer(textTheme: textTheme, colorScheme: colorScheme),
+                  _BookInfoContainer(),
                   const SizedBox(height: 20,),
                   Text('書籍狀態：在讀', style: textTheme.bodyLarge),
                   const TagArea(tagLables: ['魔法', '小說', '奇幻']),
@@ -124,16 +123,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
 class _BookInfoContainer extends StatelessWidget {
   const _BookInfoContainer({
-    // super.key,
-    required this.textTheme,
-    required this.colorScheme,
+    super.key,
   });
-
-  final TextTheme textTheme;
-  final ColorScheme colorScheme;
 
   @override
   Widget build(BuildContext context) {
+
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       // padding: EdgeInsets.all(8.0),
       child: Row(
