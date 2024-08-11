@@ -1,5 +1,5 @@
-enum BookState { 
-  waiting(displayName:  "待讀"),
+enum BookState {
+  waiting(displayName: "待讀"),
   reading(displayName: "在讀"),
   finished(displayName: "已完成"),
   suspended(displayName: "已暫停"),
@@ -8,5 +8,4 @@ enum BookState {
   final String displayName;
 
   const BookState({required this.displayName});
-  
- }
+}
