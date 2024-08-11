@@ -22,8 +22,8 @@ class PopupDialog extends StatelessWidget{
     final nav = Provider.of<NavigationService>(context, listen: false);
 
     void onPressed(popupEvent item){
-      item.onPressed();
       Navigator.of(context).pop();
+      item.onPressed();
     }
 
     return Dialog(

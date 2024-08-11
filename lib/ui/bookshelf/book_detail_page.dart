@@ -23,26 +23,9 @@ class BookDetailPage extends StatefulWidget {
 class _BookDetailPageState extends State<BookDetailPage> {
   
   
-  void _showPopup(BuildContext context) async {
-    final nav = Provider.of<NavigationService>(context, listen: false);
 
-    void goEditNote() {
-      nav.goEditNote("noteId");
-    }  
+  void _showPopup(BuildContext context, List<popupEvent> popUpEvent) async {
     
-    final List<popupEvent> popUpEvent = [
-      popupEvent(
-        icon: const Icon(Icons.add_box_outlined), 
-        text: '發布筆記', 
-        onPressed: ()=>{}
-      ),
-      popupEvent(
-        icon: const Icon(Icons.edit_document), 
-        text: '編輯筆記', 
-        onPressed:  goEditNote,
-      )
-    ];
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -58,6 +41,47 @@ class _BookDetailPageState extends State<BookDetailPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
     DateTime now = DateTime.now();
+
+    const snackBar = SnackBar(
+      content: Text('已更新書籍狀態'),
+      duration: Duration(milliseconds: 1500),
+    );
+
+    final List<popupEvent> bookStatePopUp = [
+      popupEvent(
+        icon: const Icon(Icons.flag), 
+        text: '放棄', 
+        onPressed: ()=>{ScaffoldMessenger.of(context).showSnackBar(snackBar)}
+      ),
+      popupEvent(
+        icon: const Icon(Icons.pause_circle_outline), 
+        text: '暫停', 
+        onPressed:  ()=>{},
+      ),
+      popupEvent(
+        icon: const Icon(Icons.adjust_outlined), 
+        text: '完成', 
+        onPressed: ()=>{}
+      ),
+    ];
+
+    void changeStatePressed() {
+      
+    }
+
+    final List<popupEvent> bookDetailPopup = [
+      popupEvent(
+        icon: const Icon(Icons.edit_document), 
+        text: '編輯書籍資訊', 
+        onPressed: ()=>{}
+      ),
+      popupEvent(
+        icon: const Icon(Icons.table_chart_outlined), //autorenew
+        text: '更改狀態', 
+        onPressed: () => _showPopup(context, bookStatePopUp),
+      )
+    ];
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -70,7 +94,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           IconButton(
             icon: Icon(Icons.more_vert),
             onPressed: () {
-              _showPopup(context);
+              _showPopup(context, bookDetailPopup);
             },
           ),
         ],
