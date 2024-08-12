@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/local/note_type.dart';
 import 'package:reading_app/service/navigation.dart';
-import 'package:reading_app/ui/notes/note_type.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
 import 'package:reading_app/ui/widget/popup_event.dart';
 import 'package:reading_app/ui/widget/tags.dart';

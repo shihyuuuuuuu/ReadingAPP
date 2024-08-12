@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/local/book_state.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
-import 'package:reading_app/ui/bookshelf/book_state.dart';
-
 import 'package:reading_app/ui/widget/searching_dialog.dart';
-import 'package:reading_app/ui/widget/tags.dart';
 
 
 class BookshelfPage extends StatefulWidget {
@@ -84,7 +82,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
             _BookCard(img: img[2], bookName: bookName[1], tags: tags, bookState: BookState.reading,),
             _BookCard(img: img[1], bookName: bookName[1], tags: tags, bookState: BookState.reading,),
             _BookCard(img: img[0], bookName: bookName[0], tags: tags, bookState: BookState.suspended,),
-            _BookCard(img: img[2], bookName: bookName[2], tags: tags, bookState: BookState.finish,),
+            _BookCard(img: img[2], bookName: bookName[2], tags: tags, bookState: BookState.finished,),
             _BookCard(img: img[1], bookName: bookName[0], tags: tags, bookState: BookState.waiting,),
             _BookCard(img: img[0], bookName: bookName[1], tags: tags, bookState: BookState.waiting,),
             ],
@@ -139,7 +137,7 @@ class _BookCard extends StatelessWidget{
                   bookName, 
                   style: textTheme.titleMedium, // bold
                 ),
-                Text(bookState.str), //more info for page, etc.
+                Text(bookState.displayName), //more info for page, etc.
                 // TagArea(tagLables: tags.sublist(0,2),)
               ],)
             ),
