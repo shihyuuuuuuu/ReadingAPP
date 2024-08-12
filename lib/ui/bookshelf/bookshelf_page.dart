@@ -55,7 +55,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         toolbarHeight: 70.0,
-        title: Text('書架', style: textTheme.headlineLarge,),
+        title: Text('書架', style: textTheme.headlineMedium,),
         actions: <Widget>[
           appBarIconStyle(
               colorScheme, context,
@@ -135,9 +135,9 @@ class _BookCard extends StatelessWidget{
                 const SizedBox(height: 10,),
                 Text(
                   bookName, 
-                  style: textTheme.titleMedium, // bold
+                  style: textTheme.titleSmall, // bold
                 ),
-                Text(bookState.displayName), //more info for page, etc.
+                Text(bookState.displayName, style: textTheme.bodySmall,), //more info for page, etc.
                 // TagArea(tagLables: tags.sublist(0,2),)
               ],)
             ),

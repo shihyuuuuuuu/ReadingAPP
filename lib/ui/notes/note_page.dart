@@ -48,7 +48,7 @@ class _NotePageState extends State<NotePage> {
         toolbarHeight: 70.0,
         title: Text(
           '我的筆記', 
-          style: textTheme.headlineLarge,
+          style: textTheme.headlineMedium,
         ),
         actions: <Widget>[
           appBarIconStyle(colorScheme, context,  
@@ -177,17 +177,17 @@ class _NoteContainerState extends State<_NoteContainer> {
                     children: [
                       Expanded(
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(16.0),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                           title: Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
+                            padding: const EdgeInsets.only(bottom: 8.0),
                             child: Text(
                               widget.title,
-                              style: textTheme.titleLarge,
+                              style: textTheme.titleMedium,
                             ),
                           ),
                           subtitle: Text(
                             '${widget.pages}, ${widget.date}',
-                            style: textTheme.labelLarge,
+                            style: textTheme.bodyMedium,
                           ),
                         ),
                       ),
@@ -216,7 +216,7 @@ class _NoteContainerState extends State<_NoteContainer> {
                     padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
                     child: Text(
                       widget.description!,
-                      style: textTheme.bodyLarge,
+                      style: textTheme.bodyMedium,
                     ),
                   ),
                 ],
@@ -244,7 +244,7 @@ class _NoteContainerState extends State<_NoteContainer> {
             child: (
               Text(
                 widget.noteType.str,
-                style: TextStyle(color: colorScheme.onSurface,)
+                style: textTheme.labelSmall?.copyWith(color:colorScheme.onSurface,)
               )
             )
           ),

@@ -30,8 +30,9 @@ class _Tags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Chip(
-        label: Text('#$text'),
+        label: Text('#$text', style: textTheme.labelMedium),
         backgroundColor: Colors.orange[100],
         padding: EdgeInsets.zero,
       );

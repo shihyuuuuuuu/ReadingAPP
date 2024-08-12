@@ -45,7 +45,7 @@ class PopupDialog extends StatelessWidget{
                 onTap: ()=>{ onPressed(item)},
                 child: ListTile(
                     leading: item.icon,
-                    title: Text(item.text, style: textTheme.titleLarge),
+                    title: Text(item.text, style: textTheme.labelLarge),
                   ),
               )).toList()
             )
@@ -67,8 +67,8 @@ class _HintText extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(text, style: textTheme.titleMedium),
+          padding: const EdgeInsets.all(6.0),
+          child: Text(text, style: textTheme.headlineSmall),
         ),
         Divider(),
       ],

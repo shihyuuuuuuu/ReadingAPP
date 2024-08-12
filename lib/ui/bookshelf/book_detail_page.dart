@@ -65,10 +65,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
       ),
     ];
 
-    void changeStatePressed() {
-      
-    }
-
     final List<popupEvent> bookDetailPopup = [
       popupEvent(
         icon: const Icon(Icons.edit_document), 
@@ -100,7 +96,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
@@ -108,14 +104,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start ,
                 children: [ 
                   _BookInfoContainer(),
-                  const SizedBox(height: 20,),
-                  Text('書籍狀態：在讀', style: textTheme.bodyLarge),
+                  const SizedBox(height: 10,),
+                  Text('書籍狀態：在讀', style: textTheme.bodyMedium),
+                  SizedBox(height: 10,),
                   const TagArea(tagLables: ['魔法', '小說', '奇幻']),
                   const SizedBox(height: 16,),
                   Row(children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
-                      child: Text("筆記", style: textTheme.titleLarge),
+                      child: Text("筆記", style: textTheme.titleMedium),
                     ),
                     const Expanded(child: Divider( )),  
                   ],),
@@ -141,6 +138,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           ],
         ),
       ),
+      bottomSheet: _BottomButtons(),
     );
   }
 }
@@ -173,12 +171,12 @@ class _BookInfoContainer extends StatelessWidget {
               children: [
                 Text(
                   'Book Title',
-                  style: textTheme.displaySmall,
+                  style: textTheme.titleLarge,
                 ),
                 SizedBox(height: 16),
-                Text('Author', style: textTheme.bodyLarge,),
-                Text('Publisher', style: textTheme.bodyLarge),
-                Text('Year', style: textTheme.bodyLarge),
+                Text('Author', style: textTheme.bodyMedium,),
+                Text('Publisher', style: textTheme.bodyMedium),
+                Text('Year', style: textTheme.bodyMedium),
                 SizedBox(height: 16),
                 SizedBox(
                   height: 60,
@@ -237,6 +235,7 @@ class _NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nav = Provider.of<NavigationService>(context, listen: false);
+    final textTheme = Theme.of(context).textTheme;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: InkWell(
@@ -250,14 +249,17 @@ class _NoteCard extends StatelessWidget {
                 children: [
                   Text(
                     noteTitle,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500 ),
                   ),
                   const SizedBox(height: 8),
-                  Text('p.${startPage}-${endPage+10}, ${DateFormat.yMd().format(date)}'),
+                  Text('p.${startPage}-${endPage+10}, ${DateFormat.yMd().format(date)}',
+                    style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     content,
                     maxLines: 4,
+                    style: textTheme.bodyMedium
                   ),
                 ],
               ),
@@ -273,6 +275,50 @@ class _NoteCard extends StatelessWidget {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _BottomButtons extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final nav = Provider.of<NavigationService>(context, listen: false);
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        boxShadow:[
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,  
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          FilledButton(
+              onPressed: () => { nav.goChatNote('bookId')}, 
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text("開始閱讀", style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary) ),
+              )
+            ),
+          FilledButton(
+              onPressed: () => {}, 
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text("新增筆記", style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary) ),
+              )
+            ),
+          
+        ],
       ),
     );
   }
