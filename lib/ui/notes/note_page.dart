@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
 import 'package:reading_app/data/local/note_type.dart';
@@ -17,22 +20,34 @@ class NotePage extends StatefulWidget {
 }
 
 class _NotePageState extends State<NotePage> {
-  String str = '《1984》是一部描述反烏托邦社會的經典小說。故事設定在一個虛構的極權主義國家“奧西尼亞”，時間是1984年。主角溫斯頓·史密斯是一名在黨的真理部工作的普通成員。他對黨和其領袖老大哥感到懷疑和不滿，並試圖在秘密中保持自己的思想自由。';
-  
   String _searchCondition = "";
+  List<Note> notes = [];
 
-    Future<void> _showPopup(BuildContext context) async {
-      final result = await showDialog<String>(
-        context: context,
-        builder: (BuildContext context) {
-          return const SearchingDialog(
-            searchHint: '輸入筆記名稱或相關內容',
-              history: [
-                '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
-              ],
-          );
-        },
-      );
+  Future<void> readJson() async {
+      final String dataStr = await rootBundle.loadString('assets/test_data.json');
+      final Map<String, dynamic> data = json.decode(dataStr);
+      setState(() { 
+        for (var note in data['Note']) {
+          note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
+          note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
+          final newNote = Note.fromMap(note, note['id']);
+          notes.add(newNote);
+        }
+      }); 
+    }
+    
+  Future<void> _showPopup(BuildContext context) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return const SearchingDialog(
+          searchHint: '輸入筆記名稱或相關內容',
+            history: [
+              '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
+            ],
+        );
+      },
+    );
     if (result != null) {
       setState(() {
         _searchCondition = result;
@@ -41,6 +56,11 @@ class _NotePageState extends State<NotePage> {
 
   }
 
+  @override
+  void initState() {
+    super.initState();
+    readJson();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,66 +86,24 @@ class _NotePageState extends State<NotePage> {
           )
         ],
       ),
-      body: ListView(
-        
-        children: <Widget>[
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.content,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.action,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.experience,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.thought,
-            description: str,
-          ),
-          _NoteContainer(
-            title: 'Note Title',
-            pages: 'p.148-153',
-            date: '2024.07.14',
-            noteType: NoteType.action,
-            description: str,
-          ),
-          // Text('query string: ${_searchCondition}'),
-        ],
-      ),
+      body: notes != null 
+                ? ListView( 
+                    // mainAxisAlignment: MainAxisAlignment.center, 
+                    children: notes.map((item) => 
+                      _NoteContainer(note: item)).toList(), 
+                  ) 
+                : CircularProgressIndicator(), 
     );
   }
 }
 
 
 class _NoteContainer extends StatefulWidget {
-  final String title;
-  final String pages;
-  final String date;
-  final NoteType noteType;
-  final String? description;
+  final Note note;
 
   const _NoteContainer({
     super.key,
-    required this.title,
-    required this.pages,
-    required this.date,
-    required this.noteType,
-    this.description,
+    required this.note,
   });
 
   @override
@@ -157,6 +135,7 @@ class _NoteContainerState extends State<_NoteContainer> {
     const double cardBoarderRadius = 10;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final dateFormatter = DateFormat('yyyy-MM-dd');
     
     
     EdgeInsets cardEdgeInsets = const EdgeInsets.symmetric(vertical: 0.5, horizontal: 0.0);
@@ -186,12 +165,13 @@ class _NoteContainerState extends State<_NoteContainer> {
                           title: Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: Text(
-                              widget.title,
+                              widget.note.title,
                               style: textTheme.titleMedium,
                             ),
                           ),
                           subtitle: Text(
-                            '${widget.pages}, ${widget.date}',
+                            'P.${widget.note.startPage}-${widget.note.endPage},  ${
+                              dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(widget.note.createdAt.millisecondsSinceEpoch))}',
                             style: textTheme.bodyMedium,
                           ),
                         ),
@@ -216,11 +196,11 @@ class _NoteContainerState extends State<_NoteContainer> {
                     ],
                   ),
                 ),
-                if (isExpanded && widget.description != null)
+                if (isExpanded)
                   Padding(
                     padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
                     child: Text(
-                      widget.description!,
+                      widget.note.content,
                       style: textTheme.bodyMedium,
                     ),
                   ),
@@ -240,7 +220,7 @@ class _NoteContainerState extends State<_NoteContainer> {
             padding: const EdgeInsets.all(6),
             alignment: Alignment.topCenter,
             decoration: BoxDecoration(
-              color: widget.noteType.color,
+              color: widget.note.type.color,
               borderRadius: const BorderRadius.horizontal(
                 left: Radius.zero, 
                 right: Radius.circular(cardBoarderRadius)
@@ -248,7 +228,7 @@ class _NoteContainerState extends State<_NoteContainer> {
             ),
             child: (
               Text(
-                widget.noteType.str,
+                widget.note.type.str,
                 style: textTheme.labelSmall?.copyWith(color:colorScheme.onSurface,)
               )
             )
