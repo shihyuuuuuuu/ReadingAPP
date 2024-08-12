@@ -33,7 +33,7 @@
                 "Programming"
             ],
             "pageCount": 352,
-            "coverImage": "http://example.com/cover1.jpg"
+            "coverImage": "https://d1csarkz8obe9u.cloudfront.net/themedlandingpages/tlp_hero_book-cover-adb8a02f82394b605711f8632a44488b.jpg"
         },
         {
             "id": "2",
@@ -50,7 +50,7 @@
                 "Programming"
             ],
             "pageCount": 464,
-            "coverImage": "http://example.com/cover2.jpg"
+            "coverImage": "https://edit.org/images/cat/book-covers-big-2019101610.jpg"
         },
         {
             "id": "3",
@@ -68,8 +68,65 @@
                 "Business"
             ],
             "pageCount": 320,
-            "coverImage": "http://example.com/cover3.jpg"
+            "coverImage":   "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/yellow-business-leadership-book-cover-design-template-dce2f5568638ad4643ccb9e725e5d6ff.jpg"
+        },
+        {
+            "id": "5",
+            "title": "成功路上",
+            "subtitle": "职场与生活中的智慧",
+            "authors": [
+                "王强",
+                "李丽"
+            ],
+            "publisher": "人民出版社",
+            "publishedDate": "2022-08-15",
+            "description": "一本探讨如何在职场和生活中取得成功的书籍，结合实际案例和理论分析。",
+            "categories": [
+                "职场",
+                "生活"
+            ],
+            "pageCount": 280,
+            "coverImage": "https://online.visual-paradigm.com/repository/images/bcf3d854-9f03-4d6e-b552-024177d874fd/book-covers-design/brain-illustrated-autobiography-book-cover.png?s=360"
+        },
+        {
+            "id": "7",
+            "title": "编程入门",
+            "subtitle": "掌握基础技能",
+            "authors": [
+                "张伟",
+                "刘敏"
+            ],
+            "publisher": "电子工业出版社",
+            "publishedDate": "2018-04-10",
+            "description": "这本书为初学者提供了编程的基本知识和实用技巧。",
+            "categories": [
+                "技术",
+                "教育"
+            ],
+            "pageCount": 350,
+            "coverImage": "https://online.visual-paradigm.com/repository/images/36ca7301-ae5a-4777-8cd4-1dbec0bd8bde/book-covers-design/manage-investment-book-cover.png"
+        },
+        {
+            "id": "9",
+            "title": "健康饮食指南",
+            "subtitle": "如何通过饮食改善生活",
+            "authors": [
+                "陈明",
+                "赵丹"
+            ],
+            "publisher": "健康出版社",
+            "publishedDate": "2020-12-01",
+            "description": "本书提供了科学的饮食建议，帮助读者通过健康的饮食习惯改善生活质量。",
+            "categories": [
+                "健康",
+                "饮食"
+            ],
+            "pageCount": 200,
+            "coverImage": "https://online.visual-paradigm.com/repository/images/62b16c53-9d6c-4fb3-9526-eef9250ea7d9/book-covers-design/.png"
         }
+        
+        
+        
     ],
     "UserBook": [
         {
