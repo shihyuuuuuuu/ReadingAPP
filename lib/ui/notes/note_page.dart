@@ -172,7 +172,7 @@ class _NoteContainerState extends State<_NoteContainer> {
                           subtitle: Text(
                             'P.${widget.note.startPage}-${widget.note.endPage},  ${
                               dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(widget.note.createdAt.millisecondsSinceEpoch))}',
-                            style: textTheme.bodyMedium,
+                            style: textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
                           ),
                         ),
                       ),

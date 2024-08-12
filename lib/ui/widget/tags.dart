@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TagArea extends StatelessWidget{
-  final List<String> tagLables;
+  final List<String>? tagLables;
   const TagArea({
     super.key, 
     required this.tagLables
@@ -14,7 +14,7 @@ class TagArea extends StatelessWidget{
       spacing: 8.0,
       runSpacing: 5.0,
       children: 
-        tagLables.map((item) => _Tags(text:item)).toList()
+        tagLables!.map((item) => _Tags(text:item)).toList()
       );
      
   }

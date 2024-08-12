@@ -1,7 +1,13 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:reading_app/data/local/note_type.dart';
+import 'package:reading_app/data/models/book.dart';
+import 'package:reading_app/data/models/note.dart';
+import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
 import 'package:reading_app/ui/widget/popup_event.dart';
@@ -22,7 +28,33 @@ class BookDetailPage extends StatefulWidget {
 
 class _BookDetailPageState extends State<BookDetailPage> {
   
-  
+  // TODO: [rear end]: books -> book, userBooks -> userBook
+  final List<Note> notes = [];
+  final List<Book> books = [];
+  final List<UserBook> userBooks = [];
+
+  Future<void> readJson() async {
+    // TODO: [rear end]: data fetching logic
+    final String dataStr = await rootBundle.loadString('assets/test_data.json');
+    final Map<String, dynamic> data = json.decode(dataStr);
+    setState(() { 
+      for (var note in data['Note']) {
+        note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
+        note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
+        final newNote = Note.fromMap(note, note['id']);
+        notes.add(newNote);
+      }
+      for (var book in data['Book']) {
+        books.add(Book.fromMap(book, book['id']));
+        break;
+      }
+      for (var userBook in data['UserBook']) {
+        userBooks.add(UserBook.fromMap(userBook, userBook['id']));
+        break;
+      }
+    }); 
+  }
+
 
   void _showPopup(BuildContext context, List<popupEvent> popUpEvent) async {
     
@@ -34,13 +66,18 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    readJson();
+  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
-    DateTime now = DateTime.now();
+  
 
     const snackBar = SnackBar(
       content: Text('已更新書籍狀態'),
@@ -97,17 +134,19 @@ class _BookDetailPageState extends State<BookDetailPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: CustomScrollView(
+        child: books.isEmpty? 
+        CircularProgressIndicator():
+        CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start ,
-                children: [ 
-                  _BookInfoContainer(),
+                children: [
+                  _BookInfoContainer(book: books[0], userBook: userBooks[0]),
                   const SizedBox(height: 10,),
-                  Text('書籍狀態：在讀', style: textTheme.bodyMedium),
+                  Text('書籍狀態：${userBooks[0].state.displayName}', style: textTheme.bodyMedium),
                   SizedBox(height: 10,),
-                  const TagArea(tagLables: ['魔法', '小說', '奇幻']),
+                  TagArea(tagLables: (books[0].categories)),
                   const SizedBox(height: 16,),
                   Row(children: [
                     Padding(
@@ -117,23 +156,19 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     const Expanded(child: Divider( )),  
                   ],),
                   const SizedBox(height: 4.0,),
-                  Text("共6則", style: textTheme.bodySmall),     
+                  Text("共${notes.length}則", style: textTheme.bodySmall),     
                 ],
               )
             ),
             SliverList(
-              delegate: SliverChildBuilderDelegate((_, index) => 
-                _NoteCard(
-                  noteTitle: "A Good Day",
-                  startPage: index,
-                  endPage: index,
-                  date: now,
-                  noteType: NoteType.action,
-                  content: "if there is a dall on the street, should i pick it?"
-                ),
-                childCount: 5,
-              )
-            ),
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return _NoteCard(note: notes[index]);
+                },
+                childCount: notes.length,
+                // notes.map((note)=> _NoteCard(note: note)) as NullableIndexedWidgetBuilder)
+              ),
+            )
             
           ],
         ),
@@ -144,8 +179,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
 }
 
 class _BookInfoContainer extends StatelessWidget {
+  final Book book;
+  final UserBook userBook;
+
   const _BookInfoContainer({
-    super.key,
+    super.key, 
+    required this.book, 
+    required this.userBook,
   });
 
   @override
@@ -153,31 +193,32 @@ class _BookInfoContainer extends StatelessWidget {
 
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final dateFormatter = DateFormat('yyyy-MM-dd');
 
     return Container(
       // padding: EdgeInsets.all(8.0),
       child: Row(
         children: [
           Image.network(
-            "https://d1csarkz8obe9u.cloudfront.net/themedlandingpages/tlp_hero_book-cover-adb8a02f82394b605711f8632a44488b.jpg",
+            book.coverImage!,
             width: 140,
             height: 220,
             fit: BoxFit.cover,
           ),
-          SizedBox(width: 24),
+          const SizedBox(width: 24),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Book Title',
+                  book.title,
                   style: textTheme.titleLarge,
                 ),
-                SizedBox(height: 16),
-                Text('Author', style: textTheme.bodyMedium,),
-                Text('Publisher', style: textTheme.bodyMedium),
-                Text('Year', style: textTheme.bodyMedium),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
+                Text('作者：${book.authors.map((item) => item).join()}', style: textTheme.bodyMedium,),
+                Text('出版商：${book.publisher}', style: textTheme.bodyMedium),
+                Text('出版日期：${dateFormatter.format(book.publishedDate!)}', style: textTheme.bodyMedium),
+                const SizedBox(height: 16),
                 SizedBox(
                   height: 60,
                   child: Stack(
@@ -186,21 +227,23 @@ class _BookInfoContainer extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 80.0),
                           child: SizedBox(
+                            height: 60,
+                            width: 60,
                             child: CircularProgressIndicator(
                               strokeWidth: 10,
-                              value: 0.3,
+                              value: userBook.currentPage / book.pageCount!,
                               backgroundColor: Colors.grey[350],
                               valueColor: AlwaysStoppedAnimation<Color>(colorScheme.tertiary),
                             ),
-                            height: 60,
-                            width: 60,
                           ),
                         ),
                       ),
-                      Center(child: Padding(
-                        padding: const EdgeInsets.only(left: 80.0),
-                        child: Text('30%'),
-                      )),
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 80.0),
+                          child: Text('30%'),
+                        )
+                      ),
                     ],
                   ),
                 ),
@@ -214,21 +257,12 @@ class _BookInfoContainer extends StatelessWidget {
 }
 
 class _NoteCard extends StatelessWidget {
-  final String noteTitle;
-  final int startPage;
-  final int endPage;
-  final DateTime date;
-  final String content;
-  final NoteType noteType;
+  
+  final Note note;
 
   const _NoteCard({
     super.key, 
-    required this.noteTitle, 
-    required this.startPage, 
-    required this.endPage, 
-    required this.date, 
-    required this.content, 
-    required this.noteType
+    required this.note,
   });
 
 
@@ -236,6 +270,7 @@ class _NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = Provider.of<NavigationService>(context, listen: false);
     final textTheme = Theme.of(context).textTheme;
+    final dateFormatter = DateFormat('yyyy-MM-dd');
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: InkWell(
@@ -248,16 +283,17 @@ class _NoteCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    noteTitle,
+                    note.title,
                     style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500 ),
                   ),
                   const SizedBox(height: 8),
-                  Text('p.${startPage}-${endPage+10}, ${DateFormat.yMd().format(date)}',
+                  Text('P.${note.startPage}-${note.endPage},  ${
+                              dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note.createdAt.millisecondsSinceEpoch))}',
                     style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    content,
+                    note.content,
                     maxLines: 4,
                     style: textTheme.bodyMedium
                   ),
@@ -269,8 +305,8 @@ class _NoteCard extends StatelessWidget {
               top: 24,
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
-                color: noteType.color,
-                child: Text(noteType.name),
+                color: note.type.color,
+                child: Text(note.type.name),
               )
             )
           ],
