@@ -9,6 +9,8 @@ import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
+import 'package:reading_app/ui/notes/note_page.dart';
+import 'package:reading_app/ui/widget/note_container.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
 import 'package:reading_app/ui/widget/popup_event.dart';
 import 'package:reading_app/ui/widget/tags.dart';
@@ -75,7 +77,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
   
 
@@ -118,14 +119,14 @@ class _BookDetailPageState extends State<BookDetailPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             nav.pop();        
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             onPressed: () {
               _showPopup(context, bookDetailPopup);
             },
@@ -133,40 +134,45 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.only(bottom: 85.0),
         child: books.isEmpty? 
-        CircularProgressIndicator():
+        const CircularProgressIndicator():
         CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start ,
-                children: [
-                  _BookInfoContainer(book: books[0], userBook: userBooks[0]),
-                  const SizedBox(height: 10,),
-                  Text('書籍狀態：${userBooks[0].state.displayName}', style: textTheme.bodyMedium),
-                  SizedBox(height: 10,),
-                  TagArea(tagLables: (books[0].categories)),
-                  const SizedBox(height: 16,),
-                  Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
-                      child: Text("筆記", style: textTheme.titleMedium),
-                    ),
-                    const Expanded(child: Divider( )),  
-                  ],),
-                  const SizedBox(height: 4.0,),
-                  Text("共${notes.length}則", style: textTheme.bodySmall),     
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start ,
+                  children: [
+                    _BookInfoContainer(book: books[0], userBook: userBooks[0]),
+                    const SizedBox(height: 10,),
+                    Text('書籍狀態：${userBooks[0].state.displayName}', style: textTheme.bodyMedium),
+                    const SizedBox(height: 10,),
+                    TagArea(tagLables: (books[0].categories)),
+                    const SizedBox(height: 16,),
+                    Row(children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
+                        child: Text("筆記", style: textTheme.titleMedium),
+                      ),
+                      const Expanded(child: Divider( )),  
+                    ],),
+                    const SizedBox(height: 4.0,),
+                    Text("共${notes.length}則", style: textTheme.bodySmall),     
+                  ],
+                ),
               )
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  return _NoteCard(note: notes[index]);
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: NoteContainer(note: notes[index], expand: false,),
+                  );
                 },
                 childCount: notes.length,
-                // notes.map((note)=> _NoteCard(note: note)) as NullableIndexedWidgetBuilder)
               ),
             )
             
@@ -195,123 +201,60 @@ class _BookInfoContainer extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final dateFormatter = DateFormat('yyyy-MM-dd');
 
-    return Container(
-      // padding: EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Image.network(
-            book.coverImage!,
-            width: 140,
-            height: 220,
-            fit: BoxFit.cover,
-          ),
-          const SizedBox(width: 24),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  book.title,
-                  style: textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                Text('作者：${book.authors.map((item) => item).join()}', style: textTheme.bodyMedium,),
-                Text('出版商：${book.publisher}', style: textTheme.bodyMedium),
-                Text('出版日期：${dateFormatter.format(book.publishedDate!)}', style: textTheme.bodyMedium),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 60,
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 80.0),
-                          child: SizedBox(
-                            height: 60,
-                            width: 60,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 10,
-                              value: userBook.currentPage / book.pageCount!,
-                              backgroundColor: Colors.grey[350],
-                              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.tertiary),
-                            ),
+    return Row(
+      children: [
+        Image.network(
+          book.coverImage!,
+          width: 140,
+          height: 220,
+          fit: BoxFit.cover,
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                book.title,
+                style: textTheme.titleMedium,
+              ),
+              const SizedBox(height: 16),
+              Text('作者：${book.authors.map((item) => item).join()}', style: textTheme.bodyMedium,),
+              Text('出版商：${book.publisher}', style: textTheme.bodyMedium),
+              Text('出版日期：${dateFormatter.format(book.publishedDate!)}', style: textTheme.bodyMedium),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 60,
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 80.0),
+                        child: SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 10,
+                            value: userBook.currentPage / book.pageCount!,
+                            backgroundColor: Colors.grey[350],
+                            valueColor: AlwaysStoppedAnimation<Color>(colorScheme.tertiary),
                           ),
                         ),
                       ),
-                      const Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 80.0),
-                          child: Text('30%'),
-                        )
-                      ),
-                    ],
-                  ),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 80.0),
+                        child: Text(((userBook.currentPage / book.pageCount!)*100).toStringAsFixed(0)),
+                      )
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NoteCard extends StatelessWidget {
-  
-  final Note note;
-
-  const _NoteCard({
-    super.key, 
-    required this.note,
-  });
-
-
-  @override
-  Widget build(BuildContext context) {
-    final nav = Provider.of<NavigationService>(context, listen: false);
-    final textTheme = Theme.of(context).textTheme;
-    final dateFormatter = DateFormat('yyyy-MM-dd');
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: InkWell(
-        onTap: () => {nav.goViewNote("noteId")},
-        child: Stack(
-          children: [    
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child:  Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    note.title,
-                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500 ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('P.${note.startPage}-${note.endPage},  ${
-                              dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note.createdAt.millisecondsSinceEpoch))}',
-                    style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    note.content,
-                    maxLines: 4,
-                    style: textTheme.bodyMedium
-                  ),
-                ],
               ),
-            ),
-            Positioned(
-              right: 0,
-              top: 24,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
-                color: note.type.color,
-                child: Text(note.type.name),
-              )
-            )
-          ],
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -332,7 +275,7 @@ class _BottomButtons extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 5,
             blurRadius: 7,  
-            offset: Offset(0, 3), // changes position of shadow
+            offset: const Offset(0, 3), // changes position of shadow
           ),
         ],
       ),
