@@ -9,7 +9,6 @@ import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
-import 'package:reading_app/ui/notes/note_page.dart';
 import 'package:reading_app/ui/widget/note_container.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
 import 'package:reading_app/ui/widget/popup_event.dart';
@@ -218,7 +217,7 @@ class _BookInfoContainer extends StatelessWidget {
                 book.title,
                 style: textTheme.titleMedium,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               Text('作者：${book.authors.map((item) => item).join()}', style: textTheme.bodyMedium,),
               Text('出版商：${book.publisher}', style: textTheme.bodyMedium),
               Text('出版日期：${dateFormatter.format(book.publishedDate!)}', style: textTheme.bodyMedium),
@@ -265,7 +264,7 @@ class _BottomButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final nav = Provider.of<NavigationService>(context, listen: false);
+    // final nav = Provider.of<NavigationService>(context, listen: false);
     return Container(
       height: 80,
       decoration: BoxDecoration(
@@ -275,7 +274,7 @@ class _BottomButtons extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 5,
             blurRadius: 7,  
-            offset: const Offset(0, 3), // changes position of shadow
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -283,7 +282,7 @@ class _BottomButtons extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           FilledButton(
-              onPressed: () => { nav.goChatNote('bookId')}, 
+              onPressed: () => {}, 
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("開始閱讀", style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary) ),
@@ -296,7 +295,6 @@ class _BottomButtons extends StatelessWidget {
                 child: Text("新增筆記", style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary) ),
               )
             ),
-          
         ],
       ),
     );
