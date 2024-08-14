@@ -256,7 +256,7 @@ class _NoteContainerState extends State<_NoteContainer> {
             ),
             child: (
               Text(
-                widget.noteType.str,
+                widget.noteType.name,
                 style: TextStyle(color: colorScheme.onSurface,)
               )
             )
