@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
-import 'package:reading_app/ui/widget/popup_event.dart';
+import 'package:reading_app/data/local/popup_event.dart';
 
 class PopupDialog extends StatelessWidget{
 

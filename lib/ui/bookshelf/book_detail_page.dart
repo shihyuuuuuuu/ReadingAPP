@@ -11,7 +11,7 @@ import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/note_container.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
-import 'package:reading_app/ui/widget/popup_event.dart';
+import 'package:reading_app/data/local/popup_event.dart';
 import 'package:reading_app/ui/widget/tags.dart';
 
 class BookDetailPage extends StatefulWidget {
