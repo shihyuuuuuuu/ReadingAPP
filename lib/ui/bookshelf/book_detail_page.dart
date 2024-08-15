@@ -32,6 +32,10 @@ class BookDetailPage extends StatelessWidget{
             onPressed: ()=>{nav.goViewNote('tt123')},
             child: Text("view note")
           ),
+          ElevatedButton(
+            onPressed: ()=>{nav.goChatNote('tt123')},
+            child: Text("chat note")
+          ),
         ]
       )
     );
