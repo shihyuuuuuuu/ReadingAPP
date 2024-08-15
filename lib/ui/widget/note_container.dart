@@ -7,12 +7,12 @@ import 'package:reading_app/service/navigation.dart';
 
 class NoteContainer extends StatefulWidget {
   final Note note;
-  final bool expand;
+  final bool expandable;
 
   const NoteContainer({
     super.key,
     required this.note, 
-    required this.expand,
+    required this.expandable,
   });
 
   @override
@@ -85,7 +85,7 @@ class NoteContainerState extends State<NoteContainer> {
                           ),
                         ),
                       ),
-                      widget.expand == true?
+                      widget.expandable == true?
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -106,12 +106,14 @@ class NoteContainerState extends State<NoteContainer> {
                     ],
                   ),
                 ),
-                if (widget.expand == false || isExpanded)
+                if (widget.expandable == false || isExpanded)
                   Padding(
                     padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
                     child: Text(
                       widget.note.content,
-                      style: textTheme.bodyMedium,
+                      style: textTheme.bodyLarge,
+                      maxLines: 8,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -139,7 +141,7 @@ class NoteContainerState extends State<NoteContainer> {
             child: (
               Text(
                 widget.note.type.str,
-                style: textTheme.labelSmall?.copyWith(color:colorScheme.onSurface,)
+                style: textTheme.labelSmall?.copyWith(color:colorScheme.onSurface,),
               )
             )
           ),

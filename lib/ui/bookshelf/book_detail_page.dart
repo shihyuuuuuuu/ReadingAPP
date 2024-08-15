@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
+import 'package:reading_app/data/repositories/book_repo.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/note_container.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
@@ -66,7 +67,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
     final textTheme = Theme.of(context).textTheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
   
-
     const snackBar = SnackBar(
       content: Text('已更新書籍狀態'),
       duration: Duration(milliseconds: 1500),
@@ -136,7 +136,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     const SizedBox(height: 10,),
                     Text('書籍狀態：${userBooks[0].state.displayName}', style: textTheme.bodyMedium),
                     const SizedBox(height: 10,),
-                    TagArea(tagLables: (books[0].categories)),
+                    TagArea(tagLabels: (books[0].categories)),
                     const SizedBox(height: 16,),
                     Row(children: [
                       Padding(
@@ -156,7 +156,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 (BuildContext context, int index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: NoteContainer(note: notes[index], expand: false,),
+                    child: NoteContainer(note: notes[index], expandable: false,),
                   );
                 },
                 childCount: notes.length,
@@ -232,7 +232,7 @@ class _BookInfoContainer extends StatelessWidget {
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 80.0),
-                        child: Text(((userBook.currentPage / book.pageCount!)*100).toStringAsFixed(0)),
+                        child: Text('${((userBook.currentPage / book.pageCount!)*100).toStringAsFixed(0)}%'),
                       )
                     ),
                   ],

@@ -393,7 +393,7 @@ class ColorFamily {
 }
 
 
-TextTheme lightTextTheme = TextTheme(
+TextTheme lightTextTheme = const TextTheme(
   // display: short, important text or number.
   // consider choosing a more expressive font, such as a handwritten or script style. 
 
@@ -406,8 +406,8 @@ TextTheme lightTextTheme = TextTheme(
   titleSmall: TextStyle(fontSize: 18),
 
   // body
-  bodyLarge: TextStyle(fontSize: 20),
-  bodyMedium: TextStyle(fontSize: 16),
+  bodyLarge: TextStyle(fontSize: 16, height: 1.5),
+  bodyMedium: TextStyle(fontSize: 14, height: 1.5),
   bodySmall: TextStyle(fontSize: 12),
 
   // label:  things like the text inside components or for very small text in the content body, such as captions. 

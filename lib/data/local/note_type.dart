@@ -19,13 +19,13 @@ enum NoteType {
     final colorScheme = MaterialTheme.lightScheme();
     switch (colorKey) {
       case 'primary':
-        return colorScheme.primaryFixedDim;
+        return colorScheme.primaryContainer;
       case 'secondary':
-        return colorScheme.secondaryFixedDim;
+        return colorScheme.secondaryContainer;
       case 'primaryContainer':
-        return colorScheme.tertiaryFixedDim;
+        return colorScheme.tertiaryContainer;
       case 'onPrimaryFixed':
-        return colorScheme.surfaceDim;
+        return colorScheme.errorContainer;
       default:
         return Colors.black; // Fallback color
     }

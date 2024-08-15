@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class TagArea extends StatelessWidget{
-  final List<String>? tagLables;
+  final List<String>? tagLabels;
   const TagArea({
     super.key, 
-    required this.tagLables
+    required this.tagLabels
   });
 
   @override
@@ -14,7 +14,7 @@ class TagArea extends StatelessWidget{
       spacing: 8.0,
       runSpacing: 5.0,
       children: 
-        tagLables!.map((item) => _Tags(text:item)).toList()
+        tagLabels!.map((item) => _Tags(text:item)).toList()
       );
      
   }

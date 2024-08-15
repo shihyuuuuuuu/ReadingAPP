@@ -87,7 +87,7 @@ class _NotePageState extends State<NotePage> {
                 ? ListView( 
                     // mainAxisAlignment: MainAxisAlignment.center, 
                     children: notes.map((item) => 
-                      NoteContainer(note: item, expand: true,)).toList(), 
+                      NoteContainer(note: item, expandable: true,)).toList(), 
                   ) 
                 : CircularProgressIndicator(), 
     );
