@@ -11,7 +11,6 @@ import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/note_container.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
-import 'package:reading_app/data/local/popup_event.dart';
 import 'package:reading_app/ui/widget/tags.dart';
 
 class BookDetailPage extends StatefulWidget {
@@ -56,17 +55,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
     }); 
   }
 
-
-  void _showPopup(BuildContext context, List<popupEvent> popUpEvent) async {
-    
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return PopupDialog(options: popUpEvent,);
-      },
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -84,34 +72,34 @@ class _BookDetailPageState extends State<BookDetailPage> {
       duration: Duration(milliseconds: 1500),
     );
 
-    final List<popupEvent> bookStatePopUp = [
-      popupEvent(
+    final List<PopupEvent> bookStatePopUp = [
+      PopupEvent(
         icon: const Icon(Icons.flag), 
         text: '放棄', 
         onPressed: ()=>{ScaffoldMessenger.of(context).showSnackBar(snackBar)}
       ),
-      popupEvent(
+      PopupEvent(
         icon: const Icon(Icons.pause_circle_outline), 
         text: '暫停', 
         onPressed:  ()=>{},
       ),
-      popupEvent(
+      PopupEvent(
         icon: const Icon(Icons.adjust_outlined), 
         text: '完成', 
         onPressed: ()=>{}
       ),
     ];
 
-    final List<popupEvent> bookDetailPopup = [
-      popupEvent(
+    final List<PopupEvent> bookDetailPopup = [
+      PopupEvent(
         icon: const Icon(Icons.edit_document), 
         text: '編輯書籍資訊', 
         onPressed: ()=>{}
       ),
-      popupEvent(
+      PopupEvent(
         icon: const Icon(Icons.table_chart_outlined), //autorenew
         text: '更改狀態', 
-        onPressed: () => _showPopup(context, bookStatePopUp),
+        onPressed: () => showPopup(context, bookStatePopUp),
       )
     ];
 
@@ -127,7 +115,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
-              _showPopup(context, bookDetailPopup);
+              showPopup(context, bookDetailPopup);
             },
           ),
         ],
