@@ -75,6 +75,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: colorScheme.surface,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => {nav.pop()}, 
@@ -105,7 +106,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
                               dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(notes[0].createdAt.millisecondsSinceEpoch))}',
                             style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])),
                     const SizedBox(height: 16,),
-                    Text(notes[0].content, style: textTheme.bodyMedium),
+                    Text(notes[0].content, style: textTheme.bodyLarge),
                     
                   ]
                 ),
@@ -116,7 +117,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
                 child: Container(
                   color: colorScheme.primaryFixed, //note color
                   padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
-                  child: Text(notes[0].type.name, style: textTheme.labelLarge),
+                  child: Text(notes[0].type.str, style: textTheme.labelLarge),
                 )
               ),
             ],
