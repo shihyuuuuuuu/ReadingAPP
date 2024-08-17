@@ -1,25 +1,40 @@
 import 'package:flutter/material.dart';
 
-class Tag extends StatelessWidget{
-  final String text;
-  const Tag({
+class TagArea extends StatelessWidget{
+  final List<String>? tagLabels;
+  const TagArea({
     super.key, 
-    required this.text
+    required this.tagLabels
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      margin: const EdgeInsets.only(right: 8.0),
-      padding: const EdgeInsets.symmetric(horizontal: 3.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
-        borderRadius: BorderRadius.circular(5.0),
-      ), 
-      child: Text(text,
-      style: Theme.of(context).textTheme.labelMedium),
-    );
+    return Wrap(
+      // clipBehavior: Clip.hardEdge,
+      spacing: 8.0,
+      runSpacing: 5.0,
+      children: 
+        tagLabels!.map((item) => _Tags(text:item)).toList()
+      );
+     
+  }
+}
+
+class _Tags extends StatelessWidget {
+  final String text;
+  
+  const _Tags({
+    super.key, 
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Chip(
+        label: Text('#$text', style: textTheme.labelMedium),
+        backgroundColor: Colors.orange[100],
+        padding: EdgeInsets.zero,
+      );
   }
 }

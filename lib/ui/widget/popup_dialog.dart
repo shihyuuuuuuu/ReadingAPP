@@ -1,14 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
-import 'package:reading_app/data/local/popup_event.dart';
 
-class PopupDialog extends StatelessWidget{
+class PopupEvent{
+  final Icon icon;
+  final String text;
+  final void Function() onPressed;
+
+  PopupEvent({
+    required this.icon, 
+    required this.text, 
+    required this.onPressed
+  });
+}
+
+void showPopup(BuildContext context, List<PopupEvent> popUpEvent) async {
+  
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return _PopupDialog(options: popUpEvent,);
+    },
+  );
+}
+
+class _PopupDialog extends StatelessWidget{
 
   final String? title;
   final List<PopupEvent> options;
 
-  const PopupDialog({
+  const _PopupDialog({
     super.key, 
     this.title, 
     required this.options

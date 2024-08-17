@@ -35,6 +35,7 @@ class SearchingDialogState extends State<SearchingDialog> {
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
               hintText: widget.searchHint,
+              hintStyle: textTheme.labelMedium,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -44,7 +45,7 @@ class SearchingDialogState extends State<SearchingDialog> {
               Navigator.of(context).pop(searchQuery);
             },
           ),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Divider( color: colorScheme.outline),
           Text("搜尋紀錄",  style: textTheme.labelLarge),
           Padding(
