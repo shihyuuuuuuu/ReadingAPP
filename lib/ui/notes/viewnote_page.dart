@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:reading_app/data/local/popup_event.dart';
 import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
@@ -47,15 +46,6 @@ class _ViewNotePageState extends State<ViewNotePage> {
     }); 
   }
 
-  void _showPopup(BuildContext context, List<PopupEvent> popUpEvent) async { // 可以放到和 popup dialog 一起
-    
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return PopupDialog(options: popUpEvent,);
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -93,7 +83,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert), 
-            onPressed: () => {_showPopup(context, popupEvent)}, 
+            onPressed: () => {showPopup(context, popupEvent)}, 
           ),
         ],
       ),

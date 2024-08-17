@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
-import 'package:reading_app/data/repositories/book_repo.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/note_container.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
