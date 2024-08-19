@@ -83,7 +83,7 @@ class _NotePageState extends State<NotePage> {
           )
         ],
       ),
-      body: notes != null 
+      body: notes.isNotEmpty 
                 ? ListView( 
                     // mainAxisAlignment: MainAxisAlignment.center, 
                     children: notes.map((item) => 
