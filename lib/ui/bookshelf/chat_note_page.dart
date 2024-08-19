@@ -18,6 +18,9 @@ class ChatNotePage extends StatelessWidget{
           _SlideBar(),
           _ConversationDialog(text: "text", isUser: false),
           _ConversationDialog(text: "Hi there! How are you? I am quite good. It is a nice day", isUser: true),
+          FilledButton(onPressed: () => {}, child: Text("沒問題！")),
+          FilledButton(onPressed: () => {}, child: Text("下次再說")),
+          FilledButton(onPressed: () => {}, child: Text("產生筆記")),
         ],
       ),
     );
@@ -35,40 +38,43 @@ class _SlideBarState extends State<_SlideBar> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.mood_bad,
-          size: 40.0,
-        ),
-        Expanded(
-          child: SliderTheme(
-            data: SliderThemeData(
-              activeTrackColor: colorScheme.primary,
-              inactiveTrackColor: colorScheme.outlineVariant,
-              thumbColor: colorScheme.tertiaryContainer,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 16.0,),
-              trackHeight: 10.0,
-            ),
-            child: Slider(
-              value: _currentSliderValue,
-              min: 0,
-              max: 100,
-              label: _currentSliderValue.round().toString(),
-              onChanged: (double value) {
-                setState(() {
-                  _currentSliderValue = value;
-                });
-              },
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.mood_bad,
+            size: 40.0,
+          ),
+          Expanded(
+            child: SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: colorScheme.primary,
+                inactiveTrackColor: colorScheme.outlineVariant,
+                thumbColor: colorScheme.tertiaryContainer,
+                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 16.0,),
+                trackHeight: 10.0,
+              ),
+              child: Slider(
+                value: _currentSliderValue,
+                min: 0,
+                max: 100,
+                label: _currentSliderValue.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    _currentSliderValue = value;
+                  });
+                },
+              ),
             ),
           ),
-        ),
-        Icon(
-          Icons.mood,
-          size: 40.0,  
-        ),
-      ],
+          Icon(
+            Icons.mood,
+            size: 40.0,  
+          ),
+        ],
+      ),
     );
   }
 }
@@ -84,6 +90,7 @@ class _ConversationDialog extends StatelessWidget {
     required this.isUser
   });
 
+  static double iconSize = 40;
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -92,7 +99,7 @@ class _ConversationDialog extends StatelessWidget {
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 25.0),
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: iconSize/2),
           child: Container(
             alignment: Alignment.topLeft,
             decoration: BoxDecoration(
@@ -105,14 +112,15 @@ class _ConversationDialog extends StatelessWidget {
              borderRadius: BorderRadius.circular(15),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(top: 30.0, right: 12.0, left: 12.0, bottom: 12.0),
+              padding: EdgeInsets.only(top: iconSize/2 + 5, right: 15.0, left: 15.0, bottom: 12.0),
               child: Text(text, style: textTheme.bodyLarge),
             ),
           ),
         ),
         Positioned(
           top: 0,
-          left: 30,
+          right: isUser ? 30 : null,
+          left: isUser ? null : 30,
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25),
@@ -120,7 +128,7 @@ class _ConversationDialog extends StatelessWidget {
             ),
             child: Icon(
               isUser ? Icons.face: Icons.face_2, 
-              size: 50.0,
+              size: iconSize,
               // color: colorScheme.primary,
             ),
           ),
