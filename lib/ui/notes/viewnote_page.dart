@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
+import 'package:reading_app/data/repositories/base_repo.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
 
@@ -28,6 +29,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
   final List<Book> books = [];
 
   Future<void> readJson() async {
+    // final BaseRepository book =
     final String dataStr = await rootBundle.loadString('assets/test_data.json');
     final Map<String, dynamic> data = json.decode(dataStr);
     setState(() { 
