@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/models/book.dart';
+import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
-
 import 'package:reading_app/ui/widget/searching_dialog.dart';
-import 'package:reading_app/ui/widget/tags.dart';
 
 
 class BookshelfPage extends StatefulWidget {
@@ -17,6 +20,8 @@ class BookshelfPage extends StatefulWidget {
 class _BookshelfPageState extends State<BookshelfPage> {
 
   String _searchCondition = ""; 
+  final List<Book> books = [];
+  final List<UserBook> userBooks = [];
 
   Future<void> _showPopup(BuildContext context) async {
     final result = await showDialog<String>(
@@ -38,25 +43,38 @@ class _BookshelfPageState extends State<BookshelfPage> {
       }
     }
 
+  Future<void> readJson() async {
+    final String dataStr = await rootBundle.loadString('assets/test_data.json');
+    final Map<String, dynamic> data = json.decode(dataStr);
+    setState(() { 
+      for (var book in data['Book']) {
+        final newNote = Book.fromMap(book, book['id']);
+        books.add(newNote);
+      }
+      for (var userBook in data['UserBook']) {
+        final newUserBook = UserBook.fromMap(userBook, userBook['id']);
+        userBooks.add(newUserBook);
+      }
+    }); 
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readJson();
+  }
+
   @override
   Widget build(BuildContext context) {
 
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    // will use database in the future
-    List<String> img = [
-      "https://d1csarkz8obe9u.cloudfront.net/themedlandingpages/tlp_hero_book-cover-adb8a02f82394b605711f8632a44488b.jpg",
-      "https://edit.org/images/cat/book-covers-big-2019101610.jpg",
-      "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/yellow-business-leadership-book-cover-design-template-dce2f5568638ad4643ccb9e725e5d6ff.jpg",
-    ];
-    List<String> tags = ["小說","文學","經典"];
-    List<String> bookName = ["原子習慣", "小婦人", "小王子"];
-
+  
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         toolbarHeight: 70.0,
-        title: Text('書架', style: textTheme.headlineLarge,),
+        title: Text('書架', style: textTheme.headlineMedium,),
         actions: <Widget>[
           appBarIconStyle(
               colorScheme, context,
@@ -75,16 +93,12 @@ class _BookshelfPageState extends State<BookshelfPage> {
           mainAxisSpacing: 20.0,
           crossAxisSpacing: 24.0,
           crossAxisCount: 2,
-          childAspectRatio: (0.51),
-          children: [
-            // use this to test data:
-            // Text('search condition: $_searchCondition'),
-            
-            _BookCard(img: img[0], bookName: bookName[0], tags: tags),
-            _BookCard(img: img[1], bookName: bookName[1], tags: tags),
-            _BookCard(img: img[2], bookName: bookName[2], tags: tags),
-            _BookCard(img: img[0], bookName: bookName[0], tags: tags),
-            _BookCard(img: img[1], bookName: bookName[1], tags: tags),
+          childAspectRatio: (0.53),
+          children: books != null ? 
+            // TODO: [rear end]:correspond book and userBook
+            books.map((book) => _BookCard(book: book, userBook: userBooks[0])).toList():
+            [ 
+              const CircularProgressIndicator(),
             ],
           ),
       
@@ -95,16 +109,14 @@ class _BookshelfPageState extends State<BookshelfPage> {
 
 
 class _BookCard extends StatelessWidget{
-  final String img;
-  final String bookName;
-  final List<String> tags;
+  final Book book;
+  final UserBook userBook;
+  
   const _BookCard({
     super.key,
-    required this.img,
-    required this.bookName,
-    required this.tags,
-    });
-  
+    required this.book, 
+    required this.userBook,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +124,8 @@ class _BookCard extends StatelessWidget{
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
+    
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -120,8 +134,8 @@ class _BookCard extends StatelessWidget{
       color: colorScheme.surfaceContainerHighest,
       child: InkWell(
         onTap: () {
-          // GoRouter.of(context).go('/book/tk123');
-          nav.goBookDetail('tt123');
+          // TODO: [rear end]:what to pass to the BookDetailPage
+          nav.goBookDetail(book.id!);
         },
         child: Padding(
           padding: const EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 5),
@@ -129,17 +143,15 @@ class _BookCard extends StatelessWidget{
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(img,),
+                Image.network(book.coverImage!),
                 const SizedBox(height: 10,),
                 Text(
-                  bookName, 
-                  style: textTheme.titleMedium,
+                  book.title, 
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.titleSmall, // bold
                 ),
-                const SizedBox(height: 6,),
-                Row(
-                  children: 
-                    tags.map((item) => Tag(text:item)).toList()
-                  )
+                Text(userBook.state.displayName, style: textTheme.bodySmall,), //more info for page, etc.
+                // TagArea(tagLables: tags.sublist(0,2),)
               ],)
             ),
         ),
@@ -147,7 +159,3 @@ class _BookCard extends StatelessWidget{
       );
   }
 }
-
-
-
-

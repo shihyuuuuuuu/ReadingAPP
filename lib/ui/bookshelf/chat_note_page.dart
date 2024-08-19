@@ -1,12 +1,51 @@
-import 'dart:collection';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-class ChatNotePage extends StatelessWidget{
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:reading_app/data/models/note.dart';
+
+class ChatNotePage extends StatefulWidget{
   final bookId;
   ChatNotePage({
     required this.bookId,
   });
+
+  @override
+  State<ChatNotePage> createState() => _ChatNotePageState();
+}
+
+class _ChatNotePageState extends State<ChatNotePage> {
+  
+  /*
+  Example of how to load fake data
+  Real data shoul follow the similar steps
+  */
+
+  // 1. declare data types that would be used
+  final List<Note> notes = [];
+
+  // 2. function for loading data
+  Future<void> readJson() async {
+    final String dataStr = await rootBundle.loadString('assets/test_data.json');
+    final Map<String, dynamic> data = json.decode(dataStr);
+    setState(() { 
+      for (var note in data['Note']) {
+        note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
+        note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
+        final newNote = Note.fromMap(note, note['id']);
+        notes.add(newNote);
+      }
+    }); 
+  }
+
+  // 3. in initState, execute loading data
+  @override
+  void initState() {
+    super.initState();
+    readJson();
+  }
 
   @override
   Widget build(BuildContext context) {
