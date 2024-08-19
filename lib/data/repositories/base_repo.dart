@@ -2,25 +2,57 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/base.dart';
 
 abstract class BaseRepository<T extends MappableModel> {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final String collectionPath;
+  final FirebaseFirestore db = FirebaseFirestore.instance;
+  final String basePath = 'ReadingAPP/test';
+  final String collection;
   final Duration timeout = const Duration(seconds: 10);
 
-  BaseRepository() : collectionPath = T.toString();
+  BaseRepository() : collection = T.toString();
+
+  Stream<List<T>> stream(String parentId) {
+    return db
+        .collection('$basePath/$parentCollection')
+        .doc(parentId)
+        .collection(collection)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) =>
+              fromMap(doc.data(), doc.id))
+          .toList();
+    });
+  }
 
   Future<String> add(T item) async {
     Map<String, dynamic> itemMap = item.toMap();
     itemMap.remove('id'); // Assuming `id` is managed by Firestore
 
-    DocumentReference docRef = await _db.collection(collectionPath).add(itemMap).timeout(timeout);
-    
+    DocumentReference docRef = await db
+        .collection('$basePath/$collection')
+        .add(itemMap)
+        .timeout(timeout);
+
+    return docRef.id;
+  }
+
+  Future<String> addChild(T item, String parentId) async {
+    Map<String, dynamic> itemMap = item.toMap();
+    itemMap.remove('id');
+
+    DocumentReference docRef = await db
+        .collection('$basePath/$parentCollection')
+        .doc(parentId)
+        .collection(collection)
+        .add(itemMap)
+        .timeout(timeout);
+
     return docRef.id;
   }
 
   Future<T?> get(String id) async {
     try {
-      QuerySnapshot querySnapshot = await _db
-          .collection(collectionPath)
+      QuerySnapshot querySnapshot = await db
+          .collection(collection)
           .where('id', isEqualTo: id)
           .limit(1)
           .get();
@@ -37,4 +69,5 @@ abstract class BaseRepository<T extends MappableModel> {
   }
 
   T fromMap(Map<String, dynamic> map, String id);
+  String parentCollection = ''; // Set this if it's not the root collection
 }

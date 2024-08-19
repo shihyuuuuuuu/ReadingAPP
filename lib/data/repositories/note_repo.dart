@@ -6,4 +6,7 @@ class NoteRepository extends BaseRepository<Note> {
   Note fromMap(Map<String, dynamic> map, String id) {
     return Note.fromMap(map, id);
   }
+
+  @override
+  String get parentCollection => 'User';
 }

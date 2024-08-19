@@ -48,7 +48,8 @@ class Book extends MappableModel {
       subtitle: map['subtitle'],
       authors: List<String>.from(map['authors']),
       publisher: map['publisher'],
-      publishedDate: DateTime.parse(map['publishedDate']),
+      // publishedDate field is expected to be a timestamp when retrieved from Firebase
+      publishedDate: map['publishedDate'].toDate(),
       description: map['description'],
       categories: List<String>.from(map['categories']),
       pageCount: map['pageCount'],
