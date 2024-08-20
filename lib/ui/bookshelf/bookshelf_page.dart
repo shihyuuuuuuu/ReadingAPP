@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,7 @@ import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
 import 'package:reading_app/ui/widget/searching_dialog.dart';
-
+import 'package:reading_app/view_models/userbooks_vm.dart';
 
 class BookshelfPage extends StatefulWidget {
   const BookshelfPage({super.key});
@@ -18,8 +19,7 @@ class BookshelfPage extends StatefulWidget {
 }
 
 class _BookshelfPageState extends State<BookshelfPage> {
-
-  String _searchCondition = ""; 
+  String _searchCondition = "";
   final List<Book> books = [];
   final List<UserBook> userBooks = [];
 
@@ -29,56 +29,36 @@ class _BookshelfPageState extends State<BookshelfPage> {
       builder: (BuildContext context) {
         return const SearchingDialog(
           searchHint: '輸入書名、作者或標籤',
-          history:  [
-              '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
-            ],
+          history: ['习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'],
         );
       },
     );
 
-      if (result != null) {
-        setState(() {
-          _searchCondition = result;
-        });
-      }
+    if (result != null) {
+      setState(() {
+        _searchCondition = result;
+      });
     }
-
-  Future<void> readJson() async {
-    final String dataStr = await rootBundle.loadString('assets/test_data.json');
-    final Map<String, dynamic> data = json.decode(dataStr);
-    setState(() { 
-      for (var book in data['Book']) {
-        final newNote = Book.fromMap(book, book['id']);
-        books.add(newNote);
-      }
-      for (var userBook in data['UserBook']) {
-        final newUserBook = UserBook.fromMap(userBook, userBook['id']);
-        userBooks.add(newUserBook);
-      }
-    }); 
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    readJson();
   }
 
   @override
   Widget build(BuildContext context) {
-
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-  
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         toolbarHeight: 70.0,
-        title: Text('書架', style: textTheme.headlineMedium,),
+        title: Text(
+          '書架',
+          style: textTheme.headlineMedium,
+        ),
         actions: <Widget>[
           appBarIconStyle(
-              colorScheme, context,
-              IconButton(
+            colorScheme,
+            context,
+            IconButton(
               iconSize: 28,
               color: colorScheme.onSecondaryContainer,
               icon: const Icon(Icons.search),
@@ -87,75 +67,77 @@ class _BookshelfPageState extends State<BookshelfPage> {
           ),
         ],
       ),
-      body: Center(
-        child: GridView.count(
-          padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10),
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 24.0,
-          crossAxisCount: 2,
-          childAspectRatio: (0.53),
-          children: books != null ? 
-            // TODO: [rear end]:correspond book and userBook
-            books.map((book) => _BookCard(book: book, userBook: userBooks[0])).toList():
-            [ 
-              const CircularProgressIndicator(),
-            ],
-          ),
-      
-      ),
+      body: Center(child: Consumer<UserBooksViewModel>(
+        builder: (context, viewModel, _) {
+          List<UserBook> userBooks = viewModel.userBooks;
+
+          if (userBooks.isEmpty) {
+            return const Center(child: Text('No books.'));
+          } else {
+            return GridView.count(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10),
+              mainAxisSpacing: 20.0,
+              crossAxisSpacing: 24.0,
+              crossAxisCount: 2,
+              childAspectRatio: (0.53),
+              children:
+                  userBooks.map((book) => _BookCard(userBook: book)).toList(),
+            );
+          }
+        },
+      )),
     );
   }
 }
 
-
-class _BookCard extends StatelessWidget{
-  final Book book;
+class _BookCard extends StatelessWidget {
   final UserBook userBook;
-  
+
   const _BookCard({
     super.key,
-    required this.book, 
     required this.userBook,
   });
 
   @override
   Widget build(BuildContext context) {
-
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
-    
 
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      elevation: 8,
-      color: colorScheme.surfaceContainerHighest,
-      child: InkWell(
-        onTap: () {
-          // TODO: [rear end]:what to pass to the BookDetailPage
-          nav.goBookDetail(book.id!);
-        },
-        child: Padding(
-          padding: const EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 5),
-          child: (
-            Column(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        elevation: 8,
+        color: colorScheme.surfaceContainerHighest,
+        child: InkWell(
+          onTap: () {
+            nav.goBookDetail(userBook.id!);
+          },
+          child: Padding(
+            padding:
+                const EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 5),
+            child: (Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(book.coverImage!),
-                const SizedBox(height: 10,),
+                Image.network(userBook.book.coverImage!),
+                const SizedBox(
+                  height: 10,
+                ),
                 Text(
-                  book.title, 
+                  userBook.book.title,
                   overflow: TextOverflow.ellipsis,
                   style: textTheme.titleSmall, // bold
                 ),
-                Text(userBook.state.displayName, style: textTheme.bodySmall,), //more info for page, etc.
+                Text(
+                  userBook.state.displayName,
+                  style: textTheme.bodySmall,
+                ), //more info for page, etc.
                 // TagArea(tagLables: tags.sublist(0,2),)
-              ],)
-            ),
-        ),
-      )
-      );
+              ],
+            )),
+          ),
+        ));
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,39 +40,60 @@ void main() async {
   final noteRepository = NoteRepository();
   final readingSessionRepository = ReadingSessionRepository();
 
+  List<String> userIds = [];
+  List<Book> bookObjs = [];
+  List<String> userBookIds = [];
+
   for (var user in users) {
-    final newUser = User.fromMap(user, user['id']);
-    var id = await userRepository.add(newUser);
+    final User newUser = User.fromMap(user);
+    String id = await userRepository.add(newUser);
+    userIds.add(id);
     print('User ${user['name']} $id added to Firestore');
   }
 
   for (var book in books) {
-    final newBook = Book.fromMap(book, book['id']);
-    var id = await bookRepository.add(newBook);
-    print('Book ${book['title']} $id added to Firestore');
+    book['publishedDate'] =
+        Timestamp.fromDate(DateTime.parse(book['publishedDate']));
+    final Book newBook = Book.fromMap(book);
+    newBook.id = await bookRepository.add(newBook);
+    bookObjs.add(newBook);
+    print('Book ${book['title']} $newBook.id added to Firestore');
   }
 
-  for (var userBook in userBooks) {
-    final newUserBook = UserBook.fromMap(userBook, userBook['id']);
-    var id = await userBookRepository.add(newUserBook);
-    print(
-        'UserBook $id added to Firestore');
+  for (final (index, userBook) in userBooks.indexed) {
+    userBook['userId'] = userIds[0];
+    userBook['book'] = bookObjs[index].toMap();
+    userBook['startDate'] =
+        Timestamp.fromDate(DateTime.parse(userBook['startDate']));
+    final UserBook newUserBook = UserBook.fromMap(userBook);
+    String id = await userBookRepository.add(newUserBook, userIds[0]);
+    userBookIds.add(id);
+    print('UserBook $id added to Firestore');
   }
 
-  for (var note in notes) {
+  userBookIds = userBookIds + userBookIds;
+
+  for (var (index, note) in notes.indexed) {
     note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
     note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
-    final newNote = Note.fromMap(note, note['id']);
-    var id = await noteRepository.add(newNote);
+    note['userId'] = userIds[0];
+    note['userBookId'] = userBookIds[index];
+    final Note newNote = Note.fromMap(note);
+    String id = await noteRepository.add(newNote, userIds[0]);
     print('Note ${newNote.title} $id added to Firestore');
   }
 
-  for (var session in readingSessions) {
+  for (var (index, session) in readingSessions.indexed) {
     session['startTime'] =
         Timestamp.fromDate(DateTime.parse(session['startTime']));
     session['endTime'] = Timestamp.fromDate(DateTime.parse(session['endTime']));
-    final newReadingSession = ReadingSession.fromMap(session, session['id']);
-    var id = await readingSessionRepository.add(newReadingSession);
+    session['userBookId'] = userBookIds[index];
+    final ReadingSession newReadingSession =
+        ReadingSession.fromMap(session, session['id']);
+    String id =
+        await readingSessionRepository.add(newReadingSession, userIds[0]);
     print('ReadingSession ${newReadingSession.id} $id added to Firestore');
   }
+
+  exit(0);
 }

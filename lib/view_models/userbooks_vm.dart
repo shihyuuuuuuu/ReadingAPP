@@ -28,6 +28,10 @@ class UserBooksViewModel with ChangeNotifier {
   }
 
   Future<void> addUserBook(UserBook newUserBook, String userId) async {
-    await _userBookRepository.addChild(newUserBook, userId);
+    await _userBookRepository.add(newUserBook, userId);
+  }
+
+  Future<UserBook?> getUserBook(String userBookId, String userId) async {
+    return await _userBookRepository.get(userBookId, userId);
   }
 }

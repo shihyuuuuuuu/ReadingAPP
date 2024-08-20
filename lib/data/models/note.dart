@@ -46,7 +46,7 @@ class Note extends MappableModel {
   });
 
   @override
-  factory Note.fromMap(Map<String, dynamic> map, String? id) {
+  factory Note.fromMap(Map<String, dynamic> map, [String? id]) {
     return Note._(
       id: id,
       userId: map['userId'],

@@ -8,5 +8,5 @@ class UserBookRepository extends BaseRepository<UserBook> {
   }
 
   @override
-  String get parentCollection => 'User';
+  String? parentCollection = 'User';
 }

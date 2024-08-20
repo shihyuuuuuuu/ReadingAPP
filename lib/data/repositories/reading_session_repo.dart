@@ -8,5 +8,5 @@ class ReadingSessionRepository extends BaseRepository<ReadingSession> {
   }
 
   @override
-  String get parentCollection => 'User';
+  String? parentCollection = 'User';
 }

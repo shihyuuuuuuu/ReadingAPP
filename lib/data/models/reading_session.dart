@@ -35,7 +35,7 @@ class ReadingSession extends MappableModel {
   });
 
   @override
-  factory ReadingSession.fromMap(Map<String, dynamic> map, String? id) {
+  factory ReadingSession.fromMap(Map<String, dynamic> map, [String? id]) {
     final DateTime startTime = map['startTime'].toDate();
     final DateTime endTime = map['endTime'].toDate();
     final Duration difference = endTime.difference(startTime);

@@ -8,5 +8,5 @@ class NoteRepository extends BaseRepository<Note> {
   }
 
   @override
-  String get parentCollection => 'User';
+  String? parentCollection = 'User';
 }

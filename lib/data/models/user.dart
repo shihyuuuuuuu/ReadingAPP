@@ -12,7 +12,7 @@ class User extends MappableModel {
   User._({required this.id, required this.name, this.avatarUrl});
 
   @override
-  factory User.fromMap(Map<String, dynamic> map, String? id) {
+  factory User.fromMap(Map<String, dynamic> map, [String? id]) {
     return User._(
       id: id,
       name: map['name'],

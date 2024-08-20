@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'base.dart';
 
 class Book extends MappableModel {
@@ -8,7 +9,7 @@ class Book extends MappableModel {
   String? publisher;
   DateTime? publishedDate;
   String? description;
-  List<String>? categories;
+  List<String> categories;
   int? pageCount;
   String? coverImage;
 
@@ -17,11 +18,11 @@ class Book extends MappableModel {
     this.id,
     required this.title,
     this.subtitle,
-    required this.authors,
+    this.authors = const [],
     this.publisher,
     this.publishedDate,
     this.description,
-    this.categories,
+    this.categories = const [],
     this.pageCount,
     this.coverImage,
   });
@@ -31,17 +32,17 @@ class Book extends MappableModel {
     required this.id,
     required this.title,
     this.subtitle,
-    required this.authors,
+    this.authors = const [],
     this.publisher,
     this.publishedDate,
     this.description,
-    this.categories,
+    this.categories = const [],
     this.pageCount,
     this.coverImage,
   });
 
   @override
-  factory Book.fromMap(Map<String, dynamic> map, String? id) {
+  factory Book.fromMap(Map<String, dynamic> map, [String? id]) {
     return Book._(
       id: id,
       title: map['title'],
@@ -65,7 +66,7 @@ class Book extends MappableModel {
       'subtitle': subtitle,
       'authors': authors,
       'publisher': publisher,
-      'publishedDate': publishedDate,
+      'publishedDate': publishedDate != null ? Timestamp.fromDate(publishedDate!) : null,
       'description': description,
       'categories': categories,
       'pageCount': pageCount,
