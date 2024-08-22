@@ -45,7 +45,7 @@ void main() async {
   List<String> userBookIds = [];
 
   for (var user in users) {
-    final User newUser = User.fromMap(user);
+    final User newUser = User.fromMap(user, user['id']);
     String id = await userRepository.add(newUser);
     userIds.add(id);
     print('User ${user['name']} $id added to Firestore');
@@ -54,7 +54,7 @@ void main() async {
   for (var book in books) {
     book['publishedDate'] =
         Timestamp.fromDate(DateTime.parse(book['publishedDate']));
-    final Book newBook = Book.fromMap(book);
+    final Book newBook = Book.fromMap(book, book['id']);
     newBook.id = await bookRepository.add(newBook);
     bookObjs.add(newBook);
     print('Book ${book['title']} $newBook.id added to Firestore');
@@ -65,7 +65,7 @@ void main() async {
     userBook['book'] = bookObjs[index].toMap();
     userBook['startDate'] =
         Timestamp.fromDate(DateTime.parse(userBook['startDate']));
-    final UserBook newUserBook = UserBook.fromMap(userBook);
+    final UserBook newUserBook = UserBook.fromMap(userBook, userBook['id']);
     String id = await userBookRepository.add(newUserBook, userIds[0]);
     userBookIds.add(id);
     print('UserBook $id added to Firestore');
@@ -78,7 +78,7 @@ void main() async {
     note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
     note['userId'] = userIds[0];
     note['userBookId'] = userBookIds[index];
-    final Note newNote = Note.fromMap(note);
+    final Note newNote = Note.fromMap(note, note['id']);
     String id = await noteRepository.add(newNote, userIds[0]);
     print('Note ${newNote.title} $id added to Firestore');
   }

@@ -31,7 +31,7 @@ class UserBook extends MappableModel {
   });
 
   @override
-  factory UserBook.fromMap(Map<String, dynamic> map, [String? id]) {
+  factory UserBook.fromMap(Map<String, dynamic> map, String? id) {
     return UserBook._(
       id: id,
       userId: map['userId'],

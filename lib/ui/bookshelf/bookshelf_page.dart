@@ -1,8 +1,4 @@
-import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/user_book.dart';
