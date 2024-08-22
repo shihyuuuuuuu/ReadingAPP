@@ -250,9 +250,10 @@ class _BottomButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    // final nav = Provider.of<NavigationService>(context, listen: false);
+    final nav = Provider.of<NavigationService>(context, listen: false);
     return Container(
       height: 80,
       decoration: BoxDecoration(
@@ -270,7 +271,7 @@ class _BottomButtons extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           FilledButton(
-              onPressed: () => {}, 
+              onPressed: () => { nav.goChatNote('bookId')}, 
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("開始閱讀", style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary) ),

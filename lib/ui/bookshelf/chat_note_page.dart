@@ -1,14 +1,12 @@
-import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
-import 'package:reading_app/data/models/note.dart';
 
 class ChatNotePage extends StatefulWidget{
-  final bookId;
-  ChatNotePage({
+  final String bookId;
+  const ChatNotePage({
+    super.key, 
     required this.bookId,
   });
 
@@ -17,54 +15,163 @@ class ChatNotePage extends StatefulWidget{
 }
 
 class _ChatNotePageState extends State<ChatNotePage> {
-  
-  /*
-  Example of how to load fake data
-  Real data shoul follow the similar steps
-  */
+  final _textController = TextEditingController();
+  final _scrollController = ScrollController();
+  bool _isTextEmpty = true;
 
-  // 1. declare data types that would be used
-  final List<Note> notes = [];
+  List<Widget> content = [
+    _ConversationDialog(text: "太棒了！今天的閱讀完成了！來分享一下今天看到什麼新知嗎？", isUser: false),
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: FilledButton(
+        onPressed: () => {}, // ask 
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          child: Text("沒問題"),
+        ),
+      ),
+    ),
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: FilledButton(
+        onPressed: () => {}, // confirm and quit chatNote page 
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          child: Text("先跳過"),
+        ),
+      ),
+    ),
+  ];
 
-  // 2. function for loading data
-  Future<void> readJson() async {
-    final String dataStr = await rootBundle.loadString('assets/test_data.json');
-    final Map<String, dynamic> data = json.decode(dataStr);
-    setState(() { 
-      for (var note in data['Note']) {
-        note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
-        note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
-        final newNote = Note.fromMap(note, note['id']);
-        notes.add(newNote);
-      }
-    }); 
+  Future<void> _getResponse() async {
+    setState(() {
+      log("state change: API wait");
+      content.add(_ConversationDialog(text: '...', isUser: false));
+      content = List.from(content);
+    });
+    _scrollToBottom();
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      log("state change: API get");
+      content.removeLast();
+      content.add(_ConversationDialog(text: 'abcd', isUser: false));
+      content = List.from(content);
+    });
+    _scrollToBottom();
   }
 
-  // 3. in initState, execute loading data
+  Future<void> _userSubmit(String value) async {
+    setState(() {
+      content.add(_ConversationDialog(text: value, isUser: true));
+      content = List.from(content);
+      log("state change: user submit");
+    });
+    _textController.clear();
+    _scrollToBottom();
+
+    await _getResponse();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        log("scrolling to bottom, with length ${content.length}");
+        log('maxScrollExtent: ${_scrollController.position.maxScrollExtent}');
+        log('current scroll position: ${_scrollController.position.pixels}');
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+
+
+  void _handleTextChange() {
+    setState(() {
+      _isTextEmpty = _textController.text.isEmpty;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    readJson();
+    _textController.addListener(_handleTextChange);
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        children: [
-          _SlideBar(),
-          _ConversationDialog(text: "text", isUser: false),
-          _ConversationDialog(text: "Hi there! How are you? I am quite good. It is a nice day", isUser: true),
-          FilledButton(onPressed: () => {}, child: Text("沒問題！")),
-          FilledButton(onPressed: () => {}, child: Text("下次再說")),
-          FilledButton(onPressed: () => {}, child: Text("產生筆記")),
-        ],
-      ),
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    log("rebuilt");
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: ListView(
+              controller: _scrollController,
+              children: content,
+            ),
+          ),
+        ),
+        Container(
+          color: colorScheme.surfaceContainerHighest,
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    style: textTheme.bodyLarge,
+                    controller: _textController,
+                    onSubmitted: (value) => _userSubmit(value),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      hintText: "在此輸入",
+                      hintStyle: textTheme.labelMedium?.copyWith(color: colorScheme.outline),
+                    ),
+                  ),
+                ),
+              ),
+              _isTextEmpty
+                  ? const SizedBox()
+                  : SizedBox(
+                      child: IconButton(
+                        onPressed: () => _userSubmit(_textController.text),
+                        icon: const Icon(Icons.send, size: 24),
+                      ),
+                    ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
+
 
 class _SlideBar extends StatefulWidget{
   @override
@@ -73,6 +180,7 @@ class _SlideBar extends StatefulWidget{
 
 class _SlideBarState extends State<_SlideBar> {
   double _currentSliderValue = 20;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -82,7 +190,7 @@ class _SlideBarState extends State<_SlideBar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.mood_bad,
             size: 40.0,
           ),
@@ -108,7 +216,7 @@ class _SlideBarState extends State<_SlideBar> {
               ),
             ),
           ),
-          Icon(
+          const Icon(
             Icons.mood,
             size: 40.0,  
           ),
@@ -168,7 +276,6 @@ class _ConversationDialog extends StatelessWidget {
             child: Icon(
               isUser ? Icons.face: Icons.face_2, 
               size: iconSize,
-              // color: colorScheme.primary,
             ),
           ),
         ),
