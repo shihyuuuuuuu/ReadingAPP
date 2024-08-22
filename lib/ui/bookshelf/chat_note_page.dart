@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:reading_app/service/navigation.dart';
 
 
 class ChatNotePage extends StatefulWidget{
@@ -14,59 +16,69 @@ class ChatNotePage extends StatefulWidget{
   State<ChatNotePage> createState() => _ChatNotePageState();
 }
 
+
 class _ChatNotePageState extends State<ChatNotePage> {
   final _textController = TextEditingController();
   final _scrollController = ScrollController();
   bool _isTextEmpty = true;
+  bool _noteTakingFinish = false;
 
-  List<Widget> content = [
-    _ConversationDialog(text: "太棒了！今天的閱讀完成了！來分享一下今天看到什麼新知嗎？", isUser: false),
-    Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: FilledButton(
-        onPressed: () => {}, // ask 
-        child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.0),
-          child: Text("沒問題"),
-        ),
-      ),
-    ),
-    Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: FilledButton(
-        onPressed: () => {}, // confirm and quit chatNote page 
-        child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.0),
-          child: Text("先跳過"),
-        ),
-      ),
-    ),
-  ];
+  void _showPopup() async {
+  final nav = Provider.of<NavigationService>(context, listen: false);
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+          title: Text("ㄎㄎ"),
+          content: Text("你真的不記一下筆記嗎"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("取消"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Navigator.of(context).pop();
+                nav.pop();
+              },
+              child: Text("確認"),
+            ),
+          ],
+        );
+    },
+  );
+}
+
+  List<Widget> chatContent = [];
 
   Future<void> _getResponse() async {
     setState(() {
-      log("state change: API wait");
-      content.add(_ConversationDialog(text: '...', isUser: false));
-      content = List.from(content);
+      chatContent.add(_ConversationDialog(text: '...', isUser: false));
+      chatContent = List.from(chatContent);
     });
     _scrollToBottom();
 
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
-      log("state change: API get");
-      content.removeLast();
-      content.add(_ConversationDialog(text: 'abcd', isUser: false));
-      content = List.from(content);
+      chatContent.removeLast();
+      chatContent.add(_ConversationDialog(text: 'abcd', isUser: false));
+      // TODO: 偵測到要結束的語句時
+      if (chatContent.length > 12) {
+        _noteTakingFinish = true;
+      }
+      chatContent = List.from(chatContent);
     });
     _scrollToBottom();
   }
 
   Future<void> _userSubmit(String value) async {
     setState(() {
-      content.add(_ConversationDialog(text: value, isUser: true));
-      content = List.from(content);
-      log("state change: user submit");
+      chatContent.add(_ConversationDialog(text: value, isUser: true));
+      chatContent = List.from(chatContent);
     });
     _textController.clear();
     _scrollToBottom();
@@ -77,9 +89,6 @@ class _ChatNotePageState extends State<ChatNotePage> {
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        log("scrolling to bottom, with length ${content.length}");
-        log('maxScrollExtent: ${_scrollController.position.maxScrollExtent}');
-        log('current scroll position: ${_scrollController.position.pixels}');
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
@@ -88,8 +97,6 @@ class _ChatNotePageState extends State<ChatNotePage> {
       }
     });
   }
-
-
 
   void _handleTextChange() {
     setState(() {
@@ -114,20 +121,80 @@ class _ChatNotePageState extends State<ChatNotePage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    log("rebuilt");
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: Text("記筆記", style: textTheme.titleMedium),
+        ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: ListView(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: CustomScrollView(
               controller: _scrollController,
-              children: content,
-            ),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _ConversationDialog(
+                        text: "太棒了！今天的閱讀完成了！\n來回憶一下剛剛看了什麼吧", 
+                        isUser: false
+                      ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FilledButton(
+                            onPressed: ()=>{
+                              setState(() {
+                                chatContent.add(_ConversationDialog(text: "今天有什麼新發現", isUser: false));
+                                chatContent = List.from(chatContent);
+                              })
+                            }, // ask 
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10.0),
+                              child: Text("沒問題"),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FilledButton(
+                            onPressed: _showPopup, // confirm and quit chatNote page 
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10.0),
+                              child: Text("先跳過"),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return chatContent[index];
+                    },
+                    childCount: chatContent.length,
+                  ),
+                ),
+              ],
+            )
           ),
         ),
+        _noteTakingFinish ?
+        FilledButton(
+          onPressed: ()=>{}, // ask 
+            child: const Padding(
+              padding: EdgeInsets.all(10),
+              child: Text("產生筆記"),
+          )
+        ): const SizedBox(),
         Container(
           color: colorScheme.surfaceContainerHighest,
           child: Row(
@@ -244,10 +311,17 @@ class _ConversationDialog extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Stack(
+      alignment: isUser? Alignment.topRight: Alignment.topLeft,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: iconSize/2),
+          padding: EdgeInsets.only(
+            right: isUser? 50: 0,  
+            left: isUser? 0:50,
+            top: 10,
+            bottom: 10,
+          ),
           child: Container(
+            width: MediaQuery.sizeOf(context).width / 2,
             alignment: Alignment.topLeft,
             decoration: BoxDecoration(
               color: isUser? colorScheme.surfaceContainerLowest: colorScheme.surfaceContainerHighest,
@@ -259,15 +333,15 @@ class _ConversationDialog extends StatelessWidget {
              borderRadius: BorderRadius.circular(15),
             ),
             child: Padding(
-              padding: EdgeInsets.only(top: iconSize/2 + 5, right: 15.0, left: 15.0, bottom: 12.0),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               child: Text(text, style: textTheme.bodyLarge),
             ),
           ),
         ),
         Positioned(
-          top: 0,
-          right: isUser ? 30 : null,
-          left: isUser ? null : 30,
+          top: 10,
+          right: isUser ? 0 : null,
+          left: isUser ? null : 0,
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25),
