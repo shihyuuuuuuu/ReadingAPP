@@ -6,4 +6,7 @@ class ReadingSessionRepository extends BaseRepository<ReadingSession> {
   ReadingSession fromMap(Map<String, dynamic> map, String id) {
     return ReadingSession.fromMap(map, id);
   }
+
+  @override
+  String? parentCollection = 'User';
 }

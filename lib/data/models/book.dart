@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'base.dart';
 
 class Book extends MappableModel {
@@ -8,7 +9,7 @@ class Book extends MappableModel {
   String? publisher;
   DateTime? publishedDate;
   String? description;
-  List<String>? categories;
+  List<String> categories;
   int? pageCount;
   String? coverImage;
 
@@ -17,11 +18,11 @@ class Book extends MappableModel {
     this.id,
     required this.title,
     this.subtitle,
-    required this.authors,
+    this.authors = const [],
     this.publisher,
     this.publishedDate,
     this.description,
-    this.categories,
+    this.categories = const [],
     this.pageCount,
     this.coverImage,
   });
@@ -31,11 +32,11 @@ class Book extends MappableModel {
     required this.id,
     required this.title,
     this.subtitle,
-    required this.authors,
+    this.authors = const [],
     this.publisher,
     this.publishedDate,
     this.description,
-    this.categories,
+    this.categories = const [],
     this.pageCount,
     this.coverImage,
   });
@@ -48,7 +49,8 @@ class Book extends MappableModel {
       subtitle: map['subtitle'],
       authors: List<String>.from(map['authors']),
       publisher: map['publisher'],
-      publishedDate: DateTime.parse(map['publishedDate']),
+      // publishedDate field is expected to be a timestamp when retrieved from Firebase
+      publishedDate: map['publishedDate'].toDate(),
       description: map['description'],
       categories: List<String>.from(map['categories']),
       pageCount: map['pageCount'],
@@ -64,7 +66,7 @@ class Book extends MappableModel {
       'subtitle': subtitle,
       'authors': authors,
       'publisher': publisher,
-      'publishedDate': publishedDate,
+      'publishedDate': publishedDate != null ? Timestamp.fromDate(publishedDate!) : null,
       'description': description,
       'categories': categories,
       'pageCount': pageCount,
