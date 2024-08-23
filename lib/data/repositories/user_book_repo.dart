@@ -6,4 +6,7 @@ class UserBookRepository extends BaseRepository<UserBook> {
   UserBook fromMap(Map<String, dynamic> map, String id) {
     return UserBook.fromMap(map, id);
   }
+
+  @override
+  String? parentCollection = 'User';
 }
