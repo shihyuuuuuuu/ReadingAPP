@@ -124,13 +124,19 @@ class _ChatNotePageState extends State<ChatNotePage> {
     final colorScheme = Theme.of(context).colorScheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
 
-    return Column(
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            nav.pop();
+        },),
+        title: Text("記筆記", style: textTheme.titleMedium),
+
+      ),
+      body: Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          child: Text("記筆記", style: textTheme.titleMedium),
-        ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(left: 10, right: 10),
@@ -244,6 +250,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
           ),
         ),
       ],
+    )
     );
   }
 }
