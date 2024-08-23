@@ -1,10 +1,11 @@
-import 'base.dart';
 import '../local/book_state.dart';
+import 'base.dart';
+import 'book.dart';
 
 class UserBook extends MappableModel {
   String? id;
   String userId;
-  String bookId;
+  Book book;
   BookState state;
   DateTime startDate;
   int currentPage;
@@ -13,7 +14,7 @@ class UserBook extends MappableModel {
   UserBook({
     this.id,
     required this.userId,
-    required this.bookId,
+    required this.book,
     required this.state,
     required this.startDate,
     required this.currentPage,
@@ -23,7 +24,7 @@ class UserBook extends MappableModel {
   UserBook._({
     required this.id,
     required this.userId,
-    required this.bookId,
+    required this.book,
     required this.state,
     required this.startDate,
     required this.currentPage,
@@ -34,9 +35,9 @@ class UserBook extends MappableModel {
     return UserBook._(
       id: id,
       userId: map['userId'],
-      bookId: map['bookId'],
+      book: Book.fromMap(map['book'], map['book']['id']),
       state: BookState.values.byName(map['state']),
-      startDate: DateTime.parse(map['startDate']),
+      startDate: map['startDate'].toDate(),
       currentPage: map['currentPage'],
     );
   }
@@ -46,7 +47,7 @@ class UserBook extends MappableModel {
     return {
       'id': id,
       'userId': userId,
-      'bookId': bookId,
+      'book': book.toMap(),
       'state': state.name,
       'startDate': startDate,
       'currentPage': currentPage,

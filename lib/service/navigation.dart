@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:reading_app/main.dart';
 import 'package:reading_app/ui/bookshelf/add_note_page.dart';
 import 'package:reading_app/ui/bookshelf/book_detail_page.dart';
@@ -17,9 +18,13 @@ import 'package:reading_app/ui/notes/viewnote_page.dart';
 import 'package:reading_app/ui/profile/friend_list_page.dart';
 import 'package:reading_app/ui/profile/profile.dart';
 import 'package:reading_app/ui/profile/setting_page.dart';
+import 'package:reading_app/view_models/userbooks_vm.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _sectionNavigatorKey = GlobalKey<NavigatorState>();
+
+// TODO: Use a hardcoded test ID from the Firebase before we can obtain the actual User ID.
+const String userId = 'MXWzgPVPjIjyutDPcBvx';
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -27,7 +32,10 @@ final router = GoRouter(
   routes: <RouteBase>[
     ShellRoute(
       builder: (context, state, child) {
-        return ScaffoldWithNavbar(child);
+        return ChangeNotifierProvider(
+          create: (_) => UserBooksViewModel(userId: userId),
+          child: ScaffoldWithNavbar(child),
+        );
       },
       routes: [
         // Note Routes
@@ -37,11 +45,13 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: ':noteId',
-              builder: (context, state) => ViewNotePage(noteId: state.pathParameters['noteId']),
+              builder: (context, state) =>
+                  ViewNotePage(noteId: state.pathParameters['noteId']),
               routes: [
                 GoRoute(
                   path: 'editnote',
-                  builder: (context, state) => EditNotePage(noteId: state.pathParameters['noteId']),
+                  builder: (context, state) =>
+                      EditNotePage(noteId: state.pathParameters['noteId']),
                 ),
               ],
             ),
@@ -54,23 +64,28 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: ':bookId',
-              builder: (context, state) => BookDetailPage(bookId: state.pathParameters['bookId']!),
+              builder: (context, state) =>
+                  BookDetailPage(userBookId: state.pathParameters['bookId']!),
               routes: [
                 GoRoute(
                   path: 'editbook',
-                  builder: (context, state) => EditBookPage(bookId: state.pathParameters['bookId']!),
+                  builder: (context, state) =>
+                      EditBookPage(bookId: state.pathParameters['bookId']!),
                 ),
                 GoRoute(
                   path: 'reading',
-                  builder: (context, state) => ReadingPage(bookId: state.pathParameters['bookId']!),
+                  builder: (context, state) =>
+                      ReadingPage(bookId: state.pathParameters['bookId']!),
                 ),
                 GoRoute(
                   path: 'addnote',
-                  builder: (context, state) => AddNotePage(bookId: state.pathParameters['bookId']!),
+                  builder: (context, state) =>
+                      AddNotePage(bookId: state.pathParameters['bookId']!),
                 ),
                 GoRoute(
                   path: 'chatnote',
-                  builder: (context, state) => ChatNotePage(bookId: state.pathParameters['bookId']!),
+                  builder: (context, state) =>
+                      ChatNotePage(bookId: state.pathParameters['bookId']!),
                 ),
               ],
             ),
@@ -87,7 +102,8 @@ final router = GoRouter(
               routes: [
                 GoRoute(
                   path: ':bookId',
-                  builder: (context, state) => AddBookPage(bookId: state.pathParameters['bookId']!),
+                  builder: (context, state) =>
+                      AddBookPage(bookId: state.pathParameters['bookId']!),
                 ),
               ],
             ),
@@ -140,44 +156,80 @@ class NavigationService {
     _navigationStack.clear();
   }
 
-  void goNote() { 
+  void goNote() {
     _goAndClearRoute();
-    _goRoute('/note'); 
+    _goRoute('/note');
   }
-  void goBookshelf() { 
-    _goAndClearRoute();  
-    _goRoute('/book'); 
+
+  void goBookshelf() {
+    _goAndClearRoute();
+    _goRoute('/book');
   }
-  void goHome() { 
+
+  void goHome() {
     _goAndClearRoute();
     _goRoute('/home');
   }
-  void goFeed() { 
+
+  void goFeed() {
     _goAndClearRoute();
     _goRoute('/feed');
   }
-  void goProfile() { 
+
+  void goProfile() {
     _goAndClearRoute();
     _goRoute('/profile');
   }
-  void goViewNote(String noteId) { _goRoute('/note/$noteId'); }
-  void goEditNote(String noteId) { _goRoute('/note/$noteId/editnote'); }
-  void goBookDetail(String bookId) { _goRoute('/book/$bookId'); }
-  void goEditBook(String bookId) { _goRoute('/book/$bookId/editbook'); }
-  void goReading(String bookId) { _goRoute('/book/$bookId/reading'); }
-  void goAddNote(String bookId) { _goRoute('/book/$bookId/addnote'); }
-  void goChatNote(String bookId) { _goRoute('/book/$bookId/chatnote'); }
-  void goSearchBook() { _goRoute('/home/searchbook'); }
-  void goAddBook(String bookId) { _goRoute('/home/searchbook/$bookId'); }
-  void goFriendList() { _goRoute('/profile/friendlist'); }
-  void goSetting() { _goRoute('/profile/setting'); }
+
+  void goViewNote(String noteId) {
+    _goRoute('/note/$noteId');
+  }
+
+  void goEditNote(String noteId) {
+    _goRoute('/note/$noteId/editnote');
+  }
+
+  void goBookDetail(String bookId) {
+    _goRoute('/book/$bookId');
+  }
+
+  void goEditBook(String bookId) {
+    _goRoute('/book/$bookId/editbook');
+  }
+
+  void goReading(String bookId) {
+    _goRoute('/book/$bookId/reading');
+  }
+
+  void goAddNote(String bookId) {
+    _goRoute('/book/$bookId/addnote');
+  }
+
+  void goChatNote(String bookId) {
+    _goRoute('/book/$bookId/chatnote');
+  }
+
+  void goSearchBook() {
+    _goRoute('/home/searchbook');
+  }
+
+  void goAddBook(String bookId) {
+    _goRoute('/home/searchbook/$bookId');
+  }
+
+  void goFriendList() {
+    _goRoute('/profile/friendlist');
+  }
+
+  void goSetting() {
+    _goRoute('/profile/setting');
+  }
 
   void pop() {
     // print("pop, with current stack: ${_navigationStack.join("")}");
     if (_navigationStack.isNotEmpty) {
       _navigationStack.removeLast();
       if (_navigationStack.isNotEmpty) {
-
         final previousRoute = _navigationStack.last;
         _router.go(previousRoute);
       } else {
@@ -188,6 +240,5 @@ class NavigationService {
     }
 
     // print("after pop, with current stack: ${_navigationStack.join("")}");
-    
   }
 }
