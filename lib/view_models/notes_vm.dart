@@ -4,7 +4,7 @@ import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/repositories/note_repo.dart';
 
 class NotesViewModel with ChangeNotifier {
-  final NoteRepository _NoteRepository;
+  final NoteRepository _noteRepository;
 
   final String userId;
   List<Note> _notes = [];
@@ -13,9 +13,9 @@ class NotesViewModel with ChangeNotifier {
 
   NotesViewModel(
       {required this.userId, NoteRepository? noteRepository})
-      : _NoteRepository = noteRepository ?? NoteRepository() {
+      : _noteRepository = noteRepository ?? NoteRepository() {
     _notesSubscription =
-        _NoteRepository.stream(userId).listen((notesData) {
+        _noteRepository.stream(userId).listen((notesData) {
       _notes = notesData;
       notifyListeners();
     });
@@ -28,10 +28,10 @@ class NotesViewModel with ChangeNotifier {
   }
 
   Future<void> addNote(Note newNote, String userId) async {
-    await _NoteRepository.add(newNote, userId);
+    await _noteRepository.add(newNote, userId);
   }
 
-  Future<Note?> getNote(String userBookId, String userId) async {
-    return await _NoteRepository.get(userBookId, userId);
+  Future<Note?> getNote(String noteId, String userId) async {
+    return await _noteRepository.get(noteId, userId);
   }
 }

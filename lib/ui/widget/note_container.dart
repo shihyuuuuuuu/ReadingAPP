@@ -59,7 +59,7 @@ class NoteContainerState extends State<NoteContainer> {
         color: colorScheme.surfaceContainer,
         margin: cardEdgeInsets,
         child: InkWell(
-          onTap: () => { nav.goViewNote("tt123") },
+          onTap: () => { nav.goViewNote(widget.note.id!) },
           child: Padding(
             padding: const EdgeInsets.only(right: 30),
             child: Column(
