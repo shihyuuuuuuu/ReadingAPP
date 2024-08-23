@@ -22,6 +22,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
   final _scrollController = ScrollController();
   bool _isTextEmpty = true;
   bool _noteTakingFinish = false;
+  bool _btnEnable = true;
 
   void _showPopup() async {
   final nav = Provider.of<NavigationService>(context, listen: false);
@@ -29,19 +30,18 @@ class _ChatNotePageState extends State<ChatNotePage> {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-          title: Text("ㄎㄎ"),
-          content: Text("你真的不記一下筆記嗎"),
+          title: Text("你確定..."),
+          content: Text("真的不記一下筆記嗎"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); 
               },
               child: Text("取消"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Navigator.of(context).pop();
+                Navigator.of(context).pop(); 
                 nav.pop();
               },
               child: Text("確認"),
@@ -61,13 +61,14 @@ class _ChatNotePageState extends State<ChatNotePage> {
     });
     _scrollToBottom();
 
+    // TODO: insert API
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
       chatContent.removeLast();
       chatContent.add(_ConversationDialog(text: 'abcd', isUser: false));
       // TODO: 偵測到要結束的語句時
-      if (chatContent.length > 12) {
+      if (chatContent.length > 6) {
         _noteTakingFinish = true;
       }
       chatContent = List.from(chatContent);
@@ -121,6 +122,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+    final nav = Provider.of<NavigationService>(context, listen: false);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -148,10 +150,13 @@ class _ChatNotePageState extends State<ChatNotePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: FilledButton(
                             onPressed: ()=>{
-                              setState(() {
-                                chatContent.add(_ConversationDialog(text: "今天有什麼新發現", isUser: false));
-                                chatContent = List.from(chatContent);
-                              })
+                              if (_btnEnable) {
+                                setState(() {
+                                  chatContent.add(_ConversationDialog(text: "告訴我今天有什麼新發現", isUser: false));
+                                  chatContent = List.from(chatContent);
+                                  _btnEnable = false;
+                                })
+                              }
                             }, // ask 
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -164,7 +169,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: FilledButton(
-                            onPressed: _showPopup, // confirm and quit chatNote page 
+                            onPressed: _showPopup,
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10.0),
                               child: Text("先跳過"),
@@ -188,12 +193,17 @@ class _ChatNotePageState extends State<ChatNotePage> {
           ),
         ),
         _noteTakingFinish ?
-        FilledButton(
-          onPressed: ()=>{}, // ask 
-            child: const Padding(
-              padding: EdgeInsets.all(10),
-              child: Text("產生筆記"),
-          )
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: FilledButton(
+
+            // TODO: 1. create a note    2. navigation to the correct place with data   3. add to db  
+            onPressed: ()=>{ nav.goViewNote("noteId") }, 
+              child: const Padding(
+                padding: EdgeInsets.all(10),
+                child: Text("產生筆記"),
+            )
+          ),
         ): const SizedBox(),
         Container(
           color: colorScheme.surfaceContainerHighest,
@@ -205,7 +215,6 @@ class _ChatNotePageState extends State<ChatNotePage> {
                   child: TextField(
                     style: textTheme.bodyLarge,
                     controller: _textController,
-                    onSubmitted: (value) => _userSubmit(value),
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
@@ -239,59 +248,6 @@ class _ChatNotePageState extends State<ChatNotePage> {
   }
 }
 
-
-class _SlideBar extends StatefulWidget{
-  @override
-  State<_SlideBar> createState() => _SlideBarState();
-}
-
-class _SlideBarState extends State<_SlideBar> {
-  double _currentSliderValue = 20;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.mood_bad,
-            size: 40.0,
-          ),
-          Expanded(
-            child: SliderTheme(
-              data: SliderThemeData(
-                activeTrackColor: colorScheme.primary,
-                inactiveTrackColor: colorScheme.outlineVariant,
-                thumbColor: colorScheme.tertiaryContainer,
-                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 16.0,),
-                trackHeight: 10.0,
-              ),
-              child: Slider(
-                value: _currentSliderValue,
-                min: 0,
-                max: 100,
-                label: _currentSliderValue.round().toString(),
-                onChanged: (double value) {
-                  setState(() {
-                    _currentSliderValue = value;
-                  });
-                },
-              ),
-            ),
-          ),
-          const Icon(
-            Icons.mood,
-            size: 40.0,  
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _ConversationDialog extends StatelessWidget {
   
@@ -328,7 +284,6 @@ class _ConversationDialog extends StatelessWidget {
               border: Border.all(
                 color: colorScheme.outline,
                 width: 1.0,
-              
              ),
              borderRadius: BorderRadius.circular(15),
             ),
@@ -357,3 +312,56 @@ class _ConversationDialog extends StatelessWidget {
     );
   }
 }
+
+// class _SlideBar extends StatefulWidget{
+//   @override
+//   State<_SlideBar> createState() => _SlideBarState();
+// }
+
+// class _SlideBarState extends State<_SlideBar> {
+//   double _currentSliderValue = 20;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final colorScheme = Theme.of(context).colorScheme;
+    
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 30.0),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           const Icon(
+//             Icons.mood_bad,
+//             size: 40.0,
+//           ),
+//           Expanded(
+//             child: SliderTheme(
+//               data: SliderThemeData(
+//                 activeTrackColor: colorScheme.primary,
+//                 inactiveTrackColor: colorScheme.outlineVariant,
+//                 thumbColor: colorScheme.tertiaryContainer,
+//                 thumbShape: RoundSliderThumbShape(enabledThumbRadius: 16.0,),
+//                 trackHeight: 10.0,
+//               ),
+//               child: Slider(
+//                 value: _currentSliderValue,
+//                 min: 0,
+//                 max: 100,
+//                 label: _currentSliderValue.round().toString(),
+//                 onChanged: (double value) {
+//                   setState(() {
+//                     _currentSliderValue = value;
+//                   });
+//                 },
+//               ),
+//             ),
+//           ),
+//           const Icon(
+//             Icons.mood,
+//             size: 40.0,  
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
