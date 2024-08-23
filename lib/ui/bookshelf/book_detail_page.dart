@@ -104,7 +104,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           ),
         ],
       ),
-      body: FutureBuilder<UserBook?>(
+      body: FutureBuilder<Note?>(
         future: viewModel.getUserBook(widget.userBookId, userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -181,7 +181,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 }
 
 class _BookInfoContainer extends StatelessWidget {
-  final UserBook userBook;
+  final Note userBook;
 
   const _BookInfoContainer({
     super.key,

@@ -17,7 +17,7 @@ class BookshelfPage extends StatefulWidget {
 class _BookshelfPageState extends State<BookshelfPage> {
   String _searchCondition = "";
   final List<Book> books = [];
-  final List<UserBook> userBooks = [];
+  final List<Note> userBooks = [];
 
   Future<void> _showPopup(BuildContext context) async {
     final result = await showDialog<String>(
@@ -65,7 +65,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
       ),
       body: Center(child: Consumer<UserBooksViewModel>(
         builder: (context, viewModel, _) {
-          List<UserBook> userBooks = viewModel.userBooks;
+          List<Note> userBooks = viewModel.userBooks;
 
           if (userBooks.isEmpty) {
             return const Center(child: Text('No books.'));
@@ -88,7 +88,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
 }
 
 class _BookCard extends StatelessWidget {
-  final UserBook userBook;
+  final Note userBook;
 
   const _BookCard({
     super.key,

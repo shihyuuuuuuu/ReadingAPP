@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
-import 'package:reading_app/data/repositories/base_repo.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
 
@@ -25,35 +24,8 @@ class ViewNotePage extends StatefulWidget{
 class _ViewNotePageState extends State<ViewNotePage> {
 
   final List<Note> notes = [];
-  final List<UserBook> userBooks = [];
+  final List<Note> userBooks = [];
   final List<Book> books = [];
-
-  Future<void> readJson() async {
-    // final BaseRepository book =
-    final String dataStr = await rootBundle.loadString('assets/test_data.json');
-    final Map<String, dynamic> data = json.decode(dataStr);
-    setState(() { 
-      for (var note in data['Note']) {
-        note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
-        note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
-        final newNote = Note.fromMap(note, note['id']);
-        notes.add(newNote);
-      }
-      for (var userBook in data['UserBook']) {
-        userBooks.add(UserBook.fromMap(userBook, userBook['id']));
-      }
-      for (var book in data['Book']) {
-        books.add(Book.fromMap(book, book['id']));
-      }
-    }); 
-  }
-
-
-  @override
-  void initState() {
-    super.initState();
-    readJson();
-  }
 
   @override
   Widget build(BuildContext context) {

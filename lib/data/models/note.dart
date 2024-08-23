@@ -4,7 +4,7 @@ import 'base.dart';
 
 class Note extends MappableModel {
   String? id;
-  String userId;
+  // String userId;
   String userBookId;
   String? readingSessionId;
   String title;
@@ -17,7 +17,7 @@ class Note extends MappableModel {
 
   @override
   Note({
-    required this.userId,
+    // required this.userId,
     required this.userBookId,
     this.readingSessionId,
     required this.title,
@@ -33,7 +33,7 @@ class Note extends MappableModel {
   @override
   Note._({
     required this.id,
-    required this.userId,
+    // required this.userId,
     required this.userBookId,
     this.readingSessionId,
     required this.title,
@@ -49,7 +49,7 @@ class Note extends MappableModel {
   factory Note.fromMap(Map<String, dynamic> map, String? id) {
     return Note._(
       id: id,
-      userId: map['userId'],
+      // userId: map['userId'],
       userBookId: map['userBookId'],
       readingSessionId: map['readingSessionId'],
       title: map['title'],
@@ -66,7 +66,7 @@ class Note extends MappableModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'userId': userId,
+      // 'userId': userId,
       'userBookId': userBookId,
       'readingSessionId': readingSessionId,
       'title': title,
