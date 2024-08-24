@@ -158,10 +158,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: NoteContainer(
-                            note: notes[index],
-                            expandable: false,
-                          ),
+                          child: NoteContainer(note: notes[index],),
                         );
                       },
                       childCount: notes.length,

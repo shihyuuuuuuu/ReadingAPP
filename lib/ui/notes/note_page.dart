@@ -71,7 +71,10 @@ class _NotePageState extends State<NotePage> {
           } else {
             return ListView( 
               children: notes.map((item) => 
-                NoteContainer(note: item, expandable: true,)).toList(), 
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                  child: NoteContainer(note: item,),
+                )).toList(), 
             );
           }
         }
