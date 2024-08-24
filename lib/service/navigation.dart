@@ -238,7 +238,9 @@ class NavigationService {
     } else {
       _router.pop();
     }
-
     // print("after pop, with current stack: ${_navigationStack.join("")}");
+
+    
+    
   }
 }

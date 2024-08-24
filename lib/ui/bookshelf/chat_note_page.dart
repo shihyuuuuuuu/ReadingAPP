@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
@@ -25,38 +23,38 @@ class _ChatNotePageState extends State<ChatNotePage> {
   bool _btnEnable = true;
 
   void _showPopup() async {
-  final nav = Provider.of<NavigationService>(context, listen: false);
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-          title: Text("你確定..."),
-          content: Text("真的不記一下筆記嗎"),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); 
-              },
-              child: Text("取消"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); 
-                nav.pop();
-              },
-              child: Text("確認"),
-            ),
-          ],
-        );
-    },
-  );
-}
+    final nav = Provider.of<NavigationService>(context, listen: false);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: const Text("你確定..."),
+            content: const Text("真的不記一下筆記嗎"),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();  
+                },
+                child: const Text("取消"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); 
+                  nav.pop(); // TODO: pop but skip /book/$bookid/reading page
+                },
+                child: const Text("確認"),
+              ),
+            ],
+          );
+      },
+    );
+  }
 
   List<Widget> chatContent = [];
 
   Future<void> _getResponse() async {
     setState(() {
-      chatContent.add(_ConversationDialog(text: '...', isUser: false));
+      chatContent.add(const _ConversationDialog(text: '...', isUser: false));
       chatContent = List.from(chatContent);
     });
     _scrollToBottom();
@@ -67,6 +65,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
     setState(() {
       chatContent.removeLast();
       chatContent.add(_ConversationDialog(text: 'abcd', isUser: false));
+      
       // TODO: 偵測到要結束的語句時
       if (chatContent.length > 6) {
         _noteTakingFinish = true;
@@ -129,7 +128,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            nav.pop();
+            nav.pop(); // TODO: 同_showPopUP 裡面的 確認
         },),
         title: Text("記筆記", style: textTheme.titleMedium),
 
@@ -147,6 +146,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // TODO: 之後改成random或由API提供
                       const _ConversationDialog(
                         text: "太棒了！今天的閱讀完成了！\n來回憶一下剛剛看了什麼吧", 
                         isUser: false
@@ -158,6 +158,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
                             onPressed: ()=>{
                               if (_btnEnable) {
                                 setState(() {
+                                  // TODO: 之後改成random或由API提供
                                   chatContent.add(_ConversationDialog(text: "告訴我今天有什麼新發現", isUser: false));
                                   chatContent = List.from(chatContent);
                                   _btnEnable = false;
@@ -203,7 +204,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
           padding: const EdgeInsets.all(10.0),
           child: FilledButton(
 
-            // TODO: 1. create a note    2. navigation to the correct place with data   3. add to db  
+            // TODO: (再看看之後的設計邏輯是怎樣) 儲存note, nav to ViewNote
             onPressed: ()=>{ nav.goViewNote("noteId") }, 
               child: const Padding(
                 padding: EdgeInsets.all(10),
