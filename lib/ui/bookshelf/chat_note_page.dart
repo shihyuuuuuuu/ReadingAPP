@@ -1,3 +1,6 @@
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
@@ -50,11 +53,11 @@ class _ChatNotePageState extends State<ChatNotePage> {
     );
   }
 
-  List<Widget> chatContent = [];
+  List<_ConversationDialog> chatContent = [];
 
   Future<void> _getResponse() async {
     setState(() {
-      chatContent.add(const _ConversationDialog(text: '...', isUser: false));
+      chatContent.add(const _ConversationDialog.loadingDialog());
       chatContent = List.from(chatContent);
     });
     _scrollToBottom();
@@ -63,7 +66,10 @@ class _ChatNotePageState extends State<ChatNotePage> {
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
-      chatContent.removeLast();
+      // TODO: 這邊邏輯之後要想一下，目前是user input幾則訊息就回復幾則。正常來講是user input 一則，API回覆一則。但是如過user input 太快要每則都回還是只回最後一則？
+      if (chatContent.last.text == '...' && chatContent.last.isUser == false){
+        chatContent.removeLast();
+      }
       chatContent.add(_ConversationDialog(text: 'abcd', isUser: false));
       
       // TODO: 偵測到要結束的語句時
@@ -77,7 +83,17 @@ class _ChatNotePageState extends State<ChatNotePage> {
 
   Future<void> _userSubmit(String value) async {
     setState(() {
-      chatContent.add(_ConversationDialog(text: value, isUser: true));
+      if (chatContent.isEmpty) {
+        _btnEnable = false;
+      }
+      
+      if (chatContent.isNotEmpty && chatContent.last.text == '...' && chatContent.last.isUser == false){
+        log("user input too fast");
+        chatContent.removeLast();
+        chatContent.add(_ConversationDialog(text: value, isUser: true));
+      } else {
+        chatContent.add(_ConversationDialog(text: value, isUser: true));
+      }
       chatContent = List.from(chatContent);
     });
     _textController.clear();
@@ -268,6 +284,9 @@ class _ConversationDialog extends StatelessWidget {
     required this.isUser
   });
 
+  const _ConversationDialog.loadingDialog()
+    :text='...', isUser=false;
+
   static double iconSize = 40;
   @override
   Widget build(BuildContext context) {
@@ -321,6 +340,7 @@ class _ConversationDialog extends StatelessWidget {
   }
 }
 
+// SlideBar 之後有時間再做
 // class _SlideBar extends StatefulWidget{
 //   @override
 //   State<_SlideBar> createState() => _SlideBarState();
