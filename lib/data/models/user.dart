@@ -4,6 +4,7 @@ class User extends MappableModel {
   String? id;
   String name;
   String? avatarUrl;
+  // TODO: add email
 
   @override
   User({required this.name, this.avatarUrl});
