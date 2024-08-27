@@ -105,7 +105,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
       ),
       body: FutureBuilder<UserBook?>(
-        future: viewModel.getUserBook(widget.userBookId, userId),
+        future: viewModel.getUserBook(widget.userBookId, viewModel.userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

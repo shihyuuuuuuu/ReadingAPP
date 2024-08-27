@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/book.dart';
@@ -41,6 +43,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    
 
     return Scaffold(
       appBar: AppBar(
@@ -66,7 +69,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
       body: Center(child: Consumer<UserBooksViewModel>(
         builder: (context, viewModel, _) {
           List<UserBook> userBooks = viewModel.userBooks;
-
+          log("userId: ${viewModel.userId}");
           if (userBooks.isEmpty) {
             return const Center(child: Text('No books.'));
           } else {
