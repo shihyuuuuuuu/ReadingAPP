@@ -34,3 +34,4 @@ flutter:
 
   assets:
     - assets/test_data.json
+    - assets/images/logo_google.svg

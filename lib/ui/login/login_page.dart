@@ -16,6 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   String _userEmail = '';
   String _userPassword = '';
   String _userPasswordCheck = '';
+
+  TextEditingController _passwordController = TextEditingController();
   var _isAuthenticating = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -53,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
                         if (value == null ||
                             value.isEmpty ||
                             value.trim().length < 4) {
-                          return 'Please enter at least 4 characters.';
+                          return '名稱至少四個字';
                         }
                         return null;
                       },
@@ -73,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                       if (value == null ||
                           value.trim().isEmpty ||
                           !value.contains('@')) {
-                        return 'Please enter a valid email address.';
+                        return '必須輸入email';
                       }
                       return null;
                     },
@@ -85,10 +87,11 @@ class _LoginPageState extends State<LoginPage> {
                     key: const ValueKey('password'),
                     decoration:
                         const InputDecoration(labelText: '密碼'),
+                    controller: _passwordController,
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.trim().length < 6) {
-                        return 'Password must be at least 6 characters long.';
+                        return '密碼至少6個英文或數字';
                       }
                       return null;
                     },
@@ -103,8 +106,8 @@ class _LoginPageState extends State<LoginPage> {
                         const InputDecoration(labelText: '確認密碼'),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || value.trim().length < 6) {
-                        return 'Password must be at least 6 characters long.';
+                      if (value != _passwordController.text) {
+                        return '與密碼不符';
                       }
                       return null;
                     },
@@ -112,8 +115,8 @@ class _LoginPageState extends State<LoginPage> {
                       _userPasswordCheck = value!;
                     },
                   )
-                  : SizedBox(),
-                  SizedBox(height: 10),
+                  : const SizedBox(),
+                  const SizedBox(height: 10),
                   
                   if (_isAuthenticating)
                     const Center(
@@ -136,20 +139,23 @@ class _LoginPageState extends State<LoginPage> {
                           width: double.infinity,
                           child: FilledButton.icon(
                             onPressed: _logInWithGoogle,
-                            // icon: SvgPicture.asset(
-                            //   'assets/images/logo_google.svg',
-                            //   height: 20.0,
-                            //   width: 20.0,
-                            //   colorFilter: const ColorFilter.mode(
-                            //     Colors.white,
-                            //     BlendMode.srcIn,
-                            //   ),
-                            // ),
+                            icon: SvgPicture.asset(
+                              'assets/images/logo_google.svg',
+                              height: 20.0,
+                              width: 20.0,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
                             style: FilledButton.styleFrom(
-                              backgroundColor: Colors.grey[700],
+                              backgroundColor: Colors.grey[600],
                               foregroundColor: Colors.white,
                             ),
-                            label: const Text('Log in with Google'),
+                            label: const Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Text('Log in with Google'),
+                            ),
                           ),
                         ),
                       ],
@@ -160,9 +166,12 @@ class _LoginPageState extends State<LoginPage> {
                             _isLogin = !_isLogin;
                           });
                         },
-                        child: Text(_isLogin
-                            ? '建立新帳號'
-                            : '已有帳號'),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text(_isLogin
+                              ? '建立新帳號'
+                              : '已有帳號'),
+                        ),
                       ),
                     ],
                   ]
@@ -226,62 +235,42 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Authentication failed with error: $error'),
+            content: Text(error.toString()),
           ),
         );
       }
     }
   }
 
-  void _logInWithGoogle () async {}
-}
+  
+  void _logInWithGoogle() async {
+    final authenticationService =
+        Provider.of<AuthenticationService>(context, listen: false);
+    try {
+      setState(() {
+        _isAuthenticating = true;
+      });
 
+      await authenticationService.logInWithGoogle(context);
 
-
-// class _CustomTextFormField extends StatelessWidget {
-//   final String labelText;
-//   final bool obscureText;
-//   final validator;
-
-//   _CustomTextFormField({
-//     required this.labelText, 
-//     this.obscureText = false,
-//     required this.validator,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 10.0),
-//       child: SizedBox(
-//         width: 280,
-//         child: TextFormField(
-//           validator: validator,
-//           obscureText: obscureText,
-//           decoration: InputDecoration(
-//             labelText: labelText,
-//             border: OutlineInputBorder(),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-class _CustomButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
-
-  _CustomButton({required this.label, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 180,
-      child: FilledButton(
-        onPressed: onPressed,
-        child: Text(label),
-      ),
-    );
+      if (mounted) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+      }
+    } catch (error) {
+      debugPrint('Google Sign-in failed with error: $error');
+      if (mounted) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Google Sign-in failed with error: $error'),
+          ),
+        );
+      }
+    }
   }
 }

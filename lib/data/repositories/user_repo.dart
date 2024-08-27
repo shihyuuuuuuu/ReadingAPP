@@ -21,6 +21,20 @@ class UserRepository extends BaseRepository<User> {
       .set(itemMap);
   }
 
+  Future<User?> getUserByEmail(String email) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+
+    QuerySnapshot querySnapshot = await db
+        .collection('ReadingAPP/Test/User')
+        .where('email', isEqualTo: email)
+        .get();
+    if (querySnapshot.docs.isEmpty) {
+      return null;
+    }
+    return User.fromMap(querySnapshot.docs.first.data() as Map<String, dynamic>,
+        querySnapshot.docs.first.id);
+  }
+
   @override
   String? parentCollection;
 }
