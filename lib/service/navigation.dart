@@ -40,14 +40,17 @@ final router = GoRouter(
     ),
     ShellRoute(
       navigatorKey: _sectionNavigatorKey,
+      
       builder: (context, state, child) {
         final userId = Provider.of<AuthenticationService>(context, listen: false)
             .checkAndGetLoggedInUserId();
+        
         log("rebuild shellroute");
-         if (userId == null) {
+        if (userId == null) {
           log('Warning: ShellRoute should not be built without a user');
           return const SizedBox.shrink();
         }
+        // the provider will be disposed automatically when it is not in widget tree
         return ChangeNotifierProvider(
           create: (_) => UserBooksViewModel(userId: userId),
           child: ScaffoldWithNavbar(child),
