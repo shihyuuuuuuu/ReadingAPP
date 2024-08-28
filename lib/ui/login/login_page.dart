@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:reading_app/data/models/user.dart';
 import 'package:reading_app/service/authentication.dart';
 
 
@@ -15,9 +14,8 @@ class _LoginPageState extends State<LoginPage> {
   String _userName = '';
   String _userEmail = '';
   String _userPassword = '';
-  String _userPasswordCheck = '';
 
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   var _isAuthenticating = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -110,9 +108,6 @@ class _LoginPageState extends State<LoginPage> {
                         return '與密碼不符';
                       }
                       return null;
-                    },
-                    onSaved: (value) {
-                      _userPasswordCheck = value!;
                     },
                   )
                   : const SizedBox(),
