@@ -3,8 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/local/note_type.dart';
 import 'package:reading_app/data/models/note.dart';
+import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
+import 'package:reading_app/view_models/userbooks_vm.dart';
 
 class EditNotePage extends StatefulWidget{
   final noteId;
@@ -31,16 +33,17 @@ class _EditNotePageState extends State<EditNotePage> {
     final nav = Provider.of<NavigationService>(context, listen: false);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final viewModel = Provider.of<NotesViewModel>(context);
+    final noteViewModel = Provider.of<NotesViewModel>(context);
+    final userBookViewModel = Provider.of<UserBooksViewModel>(context);
     final dateFormatter = DateFormat('yyyy-MM-dd');
 
     // TODO: 暫定
-    int columnMinLine = ((MediaQuery.sizeOf(context).height - 460) / 20).round();
+    int columnMinLine = ((MediaQuery.sizeOf(context).height - 480) / 20).round();
     if (columnMinLine < 5) { columnMinLine = 5; }
 
 
     return FutureBuilder<Note?>(
-      future: viewModel.getNote(widget.noteId, userId),
+      future: noteViewModel.getNote(widget.noteId, userId),
       builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -56,7 +59,7 @@ class _EditNotePageState extends State<EditNotePage> {
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () => {nav.pop()}, 
                   ),
-                title: Text(note.title, style: textTheme.bodyMedium!.copyWith(color: Colors.grey[400])),
+                title: Text(note.title, style: textTheme.bodyMedium!.copyWith(color:colorScheme.outline)),
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.save), 
@@ -91,17 +94,6 @@ class _EditNotePageState extends State<EditNotePage> {
                             border: InputBorder.none,
                           ),
                         ),
-                        const SizedBox(height: 6,),
-                        
-                        // TODO: book title
-                        Row(
-                          children: [
-                            Text("⟪book title⟫", style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])),
-                            Text(', last update at: ${dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note.createdAt.millisecondsSinceEpoch))}',
-                                style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])),
-                          ],
-                        ),
-                        const SizedBox(height: 6,),
                         TextField(
                           controller: TextEditingController()..text = note.content,
                           onChanged: (text) => {},
@@ -115,6 +107,7 @@ class _EditNotePageState extends State<EditNotePage> {
                   
                           ),
                         ),
+                        const SizedBox(height: 6,),
                         Row(
                           children: [
                             Text("筆記類別", style:textTheme.bodyMedium),
@@ -154,7 +147,33 @@ class _EditNotePageState extends State<EditNotePage> {
                         ),
                         _pageInput(hintText: "從幾頁", pageNum: note.startPage),
                         _pageInput(hintText: "讀到幾頁", pageNum: note.endPage),
-                        
+                        SizedBox(height: 6,),
+                        FutureBuilder<UserBook?>(
+                          future: userBookViewModel.getUserBook(note.userBookId, userId),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 6.0),
+                                child: Text(
+                                  "書籍 ⟪${snapshot.data!.book.title}⟫", 
+                                  style: textTheme.bodyMedium
+                                ),
+                              );
+                            } else {
+                              return const Center(child: Text('No data found'));
+                            }
+                          }
+                        ),
+                        // const SizedBox(height: 6,),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: Text('紀錄時間: ${dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note.createdAt.millisecondsSinceEpoch))}',
+                              style: textTheme.bodyMedium),
+                        ),
                   
                         // const SizedBox(height: 6,),
                       ]
@@ -186,7 +205,7 @@ class _pageInput extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(children: [
         Text(hintText, style: textTheme.bodyMedium,),
         const SizedBox(width: 15.0,),

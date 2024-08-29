@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/note.dart';
+import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/widget/popup_dialog.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
+import 'package:reading_app/view_models/userbooks_vm.dart';
 
 class ViewNotePage extends StatefulWidget{
   final noteId;
@@ -23,12 +25,13 @@ class _ViewNotePageState extends State<ViewNotePage> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
-    final viewModel = Provider.of<NotesViewModel>(context);
+    final noteViewModel = Provider.of<NotesViewModel>(context);
+    final userBookViewModel = Provider.of<UserBooksViewModel>(context);
     final dateFormatter = DateFormat('yyyy-MM-dd');
 
 
     return FutureBuilder<Note?>(
-      future: viewModel.getNote(widget.noteId, userId),
+      future: noteViewModel.getNote(widget.noteId, userId),
       builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -74,11 +77,24 @@ class _ViewNotePageState extends State<ViewNotePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // TODO: book title
-                            Text("book title", style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])),
+                            FutureBuilder<UserBook?>(
+                              future: userBookViewModel.getUserBook(note.userBookId, userId),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(child: Text('Error: ${snapshot.error}'));
+                                } else if (snapshot.hasData) {
+                                  return Text("⟪${snapshot.data!.book.title}⟫", style: textTheme.bodySmall?.copyWith(color: colorScheme.outline));
+                                } else {
+                                  return const Center(child: Text('No data found'));
+                                }
+                              }
+                            ),
                             const SizedBox(height: 10,),
                             Text('P.${note.startPage}-${note.endPage},  ${
                                       dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note.createdAt.millisecondsSinceEpoch))}',
-                                    style: textTheme.bodySmall?.copyWith(color: Colors.grey[700])),
+                                    style: textTheme.bodySmall?.copyWith(color: colorScheme.outline)),
                             const SizedBox(height: 16,),
                             Text(note.content, style: textTheme.bodyLarge),
                             
