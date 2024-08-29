@@ -70,7 +70,7 @@ class NoteContainerState extends State<NoteContainer> {
                   padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
                   child: Text(
                     widget.note.content,
-                    style: textTheme.bodyLarge,
+                    style: textTheme.bodyMedium,
                     maxLines: 8,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -94,13 +94,22 @@ class NoteContainerState extends State<NoteContainer> {
               color: widget.note.type.color,
               borderRadius: const BorderRadius.horizontal(
                 left: Radius.zero, 
-                right: Radius.circular(cardBoarderRadius)
+                right: Radius.circular(cardBoarderRadius),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.4),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(-2, 0), // changes position of shadow
+                ),
+                ]
+              
             ),
             child: (
               Text(
                 widget.note.type.str,
-                style: textTheme.labelSmall?.copyWith(color:colorScheme.onSurface,),
+                style: textTheme.labelSmall?.copyWith(color:colorScheme.onInverseSurface,),
               )
             )
           ),

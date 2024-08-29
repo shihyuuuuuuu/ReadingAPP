@@ -407,9 +407,9 @@ TextTheme lightTextTheme = const TextTheme(
   titleSmall: TextStyle(fontSize: 18),
 
   // body
-  bodyLarge: TextStyle(fontSize: 16, height: 1.5),
-  bodyMedium: TextStyle(fontSize: 15, height: 1.5),
-  bodySmall: TextStyle(fontSize: 12),
+  bodyLarge: TextStyle(fontSize: 18, height: 1.5),
+  bodyMedium: TextStyle(fontSize: 16, height: 1.5),
+  bodySmall: TextStyle(fontSize: 14),
 
   // label:  things like the text inside components or for very small text in the content body, such as captions. 
   labelLarge: TextStyle(fontSize: 18),
