@@ -49,6 +49,29 @@ abstract class BaseRepository<T extends MappableModel> {
     return docRef.id;
   }
 
+  Future<void> update(T item, String itemId, [String? parentId]) async {
+    Map<String, dynamic> itemMap = item.toMap();
+    itemMap.remove('id');
+
+    if (parentId == null) {
+      await db
+        .collection('$basePath/$collection')
+        .doc(itemId)
+        .set(itemMap)
+        .timeout(timeout)
+        .onError((e, _) => print("Error writing document: $e"));
+    } else {
+      await db
+        .collection('$basePath/$parentCollection')
+        .doc(parentId)
+        .collection(collection)
+        .doc(itemId)
+        .set(itemMap)
+        .onError((e, _) => print("Error writing document: $e"));
+    }
+
+  }
+
   Future<T?> get(String id, [String? parentId]) async {
     DocumentSnapshot docRef;
     if (parentId == null) {

@@ -60,7 +60,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
                       icon: const Icon(Icons.edit_document), 
                       color: colorScheme.primary,
                       // TODO: fix navigation push and pop
-                      onPressed: () => {nav.goEditNote(widget.noteId)}, 
+                      onPressed: () => {nav.goEditNote(widget.noteId, note.userBookId)}, 
                     ),
                   ),
                 ],

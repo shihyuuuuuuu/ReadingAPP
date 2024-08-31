@@ -34,4 +34,8 @@ class NotesViewModel with ChangeNotifier {
   Future<Note?> getNote(String noteId, String userId) async {
     return await _noteRepository.get(noteId, userId);
   }
+
+  Future<void> updateNote(Note updateNote, String noteId, String userId) async {
+    return await _noteRepository.update(updateNote, noteId, userId);
+  }
 }

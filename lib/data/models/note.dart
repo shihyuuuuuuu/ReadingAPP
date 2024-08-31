@@ -30,6 +30,20 @@ class Note extends MappableModel {
   })  : createdAt = createdAt ?? Timestamp.now(),
         updatedAt = updatedAt ?? Timestamp.now();
 
+  // TODO is it good to write code like this? 
+  Note.emptyNote({
+    required this.userBookId,
+    this.readingSessionId,
+    this.title = "",
+    this.type = NoteType.content,
+    this.content = "",
+    this.startPage,
+    this.endPage,
+    Timestamp? createdAt,
+    Timestamp? updatedAt,
+  })  : createdAt = createdAt ?? Timestamp.now(),
+        updatedAt = updatedAt ?? Timestamp.now();
+
   @override
   Note._({
     required this.id,
