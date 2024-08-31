@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/local/note_type.dart';
+import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
@@ -24,7 +25,8 @@ class EditNotePage extends StatelessWidget{
   final String noteId;
   final String userBookId;
 
-  EditNotePage({
+  const EditNotePage({
+    super.key, 
     required this.noteId,
     required this.userBookId,
   });
@@ -33,50 +35,73 @@ class EditNotePage extends StatelessWidget{
   Widget build(BuildContext context) {
     // how much resources it take
     final noteViewModel = Provider.of<NotesViewModel>(context);
+    final userBookViewModel = Provider.of<UserBooksViewModel>(context);
     
-    
-    // 如果是空的話要先建立model比較好還是不先建立model比較好
-    if (noteId == '-') {
-      //if the note is new, then create a new note
-      return _editScaffold(note: Note.emptyNote(userBookId: userBookId));
-    } else {
-      //else fetch the data from db
-      return FutureBuilder<Note?>(
-        future: noteViewModel.getNote(noteId, userId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
+    return FutureBuilder<UserBook?>(
+      future: userBookViewModel.getUserBook(userBookId, userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          UserBook? book = snapshot.data;
+          if (noteId == '-') {
 
-            // initialize data from db
-            Note note = snapshot.data!;
-            return _editScaffold(note: note);
+            //if the note is new, then create a new note
+            return _EditScaffold(
+              note: Note.emptyNote(userBookId: userBookId), 
+              book: book!
+            );
+          } else {
+            //else fetch the data from db
+            return FutureBuilder<Note?>(
+              future: noteViewModel.getNote(noteId, userId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.hasData) {
+
+                  // initialize data from db
+                  Note note = snapshot.data!;
+                  return _EditScaffold(note: note, book: book!);
+                }
+                else {
+                    return const Center(child: Text('No data found'));
+                }
+              }
+            );
           }
-          else {
-              return const Center(child: Text('No data found'));
-          }
+        } else {
+          return const Center(child: Text('No data found'));
         }
-      );
-    }
+      }
+    );
+    // 如果是空的話要先建立model比較好還是不先建立model比較好
 
   }
 }
-class _editScaffold extends StatefulWidget {
-  final Note note;
 
-  _editScaffold({
-    required this.note,
+class _EditScaffold extends StatefulWidget {
+  final Note note;
+  final UserBook book;
+
+  const _EditScaffold({
+    required this.note, 
+    required this.book,
   });
 
   @override
-  State<_editScaffold> createState() => _editScaffoldState();
+  State<_EditScaffold> createState() => _EditScaffoldState();
 }
 
-class _editScaffoldState extends State<_editScaffold> {
+class _EditScaffoldState extends State<_EditScaffold> {
 
   late Note note;
+  late UserBook book;
+  final TextEditingController textController = TextEditingController();
 
   // TODO update note.type here!
   void dropDownChange(NoteType? newType) { 
@@ -103,17 +128,20 @@ class _editScaffoldState extends State<_editScaffold> {
   void initState() {
     super.initState();
     note = widget.note;
+    book = widget.book;
   }
   
   @override
   Widget build(BuildContext context) {
     final nav = Provider.of<NavigationService>(context, listen: false);
     final noteViewModel = Provider.of<NotesViewModel>(context);
-    final userBookViewModel = Provider.of<UserBooksViewModel>(context);
 
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final dateFormatter = DateFormat('yyyy-MM-dd');
+
+    textController.text = note.title;
+    textController.selection =  TextSelection.collapsed(offset: textController.text.length);
 
     // TODO: 暫定
     int columnMinLine = ((MediaQuery.sizeOf(context).height - 480) / 20).round();
@@ -136,7 +164,14 @@ class _editScaffoldState extends State<_editScaffold> {
             icon: const Icon(Icons.save), 
             color: colorScheme.primary,
             onPressed: () {
-              noteViewModel.updateNote(note, note.id!, userId);
+              debugPrint("note title: ${note.title}");
+              debugPrint("note content: ${note.content}");
+              debugPrint("note type: ${note.type}");
+              debugPrint("note start page: ${note.startPage}");
+              debugPrint("note end page: ${note.endPage}");
+              // set update date 
+              // update data to db
+              // noteViewModel.updateNote(note, note.id!, userId);
             }, 
           ),
           Padding(
@@ -160,9 +195,11 @@ class _editScaffoldState extends State<_editScaffold> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
-                  controller: TextEditingController()..text = note.title,
+                  controller: textController,
                   onChanged: (text) => { 
-                    // TODO how to update the title
+                    setState(() {
+                      note.title = text;
+                    })
                   },
                   style: textTheme.titleLarge!.copyWith(fontWeight: FontWeight.w600),
                   decoration: const InputDecoration(
@@ -171,7 +208,7 @@ class _editScaffoldState extends State<_editScaffold> {
                   ),
                 ),
                 TextField(
-                  controller: TextEditingController()..text = note!.content,
+                  controller: TextEditingController()..text = note.content,
                   onChanged: (text) => {
                     note.content = text
                   },
@@ -192,16 +229,21 @@ class _editScaffoldState extends State<_editScaffold> {
                     SizedBox(
                       width: 180,
                       child: DropdownButtonFormField<NoteType>(
-                        dropdownColor: note.type.color,
-                        iconSize: 24,
-                        iconEnabledColor: colorScheme.onPrimary,
                         value: note.type,
                         style: textTheme.bodyMedium,
+                        hint: Text("筆記類型", style: textTheme.labelMedium),
+                        dropdownColor: note.type.color,
+                        iconEnabledColor: colorScheme.onPrimary,
+                        iconSize: 24,
                         onChanged: dropDownChange,
+                        items: NoteType.values.map((NoteType noteTypeItem) {
+                          return DropdownMenuItem<NoteType>(
+                            value: noteTypeItem,
+                            child: Text(noteTypeItem.str, style: textTheme.labelLarge!.copyWith(color: colorScheme.onPrimary)));
+                        }).toList(),
                         decoration: InputDecoration(
-                          
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                           border: OutlineInputBorder(
                             borderSide: BorderSide(color: colorScheme.outlineVariant),
                             borderRadius: BorderRadius.circular(10)
@@ -209,13 +251,6 @@ class _editScaffoldState extends State<_editScaffold> {
                           filled: true,
                           fillColor: note.type.color,
                         ),
-                        items: NoteType.values.map((NoteType noteTypeItem) {
-                          return DropdownMenuItem<NoteType>(
-                            value: noteTypeItem,
-                            child: Text(noteTypeItem.str, style: textTheme.labelLarge!.copyWith(color: colorScheme.onPrimary)));
-                        }).toList(),
-                        itemHeight: 50,
-                        hint: Text("筆記類型", style: textTheme.labelMedium),
                       ),
                     ),
                   ],
@@ -231,27 +266,13 @@ class _editScaffoldState extends State<_editScaffold> {
                   callback: changePage,
                 ),
                 SizedBox(height: 6,),
-                FutureBuilder<UserBook?>(
-                  future: userBookViewModel.getUserBook(note.userBookId, userId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (snapshot.hasData) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6.0),
-                        child: Text(
-                          "書籍 ⟪${snapshot.data!.book.title}⟫", 
-                          style: textTheme.bodyMedium
-                        ),
-                      );
-                    } else {
-                      return const Center(child: Text('No data found'));
-                    }
-                  }
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: Text(
+                    "書籍 ⟪${book.book.title}⟫", 
+                    style: textTheme.bodyMedium
+                  ),
                 ),
-                // const SizedBox(height: 6,),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6.0),
                   child: Text('紀錄時間: ${dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note!.createdAt.millisecondsSinceEpoch))}',
