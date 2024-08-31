@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/local/note_type.dart';
-import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
@@ -34,7 +34,6 @@ class EditNotePage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     // how much resources it take
-    final noteViewModel = Provider.of<NotesViewModel>(context);
     final userBookViewModel = Provider.of<UserBooksViewModel>(context);
     
     return FutureBuilder<UserBook?>(
@@ -45,15 +44,18 @@ class EditNotePage extends StatelessWidget{
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
-          UserBook? book = snapshot.data;
-          if (noteId == '-') {
 
+          UserBook? book = snapshot.data;
+
+          if (noteId == '-') {
             //if the note is new, then create a new note
             return _EditScaffold(
               note: Note.emptyNote(userBookId: userBookId), 
               book: book!
             );
           } else {
+
+            final noteViewModel = Provider.of<NotesViewModel>(context);
             //else fetch the data from db
             return FutureBuilder<Note?>(
               future: noteViewModel.getNote(noteId, userId),
@@ -103,6 +105,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
   late UserBook book;
   final TextEditingController textController = TextEditingController();
 
+
   // TODO update note.type here!
   void dropDownChange(NoteType? newType) { 
     if (newType != null) {
@@ -123,6 +126,27 @@ class _EditScaffoldState extends State<_EditScaffold> {
     }
   }
 
+  var saveNoteCallback = (BuildContext context, Note note) async {
+    SnackBar snackBar = const SnackBar(
+      content: Text("筆記已儲存"), 
+      duration: Duration(milliseconds: 1500),
+    );
+
+    final noteViewModel = Provider.of<NotesViewModel>(context, listen: false);
+    
+    // set update date 
+    note.updatedAt = Timestamp.now();
+
+    // update data to db
+    if (note.id == null) {
+      note.id  = await noteViewModel.addNote(note, userId);
+    }
+    else {
+      noteViewModel.updateNote(note, note.id!, userId);
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  };
 
   @override
   void initState() {
@@ -134,7 +158,6 @@ class _EditScaffoldState extends State<_EditScaffold> {
   @override
   Widget build(BuildContext context) {
     final nav = Provider.of<NavigationService>(context, listen: false);
-    final noteViewModel = Provider.of<NotesViewModel>(context);
 
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
@@ -163,16 +186,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
           IconButton(
             icon: const Icon(Icons.save), 
             color: colorScheme.primary,
-            onPressed: () {
-              debugPrint("note title: ${note.title}");
-              debugPrint("note content: ${note.content}");
-              debugPrint("note type: ${note.type}");
-              debugPrint("note start page: ${note.startPage}");
-              debugPrint("note end page: ${note.endPage}");
-              // set update date 
-              // update data to db
-              // noteViewModel.updateNote(note, note.id!, userId);
-            }, 
+            onPressed: ()=> { saveNoteCallback(context, note) },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),

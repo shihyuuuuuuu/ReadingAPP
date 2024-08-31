@@ -49,7 +49,7 @@ abstract class BaseRepository<T extends MappableModel> {
     return docRef.id;
   }
 
-  Future<void> update(T item, String itemId, [String? parentId]) async {
+  Future<void> update(T item, String? itemId, [String? parentId]) async {
     Map<String, dynamic> itemMap = item.toMap();
     itemMap.remove('id');
 
