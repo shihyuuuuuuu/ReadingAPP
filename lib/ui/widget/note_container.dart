@@ -45,6 +45,7 @@ class NoteContainerState extends State<NoteContainer> {
           child: Padding(
             padding: const EdgeInsets.only(right: 30),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IntrinsicHeight(
                   child: Expanded(
@@ -65,7 +66,6 @@ class NoteContainerState extends State<NoteContainer> {
                     ),
                   ),
                 ),
-                // if (widget.expandable == false || isExpanded)
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10.0, bottom: 20.0),
                   child: Text(

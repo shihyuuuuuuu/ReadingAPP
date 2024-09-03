@@ -15,7 +15,7 @@ class NotesViewModel with ChangeNotifier {
       {required this.userId, NoteRepository? noteRepository})
       : _noteRepository = noteRepository ?? NoteRepository() {
     _notesSubscription =
-        _noteRepository.stream(userId).listen((notesData) {
+        _noteRepository.streamOrderBy(userId, "updatedAt").listen((notesData) {
       _notes = notesData;
       notifyListeners();
     });

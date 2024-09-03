@@ -81,7 +81,6 @@ class EditNotePage extends StatelessWidget{
         }
       }
     );
-    // 如果是空的話要先建立model比較好還是不先建立model比較好
 
   }
 }
@@ -126,7 +125,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
     }
   }
 
-  var saveNoteCallback = (BuildContext context, Note note) async {
+  void saveNoteCallback (BuildContext context, bool navToViewNote) async {
     SnackBar snackBar = const SnackBar(
       content: Text("筆記已儲存"), 
       duration: Duration(milliseconds: 1500),
@@ -145,8 +144,12 @@ class _EditScaffoldState extends State<_EditScaffold> {
       noteViewModel.updateNote(note, note.id!, userId);
     }
 
+    if(navToViewNote) {
+      Provider.of<NavigationService>(context, listen: false).goViewNote(note.id!);
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  };
+  }
 
   @override
   void initState() {
@@ -167,7 +170,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
     textController.selection =  TextSelection.collapsed(offset: textController.text.length);
 
     // TODO: 暫定
-    int columnMinLine = ((MediaQuery.sizeOf(context).height - 480) / 20).round();
+    int columnMinLine = ((MediaQuery.sizeOf(context).height - 500) / 20).round();
     if (columnMinLine < 5) { columnMinLine = 5; }
 
 
@@ -186,15 +189,14 @@ class _EditScaffoldState extends State<_EditScaffold> {
           IconButton(
             icon: const Icon(Icons.save), 
             color: colorScheme.primary,
-            onPressed: ()=> { saveNoteCallback(context, note) },
+            onPressed: ()=> { saveNoteCallback(context, false) },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: IconButton(
               icon: const Icon(Icons.menu_book), 
               color: colorScheme.primary,
-              // check saved and go view? or view directly?
-              onPressed: () => { }, 
+              onPressed: () => { saveNoteCallback(context, true)},
             ),
           ),
         ],
@@ -210,6 +212,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
               children: [
                 TextField(
                   controller: textController,
+                  maxLines: null,
                   onChanged: (text) => { 
                     setState(() {
                       note.title = text;
@@ -221,6 +224,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
                     border: InputBorder.none,
                   ),
                 ),
+                // const Divider(),
                 TextField(
                   controller: TextEditingController()..text = note.content,
                   onChanged: (text) => {
@@ -279,7 +283,6 @@ class _EditScaffoldState extends State<_EditScaffold> {
                   pageNum: note.endPage,
                   callback: changePage,
                 ),
-                SizedBox(height: 6,),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6.0),
                   child: Text(
@@ -292,8 +295,6 @@ class _EditScaffoldState extends State<_EditScaffold> {
                   child: Text('紀錄時間: ${dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note!.createdAt.millisecondsSinceEpoch))}',
                       style: textTheme.bodyMedium),
                 ),
-          
-                // const SizedBox(height: 6,),
               ]
             ),
           ),

@@ -12,7 +12,9 @@ abstract class BaseRepository<T extends MappableModel> {
 
   Stream<List<T>> stream([String? parentId]) {
     if (parentId == null) {
-      return db.collection('$basePath/$collection').snapshots().map((snapshot) {
+      return db.collection('$basePath/$collection')
+              .snapshots()
+              .map((snapshot) {
         return snapshot.docs.map((doc) => fromMap(doc.data(), doc.id)).toList();
       });
     } else {
@@ -20,6 +22,28 @@ abstract class BaseRepository<T extends MappableModel> {
           .collection('$basePath/$parentCollection')
           .doc(parentId)
           .collection(collection)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs.map((doc) => fromMap(doc.data(), doc.id)).toList();
+      });
+    }
+  }
+
+  Stream<List<T>> streamOrderBy([String? parentId, String? orderBy]) {
+    orderBy ??= "id";
+    if (parentId == null) {
+      return db.collection('$basePath/$collection')
+              .orderBy(orderBy)
+              .snapshots()
+              .map((snapshot) {
+        return snapshot.docs.map((doc) => fromMap(doc.data(), doc.id)).toList();
+      });
+    } else {
+      return db
+          .collection('$basePath/$parentCollection')
+          .doc(parentId)
+          .collection(collection)
+          .orderBy(orderBy, descending: true)
           .snapshots()
           .map((snapshot) {
         return snapshot.docs.map((doc) => fromMap(doc.data(), doc.id)).toList();
