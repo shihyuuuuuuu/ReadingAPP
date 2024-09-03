@@ -21,7 +21,6 @@ enum _WhichPage {
 }
 
 class EditNotePage extends StatelessWidget{
-  // if noteId == "", then create a new note
   final String noteId;
   final String userBookId;
 
@@ -33,7 +32,6 @@ class EditNotePage extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    // how much resources it take
     final userBookViewModel = Provider.of<UserBooksViewModel>(context);
     
     return FutureBuilder<UserBook?>(
@@ -132,15 +130,10 @@ class _EditScaffoldState extends State<_EditScaffold> {
     );
 
     final noteViewModel = Provider.of<NotesViewModel>(context, listen: false);
-    
-    // set update date 
     note.updatedAt = Timestamp.now();
-
-    // update data to db
     if (note.id == null) {
       note.id  = await noteViewModel.addNote(note, userId);
-    }
-    else {
+    } else {
       noteViewModel.updateNote(note, note.id!, userId);
     }
 
@@ -148,6 +141,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
       Provider.of<NavigationService>(context, listen: false).goViewNote(note.id!);
     }
 
+    // TODO: test if it really save and show
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -224,7 +218,6 @@ class _EditScaffoldState extends State<_EditScaffold> {
                     border: InputBorder.none,
                   ),
                 ),
-                // const Divider(),
                 TextField(
                   controller: TextEditingController()..text = note.content,
                   onChanged: (text) => {
@@ -242,6 +235,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
                 const SizedBox(height: 6,),
                 Row(
                   children: [
+                    // TODO: color does not change when note change
                     Text("筆記類別", style:textTheme.bodyMedium),
                     SizedBox(width: 15,),
                     SizedBox(
@@ -292,7 +286,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6.0),
-                  child: Text('紀錄時間: ${dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note!.createdAt.millisecondsSinceEpoch))}',
+                  child: Text('紀錄時間: ${dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(note.updatedAt.millisecondsSinceEpoch))}',
                       style: textTheme.bodyMedium),
                 ),
               ]
