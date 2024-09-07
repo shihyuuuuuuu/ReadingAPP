@@ -1,9 +1,11 @@
 
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:path/path.dart' as p;
 
 
 class ChatNotePage extends StatefulWidget{
@@ -12,7 +14,7 @@ class ChatNotePage extends StatefulWidget{
     super.key, 
     required this.bookId,
   });
-
+  
   @override
   State<ChatNotePage> createState() => _ChatNotePageState();
 }
@@ -24,6 +26,38 @@ class _ChatNotePageState extends State<ChatNotePage> {
   bool _isTextEmpty = true;
   bool _noteTakingFinish = false;
   bool _btnEnable = true;
+  bool _textFieldEnable = true;
+  late GenerativeModel model;
+  late ChatSession chat;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController.addListener(_handleTextChange);
+    var filePath = p.join(Directory.current.path, 'assets', 'prompt.txt');
+    File file = File(filePath);
+    var prompt = file.readAsStringSync();
+
+    final apiKey = Platform.environment['GEMINI_API_KEY'];
+    if (apiKey == null) {
+      //TODO no exit in flutter
+      stderr.writeln(r'No $GEMINI_API_KEY environment variable');
+      exit(1);
+    }
+    model = GenerativeModel(
+      model: 'gemini-1.5-flash-latest',
+      apiKey: apiKey,
+      generationConfig: GenerationConfig(maxOutputTokens: 500),
+      systemInstruction: Content.system(prompt),
+      safetySettings: [
+        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.low),
+        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.medium),
+        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.high),
+        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+      ],
+    );
+    chat = model.startChat();
+  }
 
   void _showPopup() async {
     final nav = Provider.of<NavigationService>(context, listen: false);
@@ -55,25 +89,22 @@ class _ChatNotePageState extends State<ChatNotePage> {
 
   List<_ConversationDialog> chatContent = [];
 
-  Future<void> _getResponse() async {
+  Future<void> _getResponse(String userInput) async {
     setState(() {
       chatContent.add(const _ConversationDialog.loadingDialog());
       chatContent = List.from(chatContent);
     });
     _scrollToBottom();
 
-    // TODO: insert API
-    await Future.delayed(const Duration(seconds: 1));
+    var content = Content.text(userInput);
+    var response = await chat.sendMessage(content);
 
     setState(() {
-      // TODO: 這邊邏輯之後要想一下，目前是user input幾則訊息就回復幾則。正常來講是user input 一則，API回覆一則。但是如過user input 太快要每則都回還是只回最後一則？
-      if (chatContent.last.text == '...' && chatContent.last.isUser == false){
-        chatContent.removeLast();
-      }
-      chatContent.add(_ConversationDialog(text: 'abcd', isUser: false));
-      
-      // TODO: 偵測到要結束的語句時
-      if (chatContent.length > 6) {
+      chatContent.removeLast();
+      chatContent.add(_ConversationDialog(text: response.text!, isUser: false));
+      _textFieldEnable = true;
+
+      if (response.text!.endsWith('<end>')) {
         _noteTakingFinish = true;
       }
       chatContent = List.from(chatContent);
@@ -81,25 +112,22 @@ class _ChatNotePageState extends State<ChatNotePage> {
     _scrollToBottom();
   }
 
-  Future<void> _userSubmit(String value) async {
+  Future<void> _userSubmit(String userInput) async {
     setState(() {
       if (chatContent.isEmpty) {
         _btnEnable = false;
+        // TODO: user book
+        // userInput = ;
       }
+      _textFieldEnable = false;
       
-      if (chatContent.isNotEmpty && chatContent.last.text == '...' && chatContent.last.isUser == false){
-        log("user input too fast");
-        chatContent.removeLast();
-        chatContent.add(_ConversationDialog(text: value, isUser: true));
-      } else {
-        chatContent.add(_ConversationDialog(text: value, isUser: true));
-      }
+      chatContent.add(_ConversationDialog(text: userInput, isUser: true));
       chatContent = List.from(chatContent);
     });
     _textController.clear();
     _scrollToBottom();
 
-    await _getResponse();
+    await _getResponse(userInput);
   }
 
   void _scrollToBottom() {
@@ -120,11 +148,6 @@ class _ChatNotePageState extends State<ChatNotePage> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _textController.addListener(_handleTextChange);
-  }
 
   @override
   void dispose() {
@@ -236,6 +259,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    readOnly: !_textFieldEnable,
                     style: textTheme.bodyLarge,
                     controller: _textController,
                     keyboardType: TextInputType.multiline,
