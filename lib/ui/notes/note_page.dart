@@ -1,12 +1,10 @@
-import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/theme/appbar_icon_style.dart';
 import 'package:reading_app/ui/widget/note_container.dart';
 import 'package:reading_app/ui/widget/searching_dialog.dart';
+import 'package:reading_app/view_models/notes_vm.dart';
 
 class NotePage extends StatefulWidget {
   
@@ -19,19 +17,6 @@ class NotePage extends StatefulWidget {
 class _NotePageState extends State<NotePage> {
   String _searchCondition = "";
   List<Note> notes = [];
-
-  Future<void> readJson() async {
-      final String dataStr = await rootBundle.loadString('assets/test_data.json');
-      final Map<String, dynamic> data = json.decode(dataStr);
-      setState(() { 
-        for (var note in data['Note']) {
-          note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
-          note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
-          final newNote = Note.fromMap(note, note['id']);
-          notes.add(newNote);
-        }
-      }); 
-    }
     
   Future<void> _showPopup(BuildContext context) async {
     final result = await showDialog<String>(
@@ -51,12 +36,6 @@ class _NotePageState extends State<NotePage> {
       });
     }
 
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    readJson();
   }
 
   @override
@@ -83,13 +62,23 @@ class _NotePageState extends State<NotePage> {
           )
         ],
       ),
-      body: notes != null 
-                ? ListView( 
-                    // mainAxisAlignment: MainAxisAlignment.center, 
-                    children: notes.map((item) => 
-                      NoteContainer(note: item, expandable: true,)).toList(), 
-                  ) 
-                : CircularProgressIndicator(), 
+      body: Consumer<NotesViewModel>(
+        builder: (context, viewModel, _) {
+          List<Note> notes = viewModel.notes;
+
+          if(notes.isEmpty) {
+            return const Center(child: Text('No Notes.'));
+          } else {
+            return ListView( 
+              children: notes.map((item) => 
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                  child: NoteContainer(note: item,),
+                )).toList(), 
+            );
+          }
+        }
+      )
     );
   }
 }
