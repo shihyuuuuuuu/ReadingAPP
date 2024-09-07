@@ -46,9 +46,9 @@ class EditNotePage extends StatelessWidget{
           UserBook? book = snapshot.data;
 
           if (noteId == '-') {
-            //if the note is new, then create a new note
+            Note newNote = Note(userBookId: userBookId, title: '', type: NoteType.content, content: '');
             return _EditScaffold(
-              note: Note.emptyNote(userBookId: userBookId), 
+              note: newNote, 
               book: book!
             );
           } else {

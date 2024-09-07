@@ -36,7 +36,7 @@ void main() async {
 
   final userRepository = UserRepository();
   final bookRepository = BookRepository();
-  final userBookRepository = NoteRepository();
+  final userBookRepository = UserBookRepository();
   final noteRepository = NoteRepository();
   final readingSessionRepository = ReadingSessionRepository();
 
@@ -65,7 +65,7 @@ void main() async {
     userBook['book'] = bookObjs[index].toMap();
     userBook['startDate'] =
         Timestamp.fromDate(DateTime.parse(userBook['startDate']));
-    final Note newUserBook = Note.fromMap(userBook, userBook['id']);
+    final UserBook newUserBook = UserBook.fromMap(userBook, userBook['id']);
     String id = await userBookRepository.add(newUserBook, userIds[0]);
     userBookIds.add(id);
     print('UserBook $id added to Firestore');
