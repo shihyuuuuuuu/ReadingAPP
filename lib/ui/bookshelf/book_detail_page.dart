@@ -158,10 +158,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: NoteContainer(
-                            note: notes[index],
-                            expandable: false,
-                          ),
+                          child: NoteContainer(note: notes[index],),
                         );
                       },
                       childCount: notes.length,
@@ -175,7 +172,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           }
         },
       ),
-      bottomSheet: _BottomButtons(),
+      bottomSheet: _BottomButtons(userBookId: widget.userBookId),
     );
   }
 }
@@ -259,6 +256,13 @@ class _BookInfoContainer extends StatelessWidget {
 }
 
 class _BottomButtons extends StatelessWidget {
+  final userBookId;
+
+  const _BottomButtons({
+    super.key,
+    required this.userBookId,
+  });
+
   @override
   Widget build(BuildContext context) {
 
@@ -290,7 +294,9 @@ class _BottomButtons extends StatelessWidget {
                         ?.copyWith(color: colorScheme.onPrimary)),
               )),
           FilledButton(
-              onPressed: () => {},
+              onPressed: () => {
+                nav.goEditNote("-", userBookId)
+              },
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("新增筆記",

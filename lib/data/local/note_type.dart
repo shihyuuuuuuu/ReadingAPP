@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:reading_app/theme/theme.dart';
 
 enum NoteType {
-  content(str: "內容筆記", colorKey: 'primary'),
-  experience(str: "經驗", colorKey: 'secondary'),
-  action(str: "行動", colorKey: 'primaryContainer'),
-  thought(str: "連結想法", colorKey: 'onPrimaryFixed');
+  content(str: "內容筆記", colorKey: 1),
+  experience(str: "經驗", colorKey: 2),
+  action(str: "行動", colorKey: 3),
+  thought(str: "連結想法", colorKey: 4);
 
   final String str;
-  final String colorKey;
+  final int colorKey;
 
   const NoteType({
     required this.str,
@@ -18,16 +18,16 @@ enum NoteType {
   Color get color {
     final colorScheme = MaterialTheme.lightScheme();
     switch (colorKey) {
-      case 'primary':
-        return colorScheme.primaryContainer;
-      case 'secondary':
-        return colorScheme.secondaryContainer;
-      case 'primaryContainer':
-        return colorScheme.tertiaryContainer;
-      case 'onPrimaryFixed':
-        return colorScheme.errorContainer;
+      case 1:
+        return colorScheme.primary;
+      case 2:
+        return colorScheme.secondary;
+      case 3:
+        return colorScheme.tertiary;
+      case 4:
+        return colorScheme.error;
       default:
-        return Colors.black; // Fallback color
+        return Colors.white; // Fallback color
     }
   }
 }
