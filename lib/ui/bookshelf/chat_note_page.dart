@@ -28,7 +28,7 @@ class ChatNotePage extends StatelessWidget {
             context.read<UserBooksViewModel>(), 
             apiKey: apiKey, 
             prompt: prompt, 
-            bookId: bookId
+            userBookId: bookId
           ),
           update: (context, model, notifier) => notifier!..update(model),
           child: const ChatNoteView(),
@@ -255,7 +255,10 @@ class _InputFieldState extends State<_InputField> {
               ? const SizedBox()
               : SizedBox(
                   child: IconButton(
-                    onPressed: () => widget.submitCallback(_textController.text),
+                    onPressed: () {
+                      widget.submitCallback(_textController.text);
+                      _textController.clear();
+                    },
                     icon: const Icon(Icons.send, size: 24),
                   ),
                 ),
