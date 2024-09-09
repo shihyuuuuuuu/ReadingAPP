@@ -26,27 +26,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
   // TODO: [rear end]: books -> book, userBooks -> userBook
   final List<Note> notes = [];
 
-  Future<void> readJson() async {
-    // TODO: [rear end]: data fetching logic
-    final String dataStr = await rootBundle.loadString('assets/test_data.json');
-    final Map<String, dynamic> data = json.decode(dataStr);
-    setState(() {
-      for (var note in data['Note']) {
-        note['createdAt'] =
-            Timestamp.fromDate(DateTime.parse(note['createdAt']));
-        note['updatedAt'] =
-            Timestamp.fromDate(DateTime.parse(note['updatedAt']));
-        final newNote = Note.fromMap(note, note['id']);
-        notes.add(newNote);
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    readJson();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +235,7 @@ class _BookInfoContainer extends StatelessWidget {
 }
 
 class _BottomButtons extends StatelessWidget {
-  final userBookId;
+  final String userBookId;
 
   const _BottomButtons({
     super.key,
@@ -286,7 +265,7 @@ class _BottomButtons extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           FilledButton(
-              onPressed: () => { nav.goChatNote('bookId')}, 
+              onPressed: () => { nav.goChatNote(userBookId)}, 
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("開始閱讀",

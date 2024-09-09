@@ -25,7 +25,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
 // TODO: Use a hardcoded test ID from the Firebase before we can obtain the actual User ID.
-const String userId = 'MXWzgPVPjIjyutDPcBvx';
+const String userId = 'ovY8UIrW1aUOFwsVKXireJcux6i1';
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -97,7 +97,7 @@ final router = GoRouter(
                 GoRoute(
                   path: 'chatnote',
                   builder: (context, state) =>
-                      ChatNotePage(bookId: state.pathParameters['bookId']),
+                      ChatNotePage(bookId: state.pathParameters['bookId']!),
                 ),
               ],
             ),

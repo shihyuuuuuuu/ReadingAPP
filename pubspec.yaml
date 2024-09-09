@@ -19,6 +19,7 @@ dependencies:
   cloud_firestore: ^5.2.1
   firebase_core: ^3.3.0
   google_generative_ai: ^0.4.6
+  path_provider: ^2.1.4
 
 dev_dependencies:
   flutter_test:
@@ -31,4 +32,5 @@ flutter:
 
   assets:
     - assets/test_data.json
-    - assets/prompt.txt
+    - assets/conversation_prompt.txt
+    - assets/note_prompt.txt

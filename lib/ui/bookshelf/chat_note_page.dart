@@ -1,64 +1,58 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:path/path.dart' as p;
+import 'package:reading_app/ui/bookshelf/chat_note_vm.dart';
+import 'package:reading_app/view_models/userbooks_vm.dart';
 
-
-class ChatNotePage extends StatefulWidget{
+class ChatNotePage extends StatelessWidget {
   final String bookId;
-  const ChatNotePage({
-    super.key, 
-    required this.bookId,
-  });
-  
+
+  const ChatNotePage({super.key, required this.bookId});
   @override
-  State<ChatNotePage> createState() => _ChatNotePageState();
+  Widget build(BuildContext context) {
+    // final apiKey = Platform.environment['GEMINI_API_KEY'];
+    const apiKey = 'AIzaSyCE6J_rqycU0_GMF-MlzhjcnjpWmsA2458';
+
+    return FutureBuilder<String>(
+      future: loadPrompt(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const CircularProgressIndicator();  // Show a loading indicator while loading the prompt.
+        }
+        String prompt = snapshot.data!;
+        return ChangeNotifierProxyProvider<UserBooksViewModel,ChatNoteViewModel>(
+          create:  (_) => ChatNoteViewModel(
+            context.read<UserBooksViewModel>(), 
+            apiKey: apiKey, 
+            prompt: prompt, 
+            bookId: bookId
+          ),
+          update: (context, model, notifier) => notifier!..update(model),
+          child: const ChatNoteView(),
+        );
+      }
+    );
+  }
+  Future<String> loadPrompt() async {
+    return await rootBundle.loadString('assets/conversation_prompt.txt');
+  }
 }
 
 
-class _ChatNotePageState extends State<ChatNotePage> {
-  final _textController = TextEditingController();
-  final _scrollController = ScrollController();
-  bool _isTextEmpty = true;
-  bool _noteTakingFinish = false;
-  bool _btnEnable = true;
-  bool _textFieldEnable = true;
-  late GenerativeModel model;
-  late ChatSession chat;
-
+class ChatNoteView extends StatefulWidget{
+  const ChatNoteView({
+    super.key, 
+  });
+  
   @override
-  void initState() {
-    super.initState();
-    _textController.addListener(_handleTextChange);
-    var filePath = p.join(Directory.current.path, 'assets', 'prompt.txt');
-    File file = File(filePath);
-    var prompt = file.readAsStringSync();
+  State<ChatNoteView> createState() => _ChatNoteViewState();
+}
 
-    final apiKey = Platform.environment['GEMINI_API_KEY'];
-    if (apiKey == null) {
-      //TODO no exit in flutter
-      stderr.writeln(r'No $GEMINI_API_KEY environment variable');
-      exit(1);
-    }
-    model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
-      apiKey: apiKey,
-      generationConfig: GenerationConfig(maxOutputTokens: 500),
-      systemInstruction: Content.system(prompt),
-      safetySettings: [
-        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.low),
-        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.medium),
-        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.high),
-        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
-      ],
-    );
-    chat = model.startChat();
-  }
 
+class _ChatNoteViewState extends State<ChatNoteView> {
   void _showPopup() async {
     final nav = Provider.of<NavigationService>(context, listen: false);
     showDialog(
@@ -87,80 +81,19 @@ class _ChatNotePageState extends State<ChatNotePage> {
     );
   }
 
-  List<_ConversationDialog> chatContent = [];
-
-  Future<void> _getResponse(String userInput) async {
-    setState(() {
-      chatContent.add(const _ConversationDialog.loadingDialog());
-      chatContent = List.from(chatContent);
-    });
-    _scrollToBottom();
-
-    var content = Content.text(userInput);
-    var response = await chat.sendMessage(content);
-
-    setState(() {
-      chatContent.removeLast();
-      chatContent.add(_ConversationDialog(text: response.text!, isUser: false));
-      _textFieldEnable = true;
-
-      if (response.text!.endsWith('<end>')) {
-        _noteTakingFinish = true;
-      }
-      chatContent = List.from(chatContent);
-    });
-    _scrollToBottom();
-  }
-
-  Future<void> _userSubmit(String userInput) async {
-    setState(() {
-      if (chatContent.isEmpty) {
-        _btnEnable = false;
-        // TODO: user book
-        // userInput = ;
-      }
-      _textFieldEnable = false;
-      
-      chatContent.add(_ConversationDialog(text: userInput, isUser: true));
-      chatContent = List.from(chatContent);
-    });
-    _textController.clear();
-    _scrollToBottom();
-
-    await _getResponse(userInput);
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
-  void _handleTextChange() {
-    setState(() {
-      _isTextEmpty = _textController.text.isEmpty;
-    });
-  }
-
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
+    
+    final chatNoteViewModel = Provider.of<ChatNoteViewModel>(context);
+
+    // Scroll after chat content updates
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      chatNoteViewModel.scrollToBottom();
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -170,7 +103,6 @@ class _ChatNotePageState extends State<ChatNotePage> {
             nav.pop(); // TODO: 同_showPopUP 裡面的 確認
         },),
         title: Text("記筆記", style: textTheme.titleMedium),
-
       ),
       body: Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -179,14 +111,13 @@ class _ChatNotePageState extends State<ChatNotePage> {
           child: Padding(
             padding: const EdgeInsets.only(left: 10, right: 10),
             child: CustomScrollView(
-              controller: _scrollController,
+              controller: chatNoteViewModel.scrollController,
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // TODO: 之後改成random或由API提供
-                      const _ConversationDialog(
+                      const ConversationDialog(
                         text: "太棒了！今天的閱讀完成了！\n來回憶一下剛剛看了什麼吧", 
                         isUser: false
                       ),
@@ -194,16 +125,11 @@ class _ChatNotePageState extends State<ChatNotePage> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: FilledButton(
-                            onPressed: ()=>{
-                              if (_btnEnable) {
-                                setState(() {
-                                  // TODO: 之後改成random或由API提供
-                                  chatContent.add(_ConversationDialog(text: "告訴我今天有什麼新發現", isUser: false));
-                                  chatContent = List.from(chatContent);
-                                  _btnEnable = false;
-                                })
-                              }
-                            }, // ask 
+                            onPressed: chatNoteViewModel.startChat
+                              ? null
+                              :(){
+                                chatNoteViewModel.sendStart();
+                              }, // ask 
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10.0),
                               child: Text("沒問題"),
@@ -218,7 +144,7 @@ class _ChatNotePageState extends State<ChatNotePage> {
                             onPressed: _showPopup,
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10.0),
-                              child: Text("先跳過"),
+                              child: Text("今天先跳過"),
                             ),
                           ),
                         ),
@@ -229,66 +155,31 @@ class _ChatNotePageState extends State<ChatNotePage> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      return chatContent[index];
+                      return chatNoteViewModel.chatContent[index];
                     },
-                    childCount: chatContent.length,
+                    childCount: chatNoteViewModel.chatContent.length,
                   ),
                 ),
               ],
             )
           ),
         ),
-        _noteTakingFinish ?
+        chatNoteViewModel.noteTakingFinish ?
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: FilledButton(
-
             // TODO: (再看看之後的設計邏輯是怎樣) 儲存note, nav to ViewNote
-            onPressed: ()=>{ nav.goViewNote("noteId") }, 
+            onPressed: ()=>{ chatNoteViewModel.genNote() }, 
               child: const Padding(
                 padding: EdgeInsets.all(10),
                 child: Text("產生筆記"),
             )
           ),
         ): const SizedBox(),
-        Container(
-          color: colorScheme.surfaceContainerHighest,
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    readOnly: !_textFieldEnable,
-                    style: textTheme.bodyLarge,
-                    controller: _textController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintText: "在此輸入",
-                      hintStyle: textTheme.labelMedium?.copyWith(color: colorScheme.outline),
-                    ),
-                  ),
-                ),
-              ),
-              _isTextEmpty
-                  ? const SizedBox()
-                  : SizedBox(
-                      child: IconButton(
-                        onPressed: () => _userSubmit(_textController.text),
-                        icon: const Icon(Icons.send, size: 24),
-                      ),
-                    ),
-            ],
-          ),
+
+        _InputField(
+          enable: chatNoteViewModel.startChat, 
+          submitCallback: chatNoteViewModel.userSubmit
         ),
       ],
     )
@@ -296,124 +187,80 @@ class _ChatNotePageState extends State<ChatNotePage> {
   }
 }
 
+class _InputField extends StatefulWidget {
+  final bool enable;
+  final void Function(String) submitCallback;
 
-class _ConversationDialog extends StatelessWidget {
-  
-  final String text;
-  final bool isUser;
-
-  const _ConversationDialog({
+  const _InputField({
     super.key, 
-    required this.text, 
-    required this.isUser
+    required this.enable, 
+    required this.submitCallback
   });
 
-  const _ConversationDialog.loadingDialog()
-    :text='...', isUser=false;
+  @override
+  State<_InputField> createState() => _InputFieldState();
+}
 
-  static double iconSize = 40;
+class _InputFieldState extends State<_InputField> {
+  final TextEditingController _textController = TextEditingController();
+  bool _isTextEmpty = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController.addListener(_handleTextChange);
+
+  }
+
+  void _handleTextChange() {
+    setState(() {
+      _isTextEmpty = _textController.text.isEmpty;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Stack(
-      alignment: isUser? Alignment.topRight: Alignment.topLeft,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-            right: isUser? 50: 0,  
-            left: isUser? 0:50,
-            top: 10,
-            bottom: 10,
-          ),
-          child: Container(
-            width: MediaQuery.sizeOf(context).width / 2,
-            alignment: Alignment.topLeft,
-            decoration: BoxDecoration(
-              color: isUser? colorScheme.surfaceContainerLowest: colorScheme.surfaceContainerHighest,
-              border: Border.all(
-                color: colorScheme.outline,
-                width: 1.0,
-             ),
-             borderRadius: BorderRadius.circular(15),
-            ),
+    return Container(
+      color: colorScheme.surfaceContainerHighest,
+      child: Row(
+        children: [
+          Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              child: Text(text, style: textTheme.bodyLarge),
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                readOnly: !widget.enable,
+                style: textTheme.bodyLarge,
+                controller: _textController,
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: "在此輸入",
+                  hintStyle: textTheme.labelMedium?.copyWith(color: colorScheme.outline),
+                ),
+              ),
             ),
           ),
-        ),
-        Positioned(
-          top: 10,
-          right: isUser ? 0 : null,
-          left: isUser ? null : 0,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              color: isUser? colorScheme.tertiaryContainer:colorScheme.primary,
-            ),
-            child: Icon(
-              isUser ? Icons.face: Icons.face_2, 
-              size: iconSize,
-            ),
-          ),
-        ),
-      ]
+          _isTextEmpty
+              ? const SizedBox()
+              : SizedBox(
+                  child: IconButton(
+                    onPressed: () => widget.submitCallback(_textController.text),
+                    icon: const Icon(Icons.send, size: 24),
+                  ),
+                ),
+        ],
+      ),
     );
   }
 }
-
-// SlideBar 之後有時間再做
-// class _SlideBar extends StatefulWidget{
-//   @override
-//   State<_SlideBar> createState() => _SlideBarState();
-// }
-
-// class _SlideBarState extends State<_SlideBar> {
-//   double _currentSliderValue = 20;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final colorScheme = Theme.of(context).colorScheme;
-    
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 30.0),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           const Icon(
-//             Icons.mood_bad,
-//             size: 40.0,
-//           ),
-//           Expanded(
-//             child: SliderTheme(
-//               data: SliderThemeData(
-//                 activeTrackColor: colorScheme.primary,
-//                 inactiveTrackColor: colorScheme.outlineVariant,
-//                 thumbColor: colorScheme.tertiaryContainer,
-//                 thumbShape: RoundSliderThumbShape(enabledThumbRadius: 16.0,),
-//                 trackHeight: 10.0,
-//               ),
-//               child: Slider(
-//                 value: _currentSliderValue,
-//                 min: 0,
-//                 max: 100,
-//                 label: _currentSliderValue.round().toString(),
-//                 onChanged: (double value) {
-//                   setState(() {
-//                     _currentSliderValue = value;
-//                   });
-//                 },
-//               ),
-//             ),
-//           ),
-//           const Icon(
-//             Icons.mood,
-//             size: 40.0,  
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
