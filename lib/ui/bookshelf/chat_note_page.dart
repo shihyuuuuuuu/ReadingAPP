@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/bookshelf/chat_note_vm.dart';
+import 'package:reading_app/view_models/notes_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 
 class ChatNotePage extends StatelessWidget {
@@ -23,14 +24,15 @@ class ChatNotePage extends StatelessWidget {
           return const CircularProgressIndicator();  // Show a loading indicator while loading the prompt.
         }
         String prompt = snapshot.data!;
-        return ChangeNotifierProxyProvider<UserBooksViewModel,ChatNoteViewModel>(
+        return ChangeNotifierProxyProvider<UserBooksViewModel,  ChatNoteViewModel> (
           create:  (_) => ChatNoteViewModel(
-            context.read<UserBooksViewModel>(), 
+            context.read<UserBooksViewModel>(),
             apiKey: apiKey, 
             prompt: prompt, 
             userBookId: bookId
           ),
-          update: (context, model, notifier) => notifier!..update(model),
+          update: (context, userBookModel,  notifier) 
+            => notifier!..update(userBookModel),
           child: const ChatNoteView(),
         );
       }
@@ -169,7 +171,7 @@ class _ChatNoteViewState extends State<ChatNoteView> {
           padding: const EdgeInsets.all(10.0),
           child: FilledButton(
             // TODO: (再看看之後的設計邏輯是怎樣) 儲存note, nav to ViewNote
-            onPressed: ()=>{ chatNoteViewModel.genNote() }, 
+            onPressed: ()=>{ chatNoteViewModel.genNote(context) }, 
               child: const Padding(
                 padding: EdgeInsets.all(10),
                 child: Text("產生筆記"),

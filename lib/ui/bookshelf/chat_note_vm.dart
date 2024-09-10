@@ -1,11 +1,16 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/user_book.dart';
+import 'package:reading_app/service/navigation.dart';
+import 'package:reading_app/view_models/notes_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
+import 'package:retry/retry.dart';
 
 class ChatNoteViewModel extends ChangeNotifier {
   final ScrollController scrollController = ScrollController();
@@ -15,6 +20,7 @@ class ChatNoteViewModel extends ChangeNotifier {
   late ChatSession chat;
 
   UserBooksViewModel userBooksViewModel;
+  // NotesViewModel notesViewModel;
 
   bool _noteTakingFinish = false;
   bool _startChat = false; // whether the chat is start
@@ -24,7 +30,10 @@ class ChatNoteViewModel extends ChangeNotifier {
   bool get startChat => _startChat;
   bool get textFieldEnable => _textFieldEnable;
 
-  ChatNoteViewModel(this.userBooksViewModel, {
+  ChatNoteViewModel(
+    this.userBooksViewModel, 
+    // this.notesViewModel,
+    {
     required this.userBookId, 
     required String apiKey, 
     required String prompt}) {
@@ -38,10 +47,10 @@ class ChatNoteViewModel extends ChangeNotifier {
       generationConfig: GenerationConfig(maxOutputTokens: 500),
       systemInstruction: Content.system(prompt),
       safetySettings: [
-        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.low),
-        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.medium),
-        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.high),
-        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.high),
+        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.none),
       ],
     );
     chat = model.startChat();
@@ -76,35 +85,64 @@ class ChatNoteViewModel extends ChangeNotifier {
     chatContent.add(const ConversationDialog.loadingDialog());
     notifyListeners();
 
+    print('[user input]: $userInput');
     var content = Content.text(userInput);
-    var response = await chat.sendMessage(content);
-    String text = response.text!.replaceAll('\n', '');
-    text = text.replaceAll(' ', '');
+    final r = RetryOptions(maxAttempts: 3); // Retry up to 3 times
 
-    if (text.endsWith('<end>')) {
-      _noteTakingFinish = true;
-      text.replaceAll('<end>', '');
+    try {
+      
+      final response = await r.retry(
+
+        () async {
+          var modelResponse = await chat.sendMessage(content);
+          String text = modelResponse.text!.replaceAll('\n', '');
+          text = text.replaceAll(' ', '');
+
+          if (text.endsWith('<end>')) {
+            _noteTakingFinish = true;
+            text.replaceAll('<end>', '');
+          }
+
+          chatContent.removeLast();
+          chatContent.add(ConversationDialog(text: text, isUser: false));
+          _textFieldEnable = true;
+
+          notifyListeners();
+
+        },
+        // Retry on specific exceptions
+        retryIf: (e) => e is ServerException || e is GenerativeAIException,
+      );
+
+    
+    } catch (e) {
+      print('Failed after retrying: $e');
     }
-
-    chatContent.removeLast();
-    chatContent.add(ConversationDialog(text: text, isUser: false));
-    _textFieldEnable = true;
-
-    notifyListeners();
   }
 
-  Future<Note> genNote() async{
+  Future genNote(BuildContext context) async{
+
+    var notesViewModel = Provider.of<NotesViewModel>(context, listen: false);
+    var nav = Provider.of<NavigationService>(context, listen: false);
 
     String notePrompt = await rootBundle.loadString('assets/note_prompt.txt');
     var content = Content.text(notePrompt);
     var response = await chat.sendMessage(content);
-    chatContent.add(ConversationDialog(text: response.text!, isUser: false));
-    notifyListeners();
 
-    // TODO 跳轉到ViewNotePage
+    
     Map<String, dynamic> data = json.decode(response.text!);
-    Note note = Note.fromMap(data, '1');
-    return note;
+    Timestamp now = Timestamp.now();
+
+    final userBook = <String, dynamic>{'userBookId': userBookId};
+    final createdAt = <String, dynamic>{'createdAt': now};
+    final updatedAt = <String, dynamic>{'updatedAt': now};
+    data.addEntries(createdAt.entries);
+    data.addEntries(updatedAt.entries);
+    data.addEntries(userBook.entries);
+    Note note = Note.fromMap(data, 'emptyid');
+
+    note.id = await notesViewModel.addNote(note, notesViewModel.userId);
+    nav.goViewNote(note.id!);
 
   }
 
@@ -125,8 +163,9 @@ class ChatNoteViewModel extends ChangeNotifier {
     super.dispose();
   }
 
-  update(UserBooksViewModel model) {
-    userBooksViewModel = model;
+  update(UserBooksViewModel userBookModel) {
+    userBooksViewModel = userBookModel;
+    // notesViewModel = noteModel;
     notifyListeners();
   }
 }
