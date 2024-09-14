@@ -100,7 +100,7 @@ class ChatNoteViewModel extends ChangeNotifier {
 
           if (text.endsWith('<end>')) {
             _noteTakingFinish = true;
-            text.replaceAll('<end>', '');
+            text = text.replaceAll('<end>', '');
           }
 
           chatContent.removeLast();
