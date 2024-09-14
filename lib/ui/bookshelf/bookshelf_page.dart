@@ -132,8 +132,7 @@ class _BookCard extends StatelessWidget {
                 Text(
                   userBook.state.displayName,
                   style: textTheme.bodySmall,
-                ), //more info for page, etc.
-                // TagArea(tagLables: tags.sublist(0,2),)
+                ), 
               ],
             )),
           ),

@@ -22,6 +22,7 @@ import 'package:reading_app/ui/profile/friend_list_page.dart';
 import 'package:reading_app/ui/profile/profile.dart';
 import 'package:reading_app/ui/profile/setting_page.dart';
 import 'package:reading_app/ui/widget/scaffold_with_navbar.dart';
+import 'package:reading_app/view_models/notes_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -58,23 +59,34 @@ final router = GoRouter(
       },
       routes: [
         // Note Routes
-        GoRoute(
-          path: '/note',
-          builder: (context, state) => const NotePage(),
+        ShellRoute(
+          builder: (context, state, child) {
+            return ChangeNotifierProvider(
+              create: (_) => NotesViewModel(userId: userId),
+              child:child,
+            );
+          },
           routes: [
             GoRoute(
-              path: ':noteId',
-              builder: (context, state) =>
-                  ViewNotePage(noteId: state.pathParameters['noteId']),
+              path: '/note',
+              builder: (context, state) => const NotePage(),
               routes: [
                 GoRoute(
-                  path: 'editnote',
+                  path: ':noteId',
                   builder: (context, state) =>
-                      EditNotePage(noteId: state.pathParameters['noteId']),
+                      ViewNotePage(noteId: state.pathParameters['noteId']),
+                  routes: [
+                    GoRoute(
+                      path: ':userBookId',
+                      builder: (context, state) =>
+                          EditNotePage(noteId: state.pathParameters['noteId']!,
+                            userBookId: state.pathParameters['userBookId']!,),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ]
         ),
         // Book Routes
         GoRoute(
@@ -89,22 +101,22 @@ final router = GoRouter(
                 GoRoute(
                   path: 'editbook',
                   builder: (context, state) =>
-                      EditBookPage(bookId: state.pathParameters['bookId']!),
+                      EditBookPage(bookId: state.pathParameters['bookId']),
                 ),
                 GoRoute(
                   path: 'reading',
                   builder: (context, state) =>
-                      ReadingPage(bookId: state.pathParameters['bookId']!),
+                      ReadingPage(bookId: state.pathParameters['bookId']),
                 ),
                 GoRoute(
                   path: 'addnote',
                   builder: (context, state) =>
-                      AddNotePage(bookId: state.pathParameters['bookId']!),
+                      AddNotePage(bookId: state.pathParameters['bookId']),
                 ),
                 GoRoute(
                   path: 'chatnote',
                   builder: (context, state) =>
-                      ChatNotePage(bookId: state.pathParameters['bookId']!),
+                      ChatNotePage(bookId: state.pathParameters['bookId']),
                 ),
               ],
             ),
@@ -122,7 +134,7 @@ final router = GoRouter(
                 GoRoute(
                   path: ':bookId',
                   builder: (context, state) =>
-                      AddBookPage(bookId: state.pathParameters['bookId']!),
+                      AddBookPage(bookId: state.pathParameters['bookId']),
                 ),
               ],
             ),
@@ -219,8 +231,9 @@ class NavigationService {
     _goRoute('/note/$noteId');
   }
 
-  void goEditNote(String noteId) {
-    _goRoute('/note/$noteId/editnote');
+  void goEditNote(String noteId, String userBookId) {
+    // TODO if noteId is empty then goRoute cannot find the right page
+    _goRoute('/note/$noteId/$userBookId');
   }
 
   void goBookDetail(String bookId) {
