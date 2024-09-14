@@ -50,11 +50,6 @@ class _ViewNotePageState extends State<ViewNotePage> {
                   style: textTheme.bodyMedium!.copyWith(color:colorScheme.outline)
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.send), 
-                    color: colorScheme.primary,
-                    onPressed: () => {}, 
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: IconButton(
