@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/user_book.dart';
+import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,122 +16,120 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final dateFormatter = DateFormat('yyyy-MM-dd');
 
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _StatItem(
-                  icon: Icons.local_fire_department,
-                  color: Colors.red,
-                  count: 142,
-                ),
-                _StatItem(
-                  icon: Icons.book,
-                  color: Colors.brown,
-                  count: 87,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Your weekly report',
-              style: textTheme.titleLarge,
-            ),
-            const SizedBox(height: 20),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _ReportItem(
-                  title: 'Books read',
-                  count: 3,
-                  change: 2,
-                  rise: true,
-                ),
-                _ReportItem(
-                  title: 'Reading time',
-                  count: '5h 15m',
-                  change: '1h 24m',
-                  rise: false,
-                ),
-                _ReportItem(
-                  title: 'Notes taken',
-                  count: 6,
-                  change: 2,
-                  rise: true,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Now reading',
-              style: textTheme.titleLarge,
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 320,
-              child: Consumer<UserBooksViewModel>(
-                builder: (context, viewModel, _) {
-                  List<UserBook> userBooks = viewModel.userBooks;
-
-                  if (userBooks.isEmpty) {
-                    return const Center(child: Text('No books.'));
-                  } else {
-                    return ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: userBooks.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 20),
-                      itemBuilder: (context, index) {
-                        return _BookCard(
-                          title: userBooks[index].book.title,
-                          startDate:
-                              dateFormatter.format(userBooks[index].startDate),
-                          // TODO: get real 'totalTime' and 'notes'
-                          totalTime: '35',
-                          notes: 5,
-                          imagePath: userBooks[index].book.coverImage!,
-                        );
-                      },
-                      clipBehavior: Clip.none,
-                    );
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Challenges',
-              style: textTheme.titleLarge,
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: Colors.orange[50],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Icon(
-                    Icons.local_fire_department,
+                  _StatItem(
+                    icon: Icons.local_fire_department,
                     color: Colors.red,
+                    count: 142,
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    '200 Days Reading Streak',
-                    style: textTheme.bodyMedium,
+                  _StatItem(
+                    icon: Icons.book,
+                    color: Colors.brown,
+                    count: 87,
                   ),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                'Your weekly report',
+                style: textTheme.titleLarge,
+              ),
+              const SizedBox(height: 20),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _ReportItem(
+                    title: 'Books read',
+                    count: 3,
+                    change: 2,
+                    rise: true,
+                  ),
+                  _ReportItem(
+                    title: 'Reading time',
+                    count: '5h 15m',
+                    change: '1h 24m',
+                    rise: false,
+                  ),
+                  _ReportItem(
+                    title: 'Notes taken',
+                    count: 6,
+                    change: 2,
+                    rise: true,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Now reading',
+                style: textTheme.titleLarge,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 320,
+                child: Consumer<UserBooksViewModel>(
+                  builder: (context, viewModel, _) {
+                    List<UserBook> userBooks = viewModel.userBooks;
+
+                    if (userBooks.isEmpty) {
+                      return const Center(child: Text('No books.'));
+                    } else {
+                      return ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: userBooks.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 20),
+                        itemBuilder: (context, index) {
+                          return _BookCard(
+                            userBook: userBooks[index],
+                            // TODO: get real 'totalTime' and 'notes'
+                            totalTime: '35',
+                            notes: 5,
+                          );
+                        },
+                        clipBehavior: Clip.none,
+                      );
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Challenges',
+                style: textTheme.titleLarge,
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.local_fire_department,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      '200 Days Reading Streak',
+                      style: textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -227,24 +226,23 @@ class _ReportItem extends StatelessWidget {
 }
 
 class _BookCard extends StatelessWidget {
-  final String title;
-  final String startDate;
+  final UserBook userBook;
   final String totalTime;
   final int notes;
-  final String imagePath;
 
   const _BookCard({
-    required this.title,
-    required this.startDate,
+    required this.userBook,
     required this.totalTime,
     required this.notes,
-    required this.imagePath,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final nav = Provider.of<NavigationService>(context, listen: false);
+    final startDate = DateFormat('yyyy-MM-dd').format(userBook.startDate);
+
     return SizedBox(
       height: 320,
       width: 320,
@@ -263,9 +261,14 @@ class _BookCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image.network(
-                        imagePath,
-                        width: 115,
+                      GestureDetector(
+                        onTap: () {
+                          nav.goBookDetail(userBook.id!);
+                        },
+                        child: Image.network(
+                          userBook.book.coverImage!,
+                          width: 115,
+                        ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,7 +295,7 @@ class _BookCard extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 20),
                     child: Text(
-                      title,
+                      userBook.book.title,
                       style: textTheme.titleSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -319,20 +322,23 @@ class _BookCard extends StatelessWidget {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.inversePrimary,
+                color: theme.colorScheme.primary,
                 borderRadius: BorderRadius.circular(27),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.timer, color: Colors.white),
-                  VerticalDivider(
+                  const Icon(Icons.timer, color: Colors.white),
+                  const VerticalDivider(
                     width: 20,
                     thickness: 1,
                     indent: 0,
                     endIndent: 0,
                     color: Colors.white,
                   ),
-                  Icon(Icons.edit, color: Colors.white),
+                  GestureDetector(
+                    onTap: () => nav.goEditNote("-", userBook.id as String),
+                    child: const Icon(Icons.edit, color: Colors.white),
+                  ),
                 ],
               ),
             ),
