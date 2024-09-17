@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
+import 'package:reading_app/service/authentication.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +16,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final authService =
+        Provider.of<AuthenticationService>(context, listen: false);
     final textTheme = Theme.of(context).textTheme;
 
     return SafeArea(
@@ -127,6 +130,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
+              ),
+              FilledButton(
+                onPressed: () {
+                  authService.logOut();
+                },
+                child: const Text("Log out"),
               ),
             ],
           ),
