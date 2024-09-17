@@ -63,6 +63,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '366060295124',
     projectId: 'readingapp-aed62',
     storageBucket: 'readingapp-aed62.appspot.com',
+    androidClientId: '366060295124-sfb2jqketds7e6cfnps98mmol4b1sjmn.apps.googleusercontent.com',
+    iosClientId: '366060295124-ttpu73mkg3vih44sk5epmb5khma8k6il.apps.googleusercontent.com',
     iosBundleId: 'com.example.readingApp',
   );
+
 }

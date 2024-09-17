@@ -44,29 +44,29 @@ void main() async {
   List<Book> bookObjs = [];
   List<String> userBookIds = [];
 
-  for (var user in users) {
-    final User newUser = User.fromMap(user, user['id']);
-    String id = await userRepository.add(newUser);
-    userIds.add(id);
-    print('User ${user['name']} $id added to Firestore');
-  }
+  // for (var user in users) {
+  //   final User newUser = User.fromMap(user, user['id']);
+  //   String id = await userRepository.add(newUser);
+  //   userIds.add(id);
+  //   print('User ${user['name']} $id added to Firestore');
+  // }
 
   for (var book in books) {
     book['publishedDate'] =
         Timestamp.fromDate(DateTime.parse(book['publishedDate']));
     final Book newBook = Book.fromMap(book, book['id']);
-    newBook.id = await bookRepository.add(newBook);
+    // newBook.id = await bookRepository.add(newBook);
     bookObjs.add(newBook);
     print('Book ${book['title']} $newBook.id added to Firestore');
   }
 
   for (final (index, userBook) in userBooks.indexed) {
-    userBook['userId'] = userIds[0];
+    userBook['userId'] = "ovY8UIrW1aUOFwsVKXireJcux6i1";
     userBook['book'] = bookObjs[index].toMap();
     userBook['startDate'] =
         Timestamp.fromDate(DateTime.parse(userBook['startDate']));
     final UserBook newUserBook = UserBook.fromMap(userBook, userBook['id']);
-    String id = await userBookRepository.add(newUserBook, userIds[0]);
+    String id = await userBookRepository.add(newUserBook, "ovY8UIrW1aUOFwsVKXireJcux6i1");
     userBookIds.add(id);
     print('UserBook $id added to Firestore');
   }
@@ -76,10 +76,10 @@ void main() async {
   for (var (index, note) in notes.indexed) {
     note['createdAt'] = Timestamp.fromDate(DateTime.parse(note['createdAt']));
     note['updatedAt'] = Timestamp.fromDate(DateTime.parse(note['updatedAt']));
-    note['userId'] = userIds[0];
+    note['userId'] = "ovY8UIrW1aUOFwsVKXireJcux6i1";
     note['userBookId'] = userBookIds[index];
     final Note newNote = Note.fromMap(note, note['id']);
-    String id = await noteRepository.add(newNote, userIds[0]);
+    String id = await noteRepository.add(newNote, "ovY8UIrW1aUOFwsVKXireJcux6i1");
     print('Note ${newNote.title} $id added to Firestore');
   }
 
@@ -91,7 +91,7 @@ void main() async {
     final ReadingSession newReadingSession =
         ReadingSession.fromMap(session, session['id']);
     String id =
-        await readingSessionRepository.add(newReadingSession, userIds[0]);
+        await readingSessionRepository.add(newReadingSession, "ovY8UIrW1aUOFwsVKXireJcux6i1");
     print('ReadingSession ${newReadingSession.id} $id added to Firestore');
   }
 
