@@ -336,7 +336,10 @@ class _BookCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.timer, color: Colors.white),
+                  GestureDetector(
+                    onTap: () => nav.goReading(userBook.id as String),
+                    child: const Icon(Icons.timer, color: Colors.white),
+                  ),
                   const VerticalDivider(
                     width: 20,
                     thickness: 1,
