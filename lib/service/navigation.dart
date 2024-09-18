@@ -61,6 +61,13 @@ final router = GoRouter(
         // Note Routes
         ShellRoute(
           builder: (context, state, child) {
+            final userId = Provider.of<AuthenticationService>(context, listen: false)
+            .checkAndGetLoggedInUserId();
+        
+            if (userId == null) {
+              log('Warning: ShellRoute should not be built without a user');
+              return const SizedBox.shrink();
+            }
             return ChangeNotifierProvider(
               create: (_) => NotesViewModel(userId: userId),
               child:child,
