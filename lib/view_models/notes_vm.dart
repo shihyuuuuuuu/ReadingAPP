@@ -27,16 +27,16 @@ class NotesViewModel with ChangeNotifier {
     super.dispose();
   }
 
-  Future<String> addNote(Note newNote, String userId) async {
+  Future<String> addNote(Note newNote) async {
     String noteId = await _noteRepository.add(newNote, userId);
     return noteId;
   }
 
-  Future<Note?> getNote(String noteId, String userId) async {
+  Future<Note?> getNote(String noteId) async {
     return await _noteRepository.get(noteId, userId);
   }
 
-  Future<void> updateNote(Note updateNote, String noteId, String userId) async {
+  Future<void> updateNote(Note updateNote, String noteId) async {
     return await _noteRepository.update(updateNote, noteId, userId);
   }
 }
