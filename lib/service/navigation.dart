@@ -28,8 +28,7 @@ import 'package:reading_app/view_models/userbooks_vm.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
-// TODO: Use a hardcoded test ID from the Firebase before we can obtain the actual User ID.
-// String? userId = 'MXWzgPVPjIjyutDPcBvx';
+String? userId;
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -43,7 +42,7 @@ final router = GoRouter(
       navigatorKey: _sectionNavigatorKey,
       
       builder: (context, state, child) {
-        final userId = Provider.of<AuthenticationService>(context, listen: false)
+        userId = Provider.of<AuthenticationService>(context, listen: false)
             .checkAndGetLoggedInUserId();
         
         log("rebuild shellroute");
@@ -53,7 +52,7 @@ final router = GoRouter(
         }
         // the provider will be disposed automatically when it is not in widget tree
         return ChangeNotifierProvider(
-          create: (_) => UserBooksViewModel(userId: userId),
+          create: (_) => UserBooksViewModel(userId: userId!),
           child: ScaffoldWithNavbar(child),
         );
       },
@@ -61,15 +60,8 @@ final router = GoRouter(
         // Note Routes
         ShellRoute(
           builder: (context, state, child) {
-            final userId = Provider.of<AuthenticationService>(context, listen: false)
-            .checkAndGetLoggedInUserId();
-        
-            if (userId == null) {
-              log('Warning: ShellRoute should not be built without a user');
-              return const SizedBox.shrink();
-            }
             return ChangeNotifierProvider(
-              create: (_) => NotesViewModel(userId: userId),
+              create: (_) => NotesViewModel(userId: userId!),
               child:child,
             );
           },

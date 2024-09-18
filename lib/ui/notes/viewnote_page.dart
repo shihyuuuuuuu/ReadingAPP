@@ -30,7 +30,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
 
 
     return FutureBuilder<Note?>(
-      future: noteViewModel.getNote(widget.noteId, noteViewModel.userId),
+      future: noteViewModel.getNote(widget.noteId),
       builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -87,7 +87,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 FutureBuilder<UserBook?>(
-                                  future: userBookViewModel.getUserBook(note.userBookId, userBookViewModel.userId),
+                                  future: userBookViewModel.getUserBook(note.userBookId),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState == ConnectionState.waiting) {
                                       return const Center(child: CircularProgressIndicator());
