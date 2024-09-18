@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/data/models/reading_session.dart';
@@ -136,14 +137,15 @@ class _ReadingPageState extends State<ReadingPage> {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
+        final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
         return AlertDialog(
           title: const Text('閱讀統計'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('開始時間: ${session.startTime.toDate()}'),
-              Text('結束時間: ${session.endTime.toDate()}'),
+              Text('開始時間: ${formatter.format(session.startTime.toDate())}'),
+              Text('結束時間: ${formatter.format(session.endTime.toDate())}'),
               Text('閱讀時間: ${_formatTime(session.duration)}'),
               Text('開始頁數: ${session.startPage ?? 'N/A'}'),
               Text('結束頁數: ${session.endPage ?? 'N/A'}'),
