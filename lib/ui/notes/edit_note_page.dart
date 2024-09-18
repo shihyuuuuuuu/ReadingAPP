@@ -35,7 +35,7 @@ class EditNotePage extends StatelessWidget{
     final userBookViewModel = Provider.of<UserBooksViewModel>(context);
     
     return FutureBuilder<UserBook?>(
-      future: userBookViewModel.getUserBook(userBookId, userId),
+      future: userBookViewModel.getUserBook(userBookId, userBookViewModel.userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -56,7 +56,7 @@ class EditNotePage extends StatelessWidget{
             final noteViewModel = Provider.of<NotesViewModel>(context);
             //else fetch the data from db
             return FutureBuilder<Note?>(
-              future: noteViewModel.getNote(noteId, userId),
+              future: noteViewModel.getNote(noteId, noteViewModel.userId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -132,13 +132,13 @@ class _EditScaffoldState extends State<_EditScaffold> {
     final noteViewModel = Provider.of<NotesViewModel>(context, listen: false);
     note.updatedAt = Timestamp.now();
     if (note.id == null) {
-      note.id  = await noteViewModel.addNote(note, userId);
+      note.id  = await noteViewModel.addNote(note, noteViewModel.userId);
     } else {
-      noteViewModel.updateNote(note, note.id!, userId);
+      noteViewModel.updateNote(note, note.id!, noteViewModel.userId);
     }
 
     if(navToViewNote) {
-      Provider.of<NavigationService>(context, listen: false).goViewNote(note.id!);
+      Provider.of<NavigationService>(context, listen: false).goViewNote(note.id!, false);
     }
 
     // TODO: test if it really save and show

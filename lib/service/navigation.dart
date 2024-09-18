@@ -10,7 +10,6 @@ import 'package:reading_app/ui/bookshelf/bookshelf_page.dart';
 import 'package:reading_app/ui/bookshelf/chat_note_page.dart';
 import 'package:reading_app/ui/bookshelf/edit_book_page.dart';
 import 'package:reading_app/ui/bookshelf/reading_page.dart';
-import 'package:reading_app/ui/feed/feed.dart';
 import 'package:reading_app/ui/home/add_book_page.dart';
 import 'package:reading_app/ui/home/home.dart';
 import 'package:reading_app/ui/home/search_book_page.dart';
@@ -18,9 +17,6 @@ import 'package:reading_app/ui/login/login_page.dart';
 import 'package:reading_app/ui/notes/edit_note_page.dart';
 import 'package:reading_app/ui/notes/note_page.dart';
 import 'package:reading_app/ui/notes/viewnote_page.dart';
-import 'package:reading_app/ui/profile/friend_list_page.dart';
-import 'package:reading_app/ui/profile/profile.dart';
-import 'package:reading_app/ui/profile/setting_page.dart';
 import 'package:reading_app/ui/widget/scaffold_with_navbar.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
@@ -61,6 +57,13 @@ final router = GoRouter(
         // Note Routes
         ShellRoute(
           builder: (context, state, child) {
+            final userId = Provider.of<AuthenticationService>(context, listen: false)
+            .checkAndGetLoggedInUserId();
+        
+            if (userId == null) {
+              log('Warning: ShellRoute should not be built without a user');
+              return const SizedBox.shrink();
+            }
             return ChangeNotifierProvider(
               create: (_) => NotesViewModel(userId: userId),
               child:child,
@@ -140,26 +143,6 @@ final router = GoRouter(
             ),
           ],
         ),
-        // Activity Route
-        GoRoute(
-          path: '/feed',
-          builder: (context, state) => const FeedPage(),
-        ),
-        // Profile Routes
-        GoRoute(
-          path: '/profile',
-          builder: (context, state) => const ProfilePage(),
-          routes: [
-            GoRoute(
-              path: 'friendlist',
-              builder: (context, state) => FriendListPage(),
-            ),
-            GoRoute(
-              path: 'setting',
-              builder: (context, state) => SettingPage(),
-            ),
-          ],
-        ),
       ],
     ),
   ],
@@ -192,8 +175,10 @@ class NavigationService {
     return GoRouterState.of(context).uri.path;
   }
 
-  void _goRoute(String route) {
-    _navigationStack.add(route);
+  void _goRoute(String route, [bool popBack=true]) {
+    if (popBack) {
+      _navigationStack.add(route);
+    }
     _router.go(route);
     // print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
   }
@@ -217,23 +202,13 @@ class NavigationService {
     _goRoute('/home');
   }
 
-  void goFeed() {
-    _goAndClearRoute();
-    _goRoute('/feed');
+  void goViewNote(String noteId, [bool popBack=true]) {
+    _goRoute('/note/$noteId', popBack);
   }
 
-  void goProfile() {
-    _goAndClearRoute();
-    _goRoute('/profile');
-  }
-
-  void goViewNote(String noteId) {
-    _goRoute('/note/$noteId');
-  }
-
-  void goEditNote(String noteId, String userBookId) {
+  void goEditNote(String noteId, String userBookId, [bool popBack=true]) {
     // TODO if noteId is empty then goRoute cannot find the right page
-    _goRoute('/note/$noteId/$userBookId');
+    _goRoute('/note/$noteId/$userBookId', popBack);
   }
 
   void goBookDetail(String bookId) {
@@ -253,24 +228,13 @@ class NavigationService {
   }
 
   void goChatNote(String bookId) {
-    _goRoute('/book/$bookId/chatnote');
-  }
-
-  void goSearchBook() {
-    _goRoute('/home/searchbook');
+    _goRoute('/book/$bookId/chatnote', false);
   }
 
   void goAddBook(String bookId) {
     _goRoute('/home/searchbook/$bookId');
   }
 
-  void goFriendList() {
-    _goRoute('/profile/friendlist');
-  }
-
-  void goSetting() {
-    _goRoute('/profile/setting');
-  }
 
   void pop() {
     // print("pop, with current stack: ${_navigationStack.join("")}");

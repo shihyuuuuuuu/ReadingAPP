@@ -30,7 +30,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
 
 
     return FutureBuilder<Note?>(
-      future: noteViewModel.getNote(widget.noteId, userId),
+      future: noteViewModel.getNote(widget.noteId, noteViewModel.userId),
       builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -61,7 +61,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
                       icon: const Icon(Icons.edit_document), 
                       color: colorScheme.primary,
                       // TODO: fix navigation push and pop
-                      onPressed: () => {nav.goEditNote(widget.noteId, note.userBookId)}, 
+                      onPressed: () => {nav.goEditNote(widget.noteId, note.userBookId, false)}, 
                     ),
                   ),
                 ],
@@ -87,7 +87,7 @@ class _ViewNotePageState extends State<ViewNotePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 FutureBuilder<UserBook?>(
-                                  future: userBookViewModel.getUserBook(note.userBookId, userId),
+                                  future: userBookViewModel.getUserBook(note.userBookId, userBookViewModel.userId),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState == ConnectionState.waiting) {
                                       return const Center(child: CircularProgressIndicator());
