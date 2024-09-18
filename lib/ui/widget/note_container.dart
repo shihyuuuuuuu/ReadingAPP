@@ -47,23 +47,19 @@ class NoteContainerState extends State<NoteContainer> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IntrinsicHeight(
-                  child: Expanded(
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      title: Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          widget.note.title,
-                          style: textTheme.titleMedium,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'P.${widget.note.startPage}-${widget.note.endPage},  ${
-                          dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(widget.note.createdAt.millisecondsSinceEpoch))}',
-                        style: textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
-                      ),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  title: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      widget.note.title,
+                      style: textTheme.titleMedium,
                     ),
+                  ),
+                  subtitle: Text(
+                    'P.${widget.note.startPage}-${widget.note.endPage},  ${
+                      dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(widget.note.createdAt.millisecondsSinceEpoch))}',
+                    style: textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
                   ),
                 ),
                 Padding(

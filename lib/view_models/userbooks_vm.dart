@@ -27,11 +27,11 @@ class UserBooksViewModel with ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> addUserBook(UserBook newUserBook, String userId) async {
+  Future<void> addUserBook(UserBook newUserBook) async {
     await _userBookRepository.add(newUserBook, userId);
   }
 
-  Future<UserBook?> getUserBook(String userBookId, String userId) async {
+  Future<UserBook?> getUserBook(String userBookId) async {
     return await _userBookRepository.get(userBookId, userId);
   }
 }
