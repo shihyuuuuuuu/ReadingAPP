@@ -23,7 +23,7 @@ class ReadingPage extends StatefulWidget {
 }
 
 class _ReadingPageState extends State<ReadingPage> {
-  late Timer _timer;
+  Timer? _timer;
   final ValueNotifier<int> _elapsedSeconds = ValueNotifier<int>(0);
   bool _isRunning = false;
   int? _startPage;
@@ -36,7 +36,7 @@ class _ReadingPageState extends State<ReadingPage> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     _elapsedSeconds.dispose();
     _startPageController.dispose();
     _endPageController.dispose();
@@ -59,7 +59,7 @@ class _ReadingPageState extends State<ReadingPage> {
     setState(() {
       _isRunning = false;
     });
-    _timer.cancel();
+    _timer?.cancel();
   }
 
   Future<void> _endReadingSession() async {
@@ -188,12 +188,6 @@ class _ReadingPageState extends State<ReadingPage> {
                   nav.pop();
                 },
               ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () {},
-                ),
-              ],
             ),
             body: Center(
               child: Padding(
@@ -216,7 +210,7 @@ class _ReadingPageState extends State<ReadingPage> {
                       style: textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 32),
-                    ElevatedButton(
+                    FilledButton(
                       onPressed: _isRunning ? _pauseTimer : _startTimer,
                       child: Text(_isRunning
                           ? '暫停'
@@ -224,7 +218,7 @@ class _ReadingPageState extends State<ReadingPage> {
                     ),
                     const SizedBox(height: 16),
                     if (!_isRunning && _startTime != null) ...[
-                      ElevatedButton(
+                      FilledButton(
                         onPressed: _endReadingSession,
                         child: const Text('結束'),
                       ),
