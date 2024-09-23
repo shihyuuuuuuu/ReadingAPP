@@ -189,41 +189,43 @@ class _ReadingPageState extends State<ReadingPage> {
                 },
               ),
             ),
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 128, 16, 16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    TimerText(elapsedSeconds: _elapsedSeconds),
-                    const SizedBox(height: 32),
-                    Image.network(
-                      userBook.book.coverImage!,
-                      width: 140,
-                      height: 220,
-                      fit: BoxFit.cover,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      userBook.book.title,
-                      style: textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 32),
-                    FilledButton(
-                      onPressed: _isRunning ? _pauseTimer : _startTimer,
-                      child: Text(_isRunning
-                          ? '暫停'
-                          : (_startTime == null ? '開始' : '繼續')),
-                    ),
-                    const SizedBox(height: 16),
-                    if (!_isRunning && _startTime != null) ...[
-                      FilledButton(
-                        onPressed: _endReadingSession,
-                        child: const Text('結束'),
+            body: SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 128, 16, 16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TimerText(elapsedSeconds: _elapsedSeconds),
+                      const SizedBox(height: 32),
+                      Image.network(
+                        userBook.book.coverImage!,
+                        width: 140,
+                        height: 220,
+                        fit: BoxFit.cover,
                       ),
-                    ]
-                  ],
+                      const SizedBox(height: 16),
+                      Text(
+                        userBook.book.title,
+                        style: textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 32),
+                      FilledButton(
+                        onPressed: _isRunning ? _pauseTimer : _startTimer,
+                        child: Text(_isRunning
+                            ? '暫停'
+                            : (_startTime == null ? '開始' : '繼續')),
+                      ),
+                      const SizedBox(height: 16),
+                      if (!_isRunning && _startTime != null) ...[
+                        FilledButton(
+                          onPressed: _endReadingSession,
+                          child: const Text('結束'),
+                        ),
+                      ]
+                    ],
+                  ),
                 ),
               ),
             ),
