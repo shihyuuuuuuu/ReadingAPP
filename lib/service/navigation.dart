@@ -23,6 +23,7 @@ import 'package:reading_app/ui/profile/profile.dart';
 import 'package:reading_app/ui/profile/setting_page.dart';
 import 'package:reading_app/ui/widget/scaffold_with_navbar.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
+import 'package:reading_app/view_models/readingsession_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -40,11 +41,10 @@ final router = GoRouter(
     ),
     ShellRoute(
       navigatorKey: _sectionNavigatorKey,
-      
       builder: (context, state, child) {
         userId = Provider.of<AuthenticationService>(context, listen: false)
             .checkAndGetLoggedInUserId();
-        
+
         log("rebuild shellroute");
         if (userId == null) {
           log('Warning: ShellRoute should not be built without a user');
@@ -62,7 +62,7 @@ final router = GoRouter(
           builder: (context, state, child) {
             return ChangeNotifierProvider(
               create: (_) => NotesViewModel(userId: userId!),
-              child:child,
+              child: child,
             );
           },
           routes: [
@@ -77,15 +77,16 @@ final router = GoRouter(
                   routes: [
                     GoRoute(
                       path: ':userBookId',
-                      builder: (context, state) =>
-                          EditNotePage(noteId: state.pathParameters['noteId']!,
-                            userBookId: state.pathParameters['userBookId']!,),
+                      builder: (context, state) => EditNotePage(
+                        noteId: state.pathParameters['noteId']!,
+                        userBookId: state.pathParameters['userBookId']!,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-          ]
+          ],
         ),
         // Book Routes
         GoRoute(
@@ -104,8 +105,13 @@ final router = GoRouter(
                 ),
                 GoRoute(
                   path: 'reading',
-                  builder: (context, state) =>
-                      ReadingPage(bookId: state.pathParameters['bookId']),
+                  builder: (context, state) {
+                    return ChangeNotifierProvider(
+                      create: (_) => ReadingSessionViewModel(userId: userId!),
+                      child: ReadingPage(
+                          userBookId: state.pathParameters['bookId']!),
+                    );
+                  },
                 ),
                 GoRoute(
                   path: 'addnote',
@@ -166,7 +172,8 @@ final router = GoRouter(
     // final currentPath = state.uri.path;
     final isLoggedIn =
         Provider.of<AuthenticationService>(context, listen: false)
-                .checkAndGetLoggedInUserId() != null;
+                .checkAndGetLoggedInUserId() !=
+            null;
     log("current path ${state.uri.path}");
     if (isLoggedIn && state.uri.path == '/login') {
       return '/home';
@@ -176,7 +183,6 @@ final router = GoRouter(
     }
     return null;
   },
-  
 );
 
 class NavigationService {
