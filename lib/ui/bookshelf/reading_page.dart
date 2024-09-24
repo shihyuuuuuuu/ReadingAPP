@@ -155,7 +155,7 @@ class _ReadingPageState extends State<ReadingPage> {
             TextButton(
               onPressed: () {
                 // Provider.of<NavigationService>(context, listen: false).pop();
-                Provider.of<NavigationService>(context, listen: false).goChatNote(session.userBookId, session);
+                Provider.of<NavigationService>(context, listen: false).goChatNote(session);
                 Navigator.of(context).pop();
               },
               child: const Text('確定'),
