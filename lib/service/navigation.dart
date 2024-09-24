@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/models/reading_session.dart';
 import 'package:reading_app/service/authentication.dart';
 import 'package:reading_app/ui/bookshelf/book_detail_page.dart';
 import 'package:reading_app/ui/bookshelf/bookshelf_page.dart';
@@ -70,9 +71,11 @@ final router = GoRouter(
               builder: (context, state) => const NotePage(),
               routes: [
                 GoRoute(
-                  path: 'chatnote/:userBookId',
-                  builder: (context, state) =>
-                      ChatNotePage(bookId: state.pathParameters['userBookId']!),
+                  path: 'chatnote',
+                  builder: (context, state) {
+                      ReadingSession rs = state.extra as ReadingSession;
+                      return ChatNotePage(readingSession: rs);
+                  }
                 ),
                 GoRoute(
                   path: ':noteId',
@@ -179,6 +182,7 @@ final router = GoRouter(
   },
 );
 
+
 class NavigationService {
   late final GoRouter _router;
   final List<String> _navigationStack = [];
@@ -226,8 +230,9 @@ class NavigationService {
     _goRoute('/profile');
   }
 
-  void goChatNote(String userBookId) {
-    _goRoute('/note/chatnote/$userBookId');
+  void goChatNote(ReadingSession rs) {
+    // _goRoute('/note/chatnote/$userBookId', extra: rs);
+    _router.go('/note/chatnote', extra: rs);
   }
 
   void goViewNote(String noteId) {

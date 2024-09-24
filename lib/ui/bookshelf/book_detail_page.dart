@@ -267,7 +267,7 @@ class _BottomButtons extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           FilledButton(
-              onPressed: () => { nav.goChatNote(userBookId)}, 
+              onPressed: () => { nav.goReading(userBookId)}, 
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("開始閱讀",

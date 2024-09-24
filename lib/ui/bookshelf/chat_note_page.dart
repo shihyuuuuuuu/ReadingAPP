@@ -3,15 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/models/reading_session.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/ui/bookshelf/chat_note_vm.dart';
-import 'package:reading_app/view_models/notes_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 
 class ChatNotePage extends StatelessWidget {
-  final String bookId;
+  // final String bookId;
+  final ReadingSession readingSession;
 
-  const ChatNotePage({super.key, required this.bookId});
+  const ChatNotePage({
+    super.key, 
+    // required this.bookId, 
+    required this.readingSession
+  });
+
   @override
   Widget build(BuildContext context) {
     // final apiKey = Platform.environment['GEMINI_API_KEY'];
@@ -29,7 +35,8 @@ class ChatNotePage extends StatelessWidget {
             context.read<UserBooksViewModel>(),
             apiKey: apiKey, 
             prompt: prompt, 
-            userBookId: bookId
+            // userBookId: bookId, 
+            readingSession: readingSession,
           ),
           update: (context, userBookModel,  notifier) 
             => notifier!..update(userBookModel),

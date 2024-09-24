@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/note.dart';
+import 'package:reading_app/data/models/reading_session.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
@@ -15,9 +16,11 @@ import 'package:retry/retry.dart';
 class ChatNoteViewModel extends ChangeNotifier {
   final ScrollController scrollController = ScrollController();
   final List<ConversationDialog> chatContent = [];
-  final String userBookId;
+  // final String userBookId;
+  final ReadingSession readingSession;
   late GenerativeModel model;
   late ChatSession chat;
+
 
   UserBooksViewModel userBooksViewModel;
   // NotesViewModel notesViewModel;
@@ -31,12 +34,13 @@ class ChatNoteViewModel extends ChangeNotifier {
   bool get textFieldEnable => _textFieldEnable;
 
   ChatNoteViewModel(
-    this.userBooksViewModel, 
+    this.userBooksViewModel,  
     // this.notesViewModel,
     {
-    required this.userBookId, 
+    // required this.userBookId, 
     required String apiKey, 
-    required String prompt}) {
+    required String prompt,
+    required this.readingSession,}) {
     _initializeModel(apiKey, prompt);
   }
 
@@ -58,7 +62,7 @@ class ChatNoteViewModel extends ChangeNotifier {
 
   Future<void> sendStart() async {
 
-    UserBook? userbook = await userBooksViewModel.getUserBook(userBookId);
+    UserBook? userbook = await userBooksViewModel.getUserBook(readingSession.userBookId);
   
     String bookTitle = userbook!.book.title;
 
@@ -129,16 +133,22 @@ class ChatNoteViewModel extends ChangeNotifier {
     var content = Content.text(notePrompt);
     var response = await chat.sendMessage(content);
 
-    
     Map<String, dynamic> data = json.decode(response.text!);
     Timestamp now = Timestamp.now();
 
-    final userBook = <String, dynamic>{'userBookId': userBookId};
+
+    final userBook = <String, dynamic>{'userBookId': readingSession.userBookId};
     final createdAt = <String, dynamic>{'createdAt': now};
     final updatedAt = <String, dynamic>{'updatedAt': now};
+    final startPage = <String, dynamic>{'startPage': readingSession.startPage};
+    final endPage = <String, dynamic>{'endPage': readingSession.endPage};
+    final rsId = <String, dynamic>{'readingSessionId': readingSession.id};
     data.addEntries(createdAt.entries);
     data.addEntries(updatedAt.entries);
     data.addEntries(userBook.entries);
+    data.addEntries(startPage.entries);
+    data.addEntries(endPage.entries);
+    data.addEntries(rsId.entries);
     Note note = Note.fromMap(data, 'emptyid');
 
     note.id = await notesViewModel.addNote(note);
