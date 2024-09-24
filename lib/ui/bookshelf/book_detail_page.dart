@@ -84,7 +84,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
       ),
       body: FutureBuilder<UserBook?>(
-        future: viewModel.getUserBook(widget.userBookId, userId),
+        future: viewModel.getUserBook(widget.userBookId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -137,7 +137,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: NoteContainer(note: notes[index],),
+                          child: NoteContainer(
+                            note: notes[index],
+                          ),
                         );
                       },
                       childCount: notes.length,
@@ -273,9 +275,7 @@ class _BottomButtons extends StatelessWidget {
                         ?.copyWith(color: colorScheme.onPrimary)),
               )),
           FilledButton(
-              onPressed: () => {
-                nav.goEditNote("-", userBookId)
-              },
+              onPressed: () => {nav.goEditNote("-", userBookId)},
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("新增筆記",
