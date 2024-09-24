@@ -4,8 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/service/authentication.dart';
-import 'package:reading_app/ui/bookshelf/add_note_page.dart';
-import 'package:reading_app/main.dart';
 import 'package:reading_app/ui/bookshelf/book_detail_page.dart';
 import 'package:reading_app/ui/bookshelf/bookshelf_page.dart';
 import 'package:reading_app/ui/bookshelf/chat_note_page.dart';
@@ -111,18 +109,13 @@ final router = GoRouter(
                 ),
                 GoRoute(
                   path: 'reading',
-                  builder: (context, state) =>
-                      ReadingPage(bookId: state.pathParameters['bookId']),
-                ),
-                GoRoute(
-                  path: 'addnote',
-                  builder: (context, state) =>
-                      AddNotePage(bookId: state.pathParameters['bookId']),
-                ),
-                GoRoute(
-                  path: 'chatnote',
-                  builder: (context, state) =>
-                      ChatNotePage(bookId: state.pathParameters['bookId']),
+                  builder: (context, state) {
+                    return ChangeNotifierProvider(
+                      create: (_) => ReadingSessionViewModel(userId: userId!),
+                      child: ReadingPage(
+                          userBookId: state.pathParameters['bookId']!),
+                    );
+                  },
                 ),
               ],
             ),

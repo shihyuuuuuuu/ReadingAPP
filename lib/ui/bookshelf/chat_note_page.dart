@@ -15,7 +15,7 @@ class ChatNotePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final apiKey = Platform.environment['GEMINI_API_KEY'];
-    const apiKey = 'AIzaSyCE6J_rqycU0_GMF-MlzhjcnjpWmsA2458';
+    const apiKey = 'AIzaSyDcO8S_trwkrDBEYQ68Xl0hKgKRAvQhn18';
 
     return FutureBuilder<String>(
       future: loadPrompt(),

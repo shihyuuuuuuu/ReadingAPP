@@ -58,7 +58,7 @@ class ChatNoteViewModel extends ChangeNotifier {
 
   Future<void> sendStart() async {
 
-    UserBook? userbook = await userBooksViewModel.getUserBook(userBookId, userBooksViewModel.userId);
+    UserBook? userbook = await userBooksViewModel.getUserBook(userBookId);
   
     String bookTitle = userbook!.book.title;
 
@@ -141,7 +141,7 @@ class ChatNoteViewModel extends ChangeNotifier {
     data.addEntries(userBook.entries);
     Note note = Note.fromMap(data, 'emptyid');
 
-    note.id = await notesViewModel.addNote(note, notesViewModel.userId);
+    note.id = await notesViewModel.addNote(note);
     nav.goViewNote(note.id!);
 
   }
