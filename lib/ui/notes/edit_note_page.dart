@@ -138,7 +138,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
     }
 
     if(navToViewNote) {
-      Provider.of<NavigationService>(context, listen: false).goViewNote(note.id!, false);
+      Provider.of<NavigationService>(context, listen: false).goViewNote(note.id!);
     }
 
     // TODO: test if it really save and show
@@ -173,7 +173,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
         backgroundColor: colorScheme.surface,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => {nav.pop()}, 
+          onPressed: () => {nav.pop(context)}, 
           ),
         title: Text(
           note.title.isEmpty? "note title": note.title, 

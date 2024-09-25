@@ -8,11 +8,9 @@ import 'package:reading_app/service/authentication.dart';
 import 'package:reading_app/ui/bookshelf/book_detail_page.dart';
 import 'package:reading_app/ui/bookshelf/bookshelf_page.dart';
 import 'package:reading_app/ui/bookshelf/chat_note_page.dart';
-import 'package:reading_app/ui/bookshelf/edit_book_page.dart';
 import 'package:reading_app/ui/bookshelf/reading_page.dart';
 import 'package:reading_app/ui/home/add_book_page.dart';
 import 'package:reading_app/ui/home/home.dart';
-import 'package:reading_app/ui/home/search_book_page.dart';
 import 'package:reading_app/ui/login/login_page.dart';
 import 'package:reading_app/ui/notes/edit_note_page.dart';
 import 'package:reading_app/ui/notes/note_page.dart';
@@ -109,11 +107,6 @@ final router = GoRouter(
                   BookDetailPage(userBookId: state.pathParameters['bookId']!),
               routes: [
                 GoRoute(
-                  path: 'editbook',
-                  builder: (context, state) =>
-                      EditBookPage(bookId: state.pathParameters['bookId']),
-                ),
-                GoRoute(
                   path: 'reading',
                   builder: (context, state) {
                     return ChangeNotifierProvider(
@@ -133,15 +126,9 @@ final router = GoRouter(
           builder: (context, state) => const HomePage(),
           routes: [
             GoRoute(
-              path: 'searchbook',
-              builder: (context, state) => SearchBookPage(),
-              routes: [
-                GoRoute(
-                  path: ':bookId',
-                  builder: (context, state) =>
-                      AddBookPage(bookId: state.pathParameters['bookId']),
-                ),
-              ],
+              path: 'addBook',
+              builder: (context, state) =>
+                  AddBookPage(),
             ),
           ],
         ),
@@ -183,7 +170,7 @@ class NavigationService {
       _navigationStack.add(route);
     }
     _router.go(route);
-    print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
+    log('Go route: $route, with current stacks: ${_navigationStack.join("")}');
   }
 
   void _goAndClearRoute() {
@@ -194,10 +181,32 @@ class NavigationService {
     _goAndClearRoute();
     _goRoute('/note');
   }
+  
+  void goChatNote(ReadingSession rs) {
+    // _goRoute('/note/chatnote/$userBookId', extra: rs);
+    _router.go('/note/chatnote', extra: rs);
+    log('Go route: /note/chatnote, with current stacks: ${_navigationStack.join("")}');
+  }
 
+  void goViewNote(String noteId) {
+    _goRoute('/note/$noteId', false);
+  }
+
+  void goEditNote(String noteId, String userBookId) {
+    _goRoute('/note/$noteId/$userBookId', false);
+  }
+  
   void goBookshelf() {
     _goAndClearRoute();
     _goRoute('/book');
+  }
+
+  void goBookDetail(String bookId) {
+    _goRoute('/book/$bookId');
+  }
+
+  void goReading(String bookId) {
+    _goRoute('/book/$bookId/reading', false);
   }
 
   void goHome() {
@@ -205,44 +214,16 @@ class NavigationService {
     _goRoute('/home');
   }
 
-  void goViewNote(String noteId, [bool popBack=true]) {
-    _goRoute('/note/$noteId', popBack);
-  }
-
-  void goEditNote(String noteId, String userBookId, [bool popBack=true]) {
-    // TODO if noteId is empty then goRoute cannot find the right page
-    _goRoute('/note/$noteId/$userBookId', popBack);
-  }
-
-  void goBookDetail(String bookId) {
-    _goRoute('/book/$bookId');
-  }
-
-  void goEditBook(String bookId) {
-    _goRoute('/book/$bookId/editbook');
-  }
-
-  void goReading(String bookId) {
-    _goRoute('/book/$bookId/reading');
-  }
-
-  void goAddNote(String bookId) {
-    _goRoute('/book/$bookId/addnote');
-  }
-
-   void goChatNote(ReadingSession rs) {
-    // _goRoute('/note/chatnote/$userBookId', extra: rs);
-    _router.go('/note/chatnote', extra: rs);
-  }
-
   void goAddBook(String bookId) {
     _goRoute('/home/searchbook/$bookId');
   }
 
 
-  void pop() {
+  void pop(context) {
     if (_navigationStack.isNotEmpty) {
-      _navigationStack.removeLast();
+      if(_navigationStack.last == currentPath(context)) {
+        _navigationStack.removeLast();
+      }
       if (_navigationStack.isNotEmpty) {
         final previousRoute = _navigationStack.last;
         _router.go(previousRoute);
