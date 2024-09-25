@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/models/reading_session.dart';
 import 'package:reading_app/service/authentication.dart';
-import 'package:reading_app/ui/bookshelf/add_note_page.dart';
 import 'package:reading_app/ui/bookshelf/book_detail_page.dart';
 import 'package:reading_app/ui/bookshelf/bookshelf_page.dart';
 import 'package:reading_app/ui/bookshelf/chat_note_page.dart';
@@ -71,6 +71,13 @@ final router = GoRouter(
               builder: (context, state) => const NotePage(),
               routes: [
                 GoRoute(
+                  path: 'chatnote',
+                  builder: (context, state) {
+                      ReadingSession rs = state.extra as ReadingSession;
+                      return ChatNotePage(readingSession: rs);
+                  }
+                ),
+                GoRoute(
                   path: ':noteId',
                   builder: (context, state) =>
                       ViewNotePage(noteId: state.pathParameters['noteId']),
@@ -112,16 +119,6 @@ final router = GoRouter(
                           userBookId: state.pathParameters['bookId']!),
                     );
                   },
-                ),
-                GoRoute(
-                  path: 'addnote',
-                  builder: (context, state) =>
-                      AddNotePage(bookId: state.pathParameters['bookId']),
-                ),
-                GoRoute(
-                  path: 'chatnote',
-                  builder: (context, state) =>
-                      ChatNotePage(bookId: state.pathParameters['bookId']),
                 ),
               ],
             ),
@@ -185,6 +182,7 @@ final router = GoRouter(
   },
 );
 
+
 class NavigationService {
   late final GoRouter _router;
   final List<String> _navigationStack = [];
@@ -200,7 +198,7 @@ class NavigationService {
   void _goRoute(String route) {
     _navigationStack.add(route);
     _router.go(route);
-    // print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
+    print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
   }
 
   void _goAndClearRoute() {
@@ -232,6 +230,11 @@ class NavigationService {
     _goRoute('/profile');
   }
 
+  void goChatNote(ReadingSession rs) {
+    // _goRoute('/note/chatnote/$userBookId', extra: rs);
+    _router.go('/note/chatnote', extra: rs);
+  }
+
   void goViewNote(String noteId) {
     _goRoute('/note/$noteId');
   }
@@ -253,14 +256,6 @@ class NavigationService {
     _goRoute('/book/$bookId/reading');
   }
 
-  void goAddNote(String bookId) {
-    _goRoute('/book/$bookId/addnote');
-  }
-
-  void goChatNote(String bookId) {
-    _goRoute('/book/$bookId/chatnote');
-  }
-
   void goSearchBook() {
     _goRoute('/home/searchbook');
   }
@@ -278,7 +273,6 @@ class NavigationService {
   }
 
   void pop() {
-    // print("pop, with current stack: ${_navigationStack.join("")}");
     if (_navigationStack.isNotEmpty) {
       _navigationStack.removeLast();
       if (_navigationStack.isNotEmpty) {
@@ -290,7 +284,5 @@ class NavigationService {
     } else {
       _router.pop();
     }
-
-    // print("after pop, with current stack: ${_navigationStack.join("")}");
   }
 }

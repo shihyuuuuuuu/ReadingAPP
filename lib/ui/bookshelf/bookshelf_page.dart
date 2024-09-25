@@ -5,8 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/book.dart';
 import 'package:reading_app/data/models/user_book.dart';
 import 'package:reading_app/service/navigation.dart';
-import 'package:reading_app/theme/appbar_icon_style.dart';
-import 'package:reading_app/ui/widget/searching_dialog.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 
 class BookshelfPage extends StatefulWidget {
@@ -17,27 +15,9 @@ class BookshelfPage extends StatefulWidget {
 }
 
 class _BookshelfPageState extends State<BookshelfPage> {
-  String _searchCondition = "";
   final List<Book> books = [];
   final List<UserBook> userBooks = [];
 
-  Future<void> _showPopup(BuildContext context) async {
-    final result = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return const SearchingDialog(
-          searchHint: '輸入書名、作者或標籤',
-          history: ['习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'],
-        );
-      },
-    );
-
-    if (result != null) {
-      setState(() {
-        _searchCondition = result;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,18 +33,6 @@ class _BookshelfPageState extends State<BookshelfPage> {
           '書架',
           style: textTheme.headlineMedium,
         ),
-        actions: <Widget>[
-          appBarIconStyle(
-            colorScheme,
-            context,
-            IconButton(
-              iconSize: 28,
-              color: colorScheme.onSecondaryContainer,
-              icon: const Icon(Icons.search),
-              onPressed: () => _showPopup(context),
-            ),
-          ),
-        ],
       ),
       body: Center(child: Consumer<UserBooksViewModel>(
         builder: (context, viewModel, _) {
