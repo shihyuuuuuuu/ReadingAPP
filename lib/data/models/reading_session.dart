@@ -36,10 +36,6 @@ class ReadingSession extends MappableModel {
 
   @override
   factory ReadingSession.fromMap(Map<String, dynamic> map, String? id) {
-    final DateTime startTime = map['startTime'].toDate();
-    final DateTime endTime = map['endTime'].toDate();
-    final Duration difference = endTime.difference(startTime);
-
     return ReadingSession._(
       id: id,
       userBookId: map['userBookId'],
@@ -47,7 +43,7 @@ class ReadingSession extends MappableModel {
       endTime: map['endTime'],
       startPage: map['startPage'],
       endPage: map['endPage'],
-      duration: difference.inMinutes,
+      duration: map['duration'],
       earnedExp: map['earnedExp'],
     );
   }

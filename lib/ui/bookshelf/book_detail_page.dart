@@ -26,27 +26,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
   // TODO: [rear end]: books -> book, userBooks -> userBook
   final List<Note> notes = [];
 
-  Future<void> readJson() async {
-    // TODO: [rear end]: data fetching logic
-    final String dataStr = await rootBundle.loadString('assets/test_data.json');
-    final Map<String, dynamic> data = json.decode(dataStr);
-    setState(() {
-      for (var note in data['Note']) {
-        note['createdAt'] =
-            Timestamp.fromDate(DateTime.parse(note['createdAt']));
-        note['updatedAt'] =
-            Timestamp.fromDate(DateTime.parse(note['updatedAt']));
-        final newNote = Note.fromMap(note, note['id']);
-        notes.add(newNote);
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    readJson();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +84,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
       ),
       body: FutureBuilder<UserBook?>(
-        future: viewModel.getUserBook(widget.userBookId, viewModel.userId),
+        future: viewModel.getUserBook(widget.userBookId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -158,7 +137,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: NoteContainer(note: notes[index],),
+                          child: NoteContainer(
+                            note: notes[index],
+                          ),
                         );
                       },
                       childCount: notes.length,
@@ -256,7 +237,7 @@ class _BookInfoContainer extends StatelessWidget {
 }
 
 class _BottomButtons extends StatelessWidget {
-  final userBookId;
+  final String userBookId;
 
   const _BottomButtons({
     super.key,
@@ -265,6 +246,7 @@ class _BottomButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final nav = Provider.of<NavigationService>(context, listen: false);
@@ -285,7 +267,7 @@ class _BottomButtons extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           FilledButton(
-              onPressed: () => {},
+              onPressed: () => { nav.goReading(userBookId)}, 
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("開始閱讀",
@@ -293,9 +275,7 @@ class _BottomButtons extends StatelessWidget {
                         ?.copyWith(color: colorScheme.onPrimary)),
               )),
           FilledButton(
-              onPressed: () => {
-                nav.goEditNote("-", userBookId)
-              },
+              onPressed: () => {nav.goEditNote("-", userBookId)},
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text("新增筆記",

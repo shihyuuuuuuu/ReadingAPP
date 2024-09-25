@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/note.dart';
-import 'package:reading_app/theme/appbar_icon_style.dart';
 import 'package:reading_app/ui/widget/note_container.dart';
-import 'package:reading_app/ui/widget/searching_dialog.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
 
 class NotePage extends StatefulWidget {
@@ -15,28 +13,8 @@ class NotePage extends StatefulWidget {
 }
 
 class _NotePageState extends State<NotePage> {
-  String _searchCondition = "";
   List<Note> notes = [];
     
-  Future<void> _showPopup(BuildContext context) async {
-    final result = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return const SearchingDialog(
-          searchHint: '輸入筆記名稱或相關內容',
-            history: [
-              '习惯', '成长型思维', 'DRY', '自我察觉练习', '索引笔记', '便条纸笔记'
-            ],
-        );
-      },
-    );
-    if (result != null) {
-      setState(() {
-        _searchCondition = result;
-      });
-    }
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +29,6 @@ class _NotePageState extends State<NotePage> {
           '我的筆記', 
           style: textTheme.headlineMedium,
         ),
-        actions: <Widget>[
-          appBarIconStyle(colorScheme, context,  
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                _showPopup(context);           // Search logic here
-              },
-            ),
-          )
-        ],
       ),
       body: Consumer<NotesViewModel>(
         builder: (context, viewModel, _) {

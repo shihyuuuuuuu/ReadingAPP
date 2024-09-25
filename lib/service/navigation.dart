@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:reading_app/data/models/reading_session.dart';
 import 'package:reading_app/service/authentication.dart';
-import 'package:reading_app/ui/bookshelf/add_note_page.dart';
 import 'package:reading_app/ui/bookshelf/book_detail_page.dart';
 import 'package:reading_app/ui/bookshelf/bookshelf_page.dart';
 import 'package:reading_app/ui/bookshelf/chat_note_page.dart';
@@ -19,13 +19,13 @@ import 'package:reading_app/ui/notes/note_page.dart';
 import 'package:reading_app/ui/notes/viewnote_page.dart';
 import 'package:reading_app/ui/widget/scaffold_with_navbar.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
+import 'package:reading_app/view_models/readingsession_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
-// TODO: Use a hardcoded test ID from the Firebase before we can obtain the actual User ID.
-// String? userId = 'MXWzgPVPjIjyutDPcBvx';
+String? userId;
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -37,11 +37,10 @@ final router = GoRouter(
     ),
     ShellRoute(
       navigatorKey: _sectionNavigatorKey,
-      
       builder: (context, state, child) {
-        final userId = Provider.of<AuthenticationService>(context, listen: false)
+        userId = Provider.of<AuthenticationService>(context, listen: false)
             .checkAndGetLoggedInUserId();
-        
+
         log("rebuild shellroute");
         if (userId == null) {
           log('Warning: ShellRoute should not be built without a user');
@@ -49,7 +48,7 @@ final router = GoRouter(
         }
         // the provider will be disposed automatically when it is not in widget tree
         return ChangeNotifierProvider(
-          create: (_) => UserBooksViewModel(userId: userId),
+          create: (_) => UserBooksViewModel(userId: userId!),
           child: ScaffoldWithNavbar(child),
         );
       },
@@ -65,8 +64,8 @@ final router = GoRouter(
               return const SizedBox.shrink();
             }
             return ChangeNotifierProvider(
-              create: (_) => NotesViewModel(userId: userId),
-              child:child,
+              create: (_) => NotesViewModel(userId: userId!),
+              child: child,
             );
           },
           routes: [
@@ -75,21 +74,29 @@ final router = GoRouter(
               builder: (context, state) => const NotePage(),
               routes: [
                 GoRoute(
+                  path: 'chatnote',
+                  builder: (context, state) {
+                      ReadingSession rs = state.extra as ReadingSession;
+                      return ChatNotePage(readingSession: rs);
+                  }
+                ),
+                GoRoute(
                   path: ':noteId',
                   builder: (context, state) =>
                       ViewNotePage(noteId: state.pathParameters['noteId']),
                   routes: [
                     GoRoute(
                       path: ':userBookId',
-                      builder: (context, state) =>
-                          EditNotePage(noteId: state.pathParameters['noteId']!,
-                            userBookId: state.pathParameters['userBookId']!,),
+                      builder: (context, state) => EditNotePage(
+                        noteId: state.pathParameters['noteId']!,
+                        userBookId: state.pathParameters['userBookId']!,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-          ]
+          ],
         ),
         // Book Routes
         GoRoute(
@@ -108,18 +115,13 @@ final router = GoRouter(
                 ),
                 GoRoute(
                   path: 'reading',
-                  builder: (context, state) =>
-                      ReadingPage(bookId: state.pathParameters['bookId']),
-                ),
-                GoRoute(
-                  path: 'addnote',
-                  builder: (context, state) =>
-                      AddNotePage(bookId: state.pathParameters['bookId']),
-                ),
-                GoRoute(
-                  path: 'chatnote',
-                  builder: (context, state) =>
-                      ChatNotePage(bookId: state.pathParameters['bookId']),
+                  builder: (context, state) {
+                    return ChangeNotifierProvider(
+                      create: (_) => ReadingSessionViewModel(userId: userId!),
+                      child: ReadingPage(
+                          userBookId: state.pathParameters['bookId']!),
+                    );
+                  },
                 ),
               ],
             ),
@@ -150,7 +152,8 @@ final router = GoRouter(
     // final currentPath = state.uri.path;
     final isLoggedIn =
         Provider.of<AuthenticationService>(context, listen: false)
-                .checkAndGetLoggedInUserId() != null;
+                .checkAndGetLoggedInUserId() !=
+            null;
     log("current path ${state.uri.path}");
     if (isLoggedIn && state.uri.path == '/login') {
       return '/home';
@@ -160,8 +163,8 @@ final router = GoRouter(
     }
     return null;
   },
-  
 );
+
 
 class NavigationService {
   late final GoRouter _router;
@@ -180,7 +183,7 @@ class NavigationService {
       _navigationStack.add(route);
     }
     _router.go(route);
-    // print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
+    print('Go route: $route, with current stacks: ${_navigationStack.join("")}');
   }
 
   void _goAndClearRoute() {
@@ -227,8 +230,9 @@ class NavigationService {
     _goRoute('/book/$bookId/addnote');
   }
 
-  void goChatNote(String bookId) {
-    _goRoute('/book/$bookId/chatnote', false);
+   void goChatNote(ReadingSession rs) {
+    // _goRoute('/note/chatnote/$userBookId', extra: rs);
+    _router.go('/note/chatnote', extra: rs);
   }
 
   void goAddBook(String bookId) {
@@ -237,7 +241,6 @@ class NavigationService {
 
 
   void pop() {
-    // print("pop, with current stack: ${_navigationStack.join("")}");
     if (_navigationStack.isNotEmpty) {
       _navigationStack.removeLast();
       if (_navigationStack.isNotEmpty) {
@@ -249,7 +252,5 @@ class NavigationService {
     } else {
       _router.pop();
     }
-
-    // print("after pop, with current stack: ${_navigationStack.join("")}");
   }
 }
