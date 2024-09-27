@@ -80,7 +80,7 @@ class _ChatNoteViewState extends State<ChatNoteView> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); 
-                  nav.pop(); // TODO: pop but skip /book/$bookid/reading page
+                  nav.pop(context); // TODO: pop but skip /book/$bookid/reading page
                 },
                 child: const Text("確認"),
               ),
@@ -109,7 +109,7 @@ class _ChatNoteViewState extends State<ChatNoteView> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            nav.pop(); // TODO: 同_showPopUP 裡面的 確認
+            nav.pop(context); // TODO: 同_showPopUP 裡面的 確認
         },),
         title: Text("記筆記", style: textTheme.titleMedium),
       ),

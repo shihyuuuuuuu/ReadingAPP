@@ -54,34 +54,34 @@ class _BookDetailPageState extends State<BookDetailPage> {
           onPressed: () => {}),
     ];
 
-    final List<PopupEvent> bookDetailPopup = [
-      PopupEvent(
-          icon: const Icon(Icons.edit_document),
-          text: '編輯書籍資訊',
-          onPressed: () => {}),
-      PopupEvent(
-        icon: const Icon(Icons.table_chart_outlined), //autorenew
-        text: '更改狀態',
-        onPressed: () => showPopup(context, bookStatePopUp),
-      )
-    ];
+    // final List<PopupEvent> bookDetailPopup = [
+    //   PopupEvent(
+    //       icon: const Icon(Icons.edit_document),
+    //       text: '編輯書籍資訊',
+    //       onPressed: () => {}),
+    //   PopupEvent(
+    //     icon: const Icon(Icons.table_chart_outlined), //autorenew
+    //     text: '更改狀態',
+    //     onPressed: () => showPopup(context, bookStatePopUp),
+    //   )
+    // ];
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            nav.pop();
+            nav.pop(context);
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              showPopup(context, bookDetailPopup);
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.more_vert),
+        //     onPressed: () {
+        //       showPopup(context, bookDetailPopup);
+        //     },
+        //   ),
+        // ],
       ),
       body: FutureBuilder<UserBook?>(
         future: viewModel.getUserBook(widget.userBookId),
@@ -104,13 +104,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       children: [
                         _BookInfoContainer(userBook: userBook),
                         const SizedBox(
-                          height: 10,
+                          height: 20,
                         ),
-                        Text('書籍狀態：${userBook.state.displayName}',
-                            style: textTheme.bodyMedium),
-                        const SizedBox(
-                          height: 10,
-                        ),
+                        // Text('書籍狀態：${userBook.state.displayName}',
+                        //     style: textTheme.bodyMedium),
+                        // const SizedBox(
+                        //   height: 10,
+                        // ),
                         TagArea(tagLabels: (userBook.book.categories)),
                         const SizedBox(
                           height: 16,

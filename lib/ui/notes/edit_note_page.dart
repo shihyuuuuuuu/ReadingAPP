@@ -173,7 +173,7 @@ class _EditScaffoldState extends State<_EditScaffold> {
         backgroundColor: colorScheme.surface,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => {nav.pop()}, 
+          onPressed: () => {nav.pop(context)}, 
           ),
         title: Text(
           note.title.isEmpty? "note title": note.title, 

@@ -49,9 +49,7 @@ class ScaffoldWithNavbar extends StatelessWidget {
   bool _showBottomNavigationBar(String currentPath) {
     return (currentPath == "/book" ||
         currentPath == "/note" ||
-        currentPath == "/home" ||
-        currentPath == "/feed" ||
-        currentPath == "/profile");
+        currentPath == "/home" );
   }
 
   int _getCurrentIndex(String currentPath) {
@@ -62,10 +60,6 @@ class ScaffoldWithNavbar extends StatelessWidget {
         return 1;
       case '/home':
         return 2;
-      case '/feed':
-        return 3;
-      case '/profile':
-        return 4;
       default:
         return 2;
     }
@@ -82,12 +76,6 @@ class ScaffoldWithNavbar extends StatelessWidget {
         break;
       case 2:
         nav.goHome();
-        break;
-      case 3:
-        nav.goFeed();
-        break;
-      case 4:
-        nav.goProfile();
         break;
     }
   }
