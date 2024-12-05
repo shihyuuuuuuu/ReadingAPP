@@ -18,13 +18,14 @@ dependencies:
   intl: ^0.19.0
   cloud_firestore: ^5.2.1
   firebase_core: ^3.3.0
-  google_generative_ai: ^0.4.6
+  # google_generative_ai: ^0.4.6
   path_provider: ^2.1.4
   retry: ^3.1.2
   firebase_auth: ^5.1.4
-  flutter_svg: ^2.0.10+1
+  flutter_svg: ^2.0.9
   google_sign_in: ^6.2.1
   flutter_native_splash: ^2.4.1
+  requests: ^4.7.0
 
 dev_dependencies:
   flutter_test:

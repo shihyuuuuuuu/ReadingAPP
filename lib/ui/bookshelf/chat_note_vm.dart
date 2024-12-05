@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+// import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_app/data/models/note.dart';
 import 'package:reading_app/data/models/reading_session.dart';
@@ -12,14 +13,30 @@ import 'package:reading_app/service/navigation.dart';
 import 'package:reading_app/view_models/notes_vm.dart';
 import 'package:reading_app/view_models/userbooks_vm.dart';
 import 'package:retry/retry.dart';
+import 'package:requests/requests.dart';
 
 class ChatNoteViewModel extends ChangeNotifier {
   final ScrollController scrollController = ScrollController();
   final List<ConversationDialog> chatContent = [];
   // final String userBookId;
   final ReadingSession readingSession;
-  late GenerativeModel model;
-  late ChatSession chat;
+  // late GenerativeModel model;
+  // late ChatSession chat;
+  List<Map<String, String>> chatHistory = [];
+  final Map<String, String> headers = {
+    'Authorization': 'API_KEY',
+    'Content-Type': 'application/json',
+  };
+
+  Map<String, dynamic> payload = {
+    "providers": ["openai"],
+    "chatbot_global_action": "Act as an assistant",
+    "previous_history": [],
+    "temperature": 0.7,
+    "max_tokens": 200,
+    "fallback_providers": "replicate",
+    "text": "",
+  };
 
 
   UserBooksViewModel userBooksViewModel;
@@ -45,19 +62,26 @@ class ChatNoteViewModel extends ChangeNotifier {
   }
 
   void _initializeModel(String apiKey, String prompt) {
-    model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
-      apiKey: apiKey,
-      generationConfig: GenerationConfig(maxOutputTokens: 500),
-      systemInstruction: Content.system(prompt),
-      safetySettings: [
-        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.none),
-        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.none),
-        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.none),
-        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.none),
-      ],
+    chatHistory.add({'role': 'assistant', 'message': prompt});
+  }
+
+  Future<String> fetchResponseText(
+    Map<String, String> headers, Map<String, dynamic> payload
+  ) async {
+    const String url = 'https://api.edenai.run/v2/text/chat';
+    var r = await Requests.post(
+      url,
+      headers: headers,
+      json: payload,
     );
-    chat = model.startChat();
+
+    if (r.statusCode == 200) {
+      Map<String, dynamic> response = r.json();
+      print(response);
+      return response['openai/gpt-3.5-turbo']['generated_text'];
+    }
+
+    return 'Error: ${r.statusCode}';
   }
 
   Future<void> sendStart() async {
@@ -65,10 +89,13 @@ class ChatNoteViewModel extends ChangeNotifier {
     UserBook? userbook = await userBooksViewModel.getUserBook(readingSession.userBookId);
   
     String bookTitle = userbook!.book.title;
+    payload['previous_history'] = chatHistory;
+    payload['text'] = '今天閱讀的書： $bookTitle';
 
-    var response = await chat.sendMessage(Content.text('閱讀書籍：$bookTitle'));
-
-    chatContent.add(ConversationDialog(text: response.text!, isUser: false));
+    String responseText = await fetchResponseText(headers, payload);
+    print(responseText);
+    chatHistory.add({'role': 'assistant', 'message': responseText});
+    chatContent.add(ConversationDialog(text: responseText, isUser: false));
 
     _startChat = true;
     _textFieldEnable = true;
@@ -79,6 +106,7 @@ class ChatNoteViewModel extends ChangeNotifier {
   Future<void> userSubmit(String userInput) async {
     _textFieldEnable = false;
 
+    chatHistory.add({'role': 'user', 'message': userInput});
     chatContent.add(ConversationDialog(text: userInput, isUser: true));
     notifyListeners();
 
@@ -90,17 +118,19 @@ class ChatNoteViewModel extends ChangeNotifier {
     notifyListeners();
 
     print('[user input]: $userInput');
-    var content = Content.text(userInput);
+    // var content = Content.text(userInput);
     final r = RetryOptions(maxAttempts: 3); // Retry up to 3 times
 
+    payload['previous_history'] = chatHistory;
+    payload['text'] = userInput;
     try {
-      
-      final response = await r.retry(
-
+      await r.retry(
         () async {
-          var modelResponse = await chat.sendMessage(content);
-          String text = modelResponse.text!.replaceAll('\n', '');
+          String responseText = await fetchResponseText(headers, payload);
+          String text = responseText.replaceAll('\n', '');
+          print(responseText);
           text = text.replaceAll(' ', '');
+          text = text.replaceAll('**', '');
 
           if (text.endsWith('<end>')) {
             _noteTakingFinish = true;
@@ -108,6 +138,7 @@ class ChatNoteViewModel extends ChangeNotifier {
           }
 
           chatContent.removeLast();
+          chatHistory.add({'role': 'assistant', 'message': text});
           chatContent.add(ConversationDialog(text: text, isUser: false));
           _textFieldEnable = true;
 
@@ -115,10 +146,8 @@ class ChatNoteViewModel extends ChangeNotifier {
 
         },
         // Retry on specific exceptions
-        retryIf: (e) => e is ServerException || e is GenerativeAIException,
+        // retryIf: (e) => e is ServerException || e is GenerativeAIException,
       );
-
-    
     } catch (e) {
       print('Failed after retrying: $e');
     }
@@ -130,10 +159,16 @@ class ChatNoteViewModel extends ChangeNotifier {
     var nav = Provider.of<NavigationService>(context, listen: false);
 
     String notePrompt = await rootBundle.loadString('assets/note_prompt.txt');
-    var content = Content.text(notePrompt);
-    var response = await chat.sendMessage(content);
+    chatHistory.add({'role': 'assistant', 'message': notePrompt});
+    payload['previous_history'] = chatHistory;
+    payload['max_tokens'] = 500;
 
-    Map<String, dynamic> data = json.decode(response.text!);
+    String responseText = await fetchResponseText(headers, payload);
+    print(responseText);
+    // var content = Content.text(notePrompt);
+    // var response = await chat.sendMessage(content);
+
+    Map<String, dynamic> data = json.decode(responseText);
     Timestamp now = Timestamp.now();
 
 
